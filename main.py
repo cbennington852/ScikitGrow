@@ -80,7 +80,6 @@ def render_csv():
 
 
 def render_pipeline():
-
     # make top control buttons
     top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     control_button = Gtk.Button(label="Add Pipeline")
@@ -115,6 +114,8 @@ def render_top_bar():
 
 
 
+
+
 class MyApplication(Gtk.Application):
     def __init__(self):
         super().__init__(application_id="com.example.MyGtkApplication")
@@ -135,13 +136,18 @@ class MyApplication(Gtk.Application):
             orientation=Gtk.Orientation.VERTICAL,
             spacing=10,
         )
-        add_style(right_box, "chart")
 
         # The main box
         main_box = Gtk.Box (
             orientation=Gtk.Orientation.HORIZONTAL,
             spacing=10,
         )
+
+
+        # chart stuff
+        chart_box = Gtk.Box()
+        add_style(chart_box , 'chart')
+        right_box.append(chart_box)
 
     
         # The csv viewer
@@ -152,14 +158,10 @@ class MyApplication(Gtk.Application):
         pipeline_box = render_pipeline()
         left_box.append(pipeline_box)
 
-        # chart stuff
-        chart_box = Gtk.Box()
-        add_style(chart_box , 'chart')
-        left_box.append(chart_box)
-
-        # end of loop stuff
+        # adding left and right boxes
         main_box.append(left_box)
         main_box.append(right_box)
+        # adding main box
         window.set_child(main_box)
         window.set_titlebar(render_top_bar())
         load_css_file()
