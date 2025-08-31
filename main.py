@@ -8,6 +8,7 @@ from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
 import viewclasses
 import standard_box
+import sklearn_proccesses
 
 
 css_file_path = "./styles.css"
@@ -112,7 +113,17 @@ def render_top_bar():
     header_bar.set_show_title_buttons(True)
     return header_bar
 
+def render_block_library():
+    main_box = standard_box.StdBox(
+        header_box=Gtk.Box(),
+        body_box=Gtk.Box()
+    )
 
+    return main_box
+
+def render_graph():
+    main_box = sklearn_proccesses.PlottingBox()
+    return main_box
 
 
 
@@ -124,43 +135,42 @@ class MyApplication(Gtk.Application):
     def do_activate(self):
         # the main window
         window = Gtk.ApplicationWindow(application=self, title="Hello World")
-        window.set_default_size(600, 600)
+        window.set_default_size(1200, 900)
 
         # left side
-        left_box = Gtk.Box(
+        left_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
-            spacing=10,
         )
         # right side
-        right_box = Gtk.Box(
+        right_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
-            spacing=10,
         )
 
         # The main box
-        main_box = Gtk.Box (
+        main_box = Gtk.Paned (
             orientation=Gtk.Orientation.HORIZONTAL,
-            spacing=10,
         )
 
 
         # chart stuff
-        chart_box = Gtk.Box()
-        add_style(chart_box , 'chart')
-        right_box.append(chart_box)
+        chart_box = render_graph()
+        right_box.set_start_child(chart_box)
 
+        # block library stuff
+        block_library = render_block_library()
+        right_box.set_end_child(block_library)
     
         # The csv viewer
         csv_veiwer_box = render_csv()
-        left_box.append(csv_veiwer_box)
+        left_box.set_start_child(csv_veiwer_box )
 
         # pipeline 
         pipeline_box = render_pipeline()
-        left_box.append(pipeline_box)
+        left_box.set_end_child(pipeline_box )
 
         # adding left and right boxes
-        main_box.append(left_box)
-        main_box.append(right_box)
+        main_box.set_start_child(left_box)
+        main_box.set_end_child(right_box)
         # adding main box
         window.set_child(main_box)
         window.set_titlebar(render_top_bar())

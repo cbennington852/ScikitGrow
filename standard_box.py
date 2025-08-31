@@ -20,11 +20,14 @@ class StdBox(Gtk.Box):
         add_style(header_box , 'header-box')
         for child in header_box:
             add_style(child, 'header-button')
-        main_box.append(header_box)
+        main_box.set_hexpand(True)
+        main_box.set_vexpand(True)
 
         main_box.append(header_box)
         main_box.append(body_box)
         self.append(main_box)
+
+
 
 
 
