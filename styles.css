@@ -1,0 +1,15 @@
+.bordered-box {
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #eef;
+        }
+
+.chart {
+  border: 2px solid #4a90e2;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #eef;
+    float: right;
+
+}
