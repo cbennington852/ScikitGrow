@@ -7,6 +7,7 @@ from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
 
 import viewclasses
+import standard_box
 
 
 css_file_path = "./styles.css"
@@ -36,12 +37,20 @@ def add_style(gui_thing , class_name):
     gui_thing.get_style_context().add_class(class_name)
 
 def render_csv():
-    scrolled_window = Gtk.ScrolledWindow()
-    
+    # make top control buttons
+    top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+    control_button = Gtk.Button(label="Edit CSV")
+    top_control_box.append(control_button)
 
-    scrolled_window.set_policy(Gtk.PolicyType.ALWAYS, Gtk.PolicyType.ALWAYS)
+
+    scrolled_window = Gtk.ScrolledWindow()
+    scrolled_window.set_size_request(300,300)
+    scrolled_window.set_hexpand(True)
+    scrolled_window.set_vexpand(True)
+
+
+    scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     csv_viewer_box = Gtk.Box()
-    csv_viewer_box.get_style_context().add_class("bordered-box")
     # read csv
     csv_data = read_csv_data("./customers-100.csv")
     liststore = Gtk.ListStore(*([str] * len(csv_data[0])))
@@ -61,13 +70,23 @@ def render_csv():
     # Add the TreeView (not the ListStore!) to the container
     csv_viewer_box.append(treeview)
     scrolled_window.set_child(csv_viewer_box)
-    scrolled_window.set_max_content_height(300)
-    scrolled_window.set_max_content_width(300)
-    return scrolled_window
+    add_style(scrolled_window , 'csv-reader ')
+
+    main_box = standard_box.StdBox(
+        header_box=top_control_box,
+        body_box=scrolled_window
+    )
+    return main_box
 
 
 def render_pipeline():
-    main_box = Gtk.Box()
+
+    # make top control buttons
+    top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+    control_button = Gtk.Button(label="Add Pipeline")
+    top_control_box.append(control_button)
+
+    # drag and drop demo
     flow_box = Gtk.FlowBox()
     views_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     views_box.props.vexpand = True
@@ -76,8 +95,16 @@ def render_pipeline():
     flow_box.append(viewclasses.SourceFlowBoxChild("Item 2", "help-about"))
     flow_box.append(viewclasses.SourceFlowBoxChild("Item 3", "edit-copy"))
     views_box.append(viewclasses.TargetView(vexpand=True))
-    main_box.append(flow_box)
-    main_box.append(views_box)
+    drop_demo = Gtk.Box()
+    drop_demo.append(views_box)
+    drop_demo.append(flow_box)
+    
+    # create a standard box
+    main_box = standard_box.StdBox(
+        header_box=top_control_box,
+        body_box=drop_demo
+    )
+
     return main_box
 
 
@@ -119,8 +146,6 @@ class MyApplication(Gtk.Application):
     
         # The csv viewer
         csv_veiwer_box = render_csv()
-        add_style(csv_veiwer_box , "csv-viewer")
-        csv_veiwer_box.set_size_request(300,300)
         left_box.append(csv_veiwer_box)
 
         # pipeline 
