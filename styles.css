@@ -9,7 +9,6 @@
   border: 2px solid #4a90e2;
     padding: 10px;
     background-color: #eef;
-    float: right;
 
 }
 
@@ -20,11 +19,28 @@
 
 
 
+
+
+
 /*
 Standard frame related things 
 */
+.block-library{
+  min-width: 100px;
+  min-height: 300px;
+}
+
+.block-green {
+  background-color : #11793b;
+  margin: 10px;
+  border-radius: 10px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
 .frame {
-    border: 2px solid #424242;
+    border: 6px solid #424242;
     border-radius: 6px;
     background-color: #dddddd;
 }

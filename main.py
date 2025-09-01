@@ -9,6 +9,7 @@ from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 import viewclasses
 import standard_box
 import sklearn_proccesses
+import block_libary
 
 
 css_file_path = "./styles.css"
@@ -114,12 +115,22 @@ def render_top_bar():
     return header_bar
 
 def render_block_library():
+    # make a search bar
+    search_bar = Gtk.SearchEntry()
+    search_bar.set_placeholder_text("Search for blocks...")
+    search_bar.connect("search-changed", searching_block_library)
+
+    block_library_var = block_libary.BlockLibary()
+
     main_box = standard_box.StdBox(
-        header_box=Gtk.Box(),
-        body_box=Gtk.Box()
+        header_box=search_bar,
+        body_box=block_library_var
     )
 
     return main_box
+
+def searching_block_library(search_entry):
+    print(f"Query {str(search_entry)}")
 
 def render_graph():
     main_box = sklearn_proccesses.PlottingBox()
@@ -134,23 +145,25 @@ class MyApplication(Gtk.Application):
 
     def do_activate(self):
         # the main window
-        window = Gtk.ApplicationWindow(application=self, title="Hello World")
+        window = Gtk.ApplicationWindow(application=self, title="Sklearn GUI software")
         window.set_default_size(1200, 900)
 
         # left side
         left_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
         )
+        add_style(left_box , 'back-area')
         # right side
         right_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
         )
+        add_style(right_box , 'back-area')
 
         # The main box
         main_box = Gtk.Paned (
             orientation=Gtk.Orientation.HORIZONTAL,
         )
-
+        add_style(main_box , 'back-area')
 
         # chart stuff
         chart_box = render_graph()

@@ -4,6 +4,7 @@ import csv
 import gi
 
 gi.require_version("Gtk", "4.0")
+import block_libary
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
 
@@ -67,24 +68,14 @@ class TargetView(Gtk.Box):
         drop_controller = Gtk.DropTarget.new(
             type=GObject.TYPE_NONE, actions=Gdk.DragAction.COPY
         )
-        drop_controller.set_gtypes([SourceFlowBoxChild, Gdk.FileList, str])
+        drop_controller.set_gtypes([block_libary.ModelBlock])
         drop_controller.connect("drop", self.on_drop)
         self.add_controller(drop_controller)
 
     def on_drop(self, _ctrl, value, _x, _y):
-        if isinstance(value, SourceFlowBoxChild):
-            self.label.props.label = value.name
-            self.icon.props.icon_name = value.icon_name
+        if isinstance(value, block_libary.ModelBlock):
+            self.label.props.label = str(value.sklearn_model_function_call)
             self.stack.set_visible_child_name("item")
-
-        elif isinstance(value, Gdk.FileList):
-            files = value.get_files()
-            names = ""
-            for file in files:
-                names += f"Loaded file {file.get_basename()}\n"
-            self.text.props.label = names
-            self.stack.set_visible_child_name("other")
-
-        elif isinstance(value, str):
-            self.text.props.label = value
-            self.stack.set_visible_child_name("other")
+            #self.append(value)
+        else:
+            print(f"some kinda bug? {value}")
