@@ -13,6 +13,7 @@ import pipeline
 
 
 css_file_path = "./styles.css"
+block_library_var : block_libary.BlockLibary = block_libary.BlockLibary()
 
 def load_css_file():
         with open(css_file_path) as f:
@@ -110,8 +111,6 @@ def render_block_library():
     search_bar.set_placeholder_text("Search for blocks...")
     search_bar.connect("search-changed", searching_block_library)
 
-    block_library_var = block_libary.BlockLibary()
-
     main_box = standard_box.StdBox(
         header_box=search_bar,
         body_box=block_library_var
@@ -120,7 +119,21 @@ def render_block_library():
     return main_box
 
 def searching_block_library(search_entry):
-    print(f"Query {str(search_entry)}")
+    search_entry = search_entry.get_text().lower()
+    for children in block_library_var.main_box:
+        if isinstance(children , Gtk.Label):
+            if len(search_entry) < 2:
+                children.set_visible(True)
+            else:
+                children.set_visible(False)
+        elif isinstance(children , Gtk.Grid):
+            for grid_child in children:
+                curr_func_name = grid_child.sklearn_model_function_call.__name__.lower()
+                if search_entry in curr_func_name:
+                    grid_child.set_visible(True)
+                else:
+                    grid_child.set_visible(False)
+
 
 def render_graph():
     main_box = sklearn_proccesses.PlottingBox()

@@ -60,6 +60,35 @@ Block related things
   border: none;
 }
 
+
+.block-blue{
+  background-color : rgb(65, 74, 234);
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  border-radius: 10px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+
+.block-orange {
+  background-color : #795311;
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  border-radius: 10px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+
 /*
 Standard frame related things 
 */

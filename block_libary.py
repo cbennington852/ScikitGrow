@@ -27,7 +27,7 @@ def add_sklearn_submodule(passed_box, submodule , color):
     main_box.set_hexpand(True)
     main_box.set_vexpand(True)
     # for all of the models in linear_model add them
-    linear_model_list = get_public_methods(sklearn.linear_model)
+    linear_model_list = get_public_methods(submodule)
     for k in range(0 , len(linear_model_list)):
         curr = ModelBlock(linear_model_list[k] , color)
         y = k // STACKING_AMOUNT
@@ -56,8 +56,12 @@ class BlockLibary(Gtk.ScrolledWindow):
         # adding linear libary
         add_sklearn_submodule(main_box , sklearn.linear_model , 'green')
         add_sklearn_submodule(main_box , sklearn.ensemble , 'purple')
+        add_sklearn_submodule(main_box , sklearn.neural_network , 'orange')
+        add_sklearn_submodule(main_box , sklearn.tree , 'blue')
+
 
         # save as self
+        self.main_box = main_box
         self.set_child(main_box)
    
 
