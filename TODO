@@ -1,0 +1,10 @@
+1. Block Library Functional Searchbar
+2. Have pipeline automaticly remove or add droppable areas upon drag and droppable
+3. Allow for user to remove drag and drop models
+4. have the pipeline return a pipeline
+5. actually plot the thing user wants
+6. have a run button to run the thing
+
+
+STRETCH:
+1. allow for autocompleie when filling in x values and y values

@@ -6,10 +6,10 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
 
-import viewclasses
 import standard_box
 import sklearn_proccesses
 import block_libary
+import pipeline
 
 
 css_file_path = "./styles.css"
@@ -87,23 +87,13 @@ def render_pipeline():
     control_button = Gtk.Button(label="Add Pipeline")
     top_control_box.append(control_button)
 
-    # drag and drop demo
-    flow_box = Gtk.FlowBox()
-    views_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-    views_box.props.vexpand = True
-    flow_box.props.selection_mode = Gtk.SelectionMode.NONE
-    flow_box.append(viewclasses.SourceFlowBoxChild("Item 1", "image-missing"))
-    flow_box.append(viewclasses.SourceFlowBoxChild("Item 2", "help-about"))
-    flow_box.append(viewclasses.SourceFlowBoxChild("Item 3", "edit-copy"))
-    views_box.append(viewclasses.TargetView(vexpand=True))
-    drop_demo = Gtk.Box()
-    drop_demo.append(views_box)
-    drop_demo.append(flow_box)
+    # pipeline section
+    pipeline_box = pipeline.SklearnPipeline() 
     
     # create a standard box
     main_box = standard_box.StdBox(
         header_box=top_control_box,
-        body_box=drop_demo
+        body_box=pipeline_box
     )
 
     return main_box
