@@ -43,27 +43,9 @@ class TargetView(Gtk.Box):
     def __init__(self, **kargs):
         super().__init__(**kargs)
 
-        self.stack = Gtk.Stack(hexpand=True)
-        self.append(self.stack)
-
-        empty_label = Gtk.Label(label="Drag some item, text, or files here.")
-        self.stack.add_named(empty_label, "empty")
-        self.stack.set_visible_child_name("empty")
-
-        box = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL,
-            vexpand=True,
-            valign=Gtk.Align.CENTER,
-        )
-        self.stack.add_named(box, "item")
-
-        self.icon = Gtk.Image()
-        box.append(self.icon)
-        self.label = Gtk.Label()
-        box.append(self.label)
-
-        self.text = Gtk.Label()
-        self.stack.add_named(self.text, "other")
+        self.box = Gtk.Box()
+        self.box.append(Gtk.Label(label="Hello drop here!"))
+        self.append(self.box)
 
         drop_controller = Gtk.DropTarget.new(
             type=GObject.TYPE_NONE, actions=Gdk.DragAction.COPY
@@ -74,8 +56,13 @@ class TargetView(Gtk.Box):
 
     def on_drop(self, _ctrl, value, _x, _y):
         if isinstance(value, block_libary.ModelBlock):
-            self.label.props.label = str(value.sklearn_model_function_call)
-            self.stack.set_visible_child_name("item")
-            #self.append(value)
+            for child in self.box:
+                self.box.remove(child)
+            self.box.append(block_libary.ModelBlock(
+                sklearn_model_function_call=value.sklearn_model_function_call,
+                color=value.block_color
+            ))
         else:
             print(f"some kinda bug? {value}")
+
+        print(self)

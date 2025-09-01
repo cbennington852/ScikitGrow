@@ -20,31 +20,49 @@ def get_public_methods(library):
             res.append(getattr(library , function))
     return res
 
+
+def add_sklearn_submodule(passed_box, submodule , color):
+    #setup grid
+    main_box = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+    main_box.set_hexpand(True)
+    main_box.set_vexpand(True)
+    # for all of the models in linear_model add them
+    linear_model_list = get_public_methods(sklearn.linear_model)
+    for k in range(0 , len(linear_model_list)):
+        curr = ModelBlock(linear_model_list[k] , color)
+        y = k // STACKING_AMOUNT
+        x = k % STACKING_AMOUNT
+        # apply a style that is a certain color
+        main_box.attach(curr , x , y , 1 , 1)
+    # add label
+    label_thing = Gtk.Label(label=submodule.__name__)
+    add_style(label_thing , 'block-label')
+    passed_box.append(label_thing)
+    passed_box.append(main_box)
+
+
+STACKING_AMOUNT = 3
 class BlockLibary(Gtk.ScrolledWindow):
     def __init__(self, **kargs):
         super().__init__(**kargs)
 
+        # adding styles
         add_style(self , 'block-library')
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         main_box.set_hexpand(True)
         main_box.set_vexpand(True)
         add_style(main_box , 'block-library')
-        # for all of the models in linear_model add them
-        linear_model_list = get_public_methods(sklearn.linear_model)
-        for model in linear_model_list:
-            curr = ModelBlock(model)
-            # apply a style that is a certain color
-            add_style(curr , "block-green")
-            curr.set_size_request(5 , 20)
-            main_box.append(curr)
 
+        # adding linear libary
+        add_sklearn_submodule(main_box , sklearn.linear_model , 'green')
+        add_sklearn_submodule(main_box , sklearn.ensemble , 'purple')
+
+        # save as self
         self.set_child(main_box)
-        
-
    
 
 class ModelBlock(Gtk.Box):
-    def __init__(self, sklearn_model_function_call ,  **kargs):
+    def __init__(self, sklearn_model_function_call , color,  **kargs):
         super().__init__(**kargs)
         self.sklearn_model_function_call = sklearn_model_function_call
         self.append(Gtk.Label(label=sklearn_model_function_call.__name__))
@@ -52,6 +70,9 @@ class ModelBlock(Gtk.Box):
         drag_controller.connect("prepare", self.on_drag_prepare)
         drag_controller.connect("drag-begin", self.on_drag_begin)
         self.add_controller(drag_controller)
+        add_style(self , f"block-{color}")
+        self.block_color = color
+
 
     def on_drag_prepare(self, _ctrl, _x, _y):
         item = Gdk.ContentProvider.new_for_value(self)
