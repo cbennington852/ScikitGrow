@@ -10,10 +10,14 @@ import standard_box
 import sklearn_proccesses
 import block_libary
 import pipeline
+import pandas as pd
 
 
 css_file_path = "./styles.css"
+csv_file_path = "./customers-100.csv"
 block_library_var : block_libary.BlockLibary = block_libary.BlockLibary()
+pipeline_box = pipeline.SklearnPipeline() 
+
 
 def load_css_file():
         with open(css_file_path) as f:
@@ -55,7 +59,7 @@ def render_csv():
     scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     csv_viewer_box = Gtk.Box()
     # read csv
-    csv_data = read_csv_data("./customers-100.csv")
+    csv_data = read_csv_data(csv_file_path)
     liststore = Gtk.ListStore(*([str] * len(csv_data[0])))
 
     for line in csv_data:
@@ -81,15 +85,27 @@ def render_csv():
     )
     return main_box
 
+def train_model():
+    """
+        trains the model
+    """
+    # parse and get the untrained pipeline
+    untrained_pipeline = pipeline_box.get_sklearn_pipeline()
+
+    # use pandas to load the .csv as a dataframe
+    df = pd.read_csv(csv_file_path)
+    print(df)
+
+def plot_chart(widget):
+    print("Not there yet")
+    model = train_model()
 
 def render_pipeline():
-    # pipeline section
-    pipeline_box = pipeline.SklearnPipeline() 
 
     # make top control buttons
     top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     control_button = Gtk.Button(label="Run Sklearn! ▶️")
-    control_button.connect("clicked",pipeline_box.get_sklearn_pipeline )
+    control_button.connect("clicked", plot_chart)
     add_style(control_button , 'control-button')
     top_control_box.append(control_button)
 
@@ -184,8 +200,8 @@ class MyApplication(Gtk.Application):
         left_box.set_start_child(csv_veiwer_box )
 
         # pipeline 
-        pipeline_box = render_pipeline()
-        left_box.set_end_child(pipeline_box )
+        pipeline_main_box = render_pipeline()
+        left_box.set_end_child(pipeline_main_box )
 
         # adding left and right boxes
         main_box.set_start_child(left_box)

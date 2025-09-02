@@ -8,5 +8,16 @@
 6. have a run button to run the thing
 7. have an accuracy graph so you can see the accuracu
 
+8. # changing the csv viewer to work with pandas, and allow for many file types.  
+The user might want to input diffrent types of files, we could parse for diffrent types,
+    and then use pandas dataframe to display the dataframe.
+    This would allow for the following to be parsed
+        - .excel
+        - .csv
+        - .json
+        - SQL
+        - parquet
+
+
 STRETCH:
 1. allow for autocompleie when filling in x values and y values

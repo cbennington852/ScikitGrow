@@ -5,6 +5,8 @@ import gi
 gi.require_version("Gtk", "4.0")
 import block_libary
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
+import sklearn
+
 
 
 
@@ -96,39 +98,66 @@ class SklearnPipeline(Gtk.Box):
     def add_more_models(self , widget):
         self.box_pipeline.append(ModelHolder(self))
 
-    def get_sklearn_pipeline(self , widget):
+    def get_sklearn_pipeline(self ):
         """
         Returns the full sklearn pipeline object, using the input / stuff from the user. 
-        """
 
+        returns an untrained pipeline 
+        """
+        # create a list of the models going into the pipeline
+        model_list = []
         # loop thru each model and add them to the pipeline 
-        print(self.box_pipeline)
+        x = 0
         for outer_child in self.box_pipeline:
-            # all of the guis
-            print('outer: ',outer_child)
+            # Get the current model if there is one here
             if isinstance(outer_child , ModelHolder) and outer_child.model_block != None:
-                # now we have all of the ModelHolder objects
-                curr_block = outer_child.model_block
-                print(' mid: ' , outer_child.model_block)
-                print(' model: ' , curr_block.sklearn_model_function_call)
-                for k in range(0 , curr_block.x):
-                    parameter = curr_block.parameters_box.get_child_at(0 , k).get_text()
-                    para_value = curr_block.parameters_box.get_child_at(1 , k).get_text()
-                    print('     label: ', parameter)
-                    print('     value: ', para_value)
+                curr_model = SklearnPipeline.parse_current_model(outer_child)
+                new_entry_in_model_list = (f"{curr_model.__class__.__name__}__{x}")
+                model_list.append(new_entry_in_model_list)
+            x += 1
+        untrained_pipeline = sklearn.pipeline.Pipeline(model_list)
+        return untrained_pipeline
+    
+    def get_x_values_entry(self):
+        return self.x_values_entry.get_text()
+    
+    def get_y_values_entry(self):
+        return self.y_values_entry.get_text()
+        
+
+    def parse_current_model(outer_child):
+        # now we have all of the ModelHolder objects
+        map_of_parameters = {}
+        curr_block = outer_child.model_block
+        print(' mid: ' , outer_child.model_block)
+        print(' model: ' , curr_block.sklearn_model_function_call)
+        for k in range(0 , curr_block.x):
+            parameter = curr_block.parameters_box.get_child_at(0 , k).get_text()
+            para_value = SklearnPipeline.handle_parameter_input(curr_block.parameters_box.get_child_at(1 , k).get_text())
+            # NOTE:
+                # eval allows for arbitrary code execution, this is acceptable, because the purpose
+                # of this program is to compile software gui components into real python code.
+            print('     label: ', parameter)
+            print('     value: ', para_value)
+            print('     type : ', type(para_value))
+            map_of_parameters[parameter] = para_value
+        print(map_of_parameters)
+        # now time to assemble this specific model. 
+        assembled_model = curr_block.sklearn_model_function_call(**map_of_parameters)
+        print(assembled_model)
+        return assembled_model
 
 
-            # if there is data that we can't proccess, leave the option out.
-
-        # train the pipline on the data
-        print("x: " , self.x_values_entry.get_text())
-        print("y: " , self.y_values_entry.get_text())
-
-    def handle_parameter_input():
+    def handle_parameter_input(input):
         """
-        Brain storming:
-            * we could get the types from sklearn
-            * we could also infer the types thru filtering.
+        # WARNING:
+            eval allows for arbitrary code execution, this is acceptable, because the purpose
+            of this program is to compile software gui components into real python code.
+              
             * FINAL : use of eval()
                 - this executes it as python code
         """
+        try:
+            return eval(input)
+        except NameError:
+            return str(input)
