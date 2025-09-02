@@ -110,10 +110,12 @@ class SklearnPipeline(Gtk.Box):
                 # now we have all of the ModelHolder objects
                 curr_block = outer_child.model_block
                 print(' mid: ' , outer_child.model_block)
-                print(' mid: ' , curr_block.sklearn_model_function_call)
+                print(' model: ' , curr_block.sklearn_model_function_call)
                 for k in range(0 , curr_block.x):
-                    print('     label: ',curr_block.parameters_box.get_child_at(0 , k).get_text())
-                    print('     value: ',curr_block.parameters_box.get_child_at(1 , k).get_text())
+                    parameter = curr_block.parameters_box.get_child_at(0 , k).get_text()
+                    para_value = curr_block.parameters_box.get_child_at(1 , k).get_text()
+                    print('     label: ', parameter)
+                    print('     value: ', para_value)
 
 
             # if there is data that we can't proccess, leave the option out.
@@ -121,3 +123,12 @@ class SklearnPipeline(Gtk.Box):
         # train the pipline on the data
         print("x: " , self.x_values_entry.get_text())
         print("y: " , self.y_values_entry.get_text())
+
+    def handle_parameter_input():
+        """
+        Brain storming:
+            * we could get the types from sklearn
+            * we could also infer the types thru filtering.
+            * FINAL : use of eval()
+                - this executes it as python code
+        """
