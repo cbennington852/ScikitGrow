@@ -8,12 +8,16 @@ from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
 
 
-class TargetView(Gtk.Box):
-    def __init__(self, **kargs):
+class ModelHolder(Gtk.Box):
+    def __init__(self, parent = None, **kargs):
         super().__init__(**kargs)
 
+        self.parent = parent
+
+        block_libary.add_style(self , 'pipeline-model-holder')
+
         self.box = Gtk.Box()
-        self.box.append(Gtk.Label(label="Hello drop here!"))
+        self.box.append(Gtk.Label(label="drop models here!"))
         self.append(self.box)
 
         drop_controller = Gtk.DropTarget.new(
@@ -31,6 +35,7 @@ class TargetView(Gtk.Box):
                 sklearn_model_function_call=value.sklearn_model_function_call,
                 color=value.block_color
             ))
+            self.parent.add_more_models(None)
         else:
             print(f"some kinda bug? {value}")
 
@@ -76,24 +81,17 @@ class SklearnPipeline(Gtk.Box):
         #============================================
 
         self.box_pipeline = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-
+        self.box_pipeline.append(Gtk.Label(label="Sklearn Models"))
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
-        self.box_pipeline.append(TargetView())
-        #button to add more
-        button_add_more = Gtk.Button(label='+')
-        button_add_more.connect('clicked' , self.add_more_models)
-        
-        # append things
-        self.box_pipeline.append(button_add_more)
-
+        self.box_pipeline.append(ModelHolder(self))
         # append important stuff
         self.append(box_data)
         self.append(self.box_pipeline)
 
 
     def add_more_models(self , widget):
-        self.box_pipeline.prepend(TargetView())
+        self.box_pipeline.append(ModelHolder(self))
 
     def get_sklearn_pipeline():
         """

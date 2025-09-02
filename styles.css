@@ -17,6 +17,18 @@
   min-height: 400px;
 }
 
+.pipeline-model-holder{
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 10px;
+  align-content: center;
+  background-color: #ededed;
+}
+
+.control-button {
+  color: black;
+  background-color: #00b548;
+}
 
 .data-pipeline {
   margin: 10px;
