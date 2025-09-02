@@ -76,7 +76,7 @@ class BlockLibary(Gtk.ScrolledWindow):
 
         # adding linear libary
         add_sklearn_submodule(main_box , sklearn.linear_model , 'green')
-        add_sklearn_submodule(main_box , sklearn.ensemble , 'purple')
+        add_sklearn_submodule(main_box , sklearn.preprocessing , 'purple')
         add_sklearn_submodule(main_box , sklearn.neural_network , 'orange')
         add_sklearn_submodule(main_box , sklearn.tree , 'blue')
 

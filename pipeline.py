@@ -93,8 +93,16 @@ class SklearnPipeline(Gtk.Box):
     def add_more_models(self , widget):
         self.box_pipeline.append(ModelHolder(self))
 
-    def get_sklearn_pipeline():
+    def get_sklearn_pipeline(self):
         """
         Returns the full sklearn pipeline object, using the input / stuff from the user. 
         """
 
+        # loop thru each model and add them to the pipeline 
+        print(self.box_pipeline)
+            # for each model, and get a process the input data.
+            # if there is data that we can't proccess, leave the option out.
+
+        # train the pipline on the data
+        print(self.x_values_entry)
+        print(self.y_values_entry)
