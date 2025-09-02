@@ -26,16 +26,19 @@ class ModelHolder(Gtk.Box):
         drop_controller.set_gtypes([block_libary.ModelBlock])
         drop_controller.connect("drop", self.on_drop)
         self.add_controller(drop_controller)
+        self.model_block = None
 
     def on_drop(self, _ctrl, value, _x, _y):
         if isinstance(value, block_libary.ModelBlock):
             for child in self.box:
                 self.box.remove(child)
-            self.box.append(block_libary.ModelBlock(
+            new_block = block_libary.ModelBlock(
                 sklearn_model_function_call=value.sklearn_model_function_call,
                 color=value.block_color
-            ))
+            )
+            self.box.append(new_block)
             self.parent.add_more_models(None)
+            self.model_block = new_block
         else:
             print(f"some kinda bug? {value}")
 
@@ -93,16 +96,28 @@ class SklearnPipeline(Gtk.Box):
     def add_more_models(self , widget):
         self.box_pipeline.append(ModelHolder(self))
 
-    def get_sklearn_pipeline(self):
+    def get_sklearn_pipeline(self , widget):
         """
         Returns the full sklearn pipeline object, using the input / stuff from the user. 
         """
 
         # loop thru each model and add them to the pipeline 
         print(self.box_pipeline)
-            # for each model, and get a process the input data.
+        for outer_child in self.box_pipeline:
+            # all of the guis
+            print('outer: ',outer_child)
+            if isinstance(outer_child , ModelHolder) and outer_child.model_block != None:
+                # now we have all of the ModelHolder objects
+                curr_block = outer_child.model_block
+                print(' mid: ' , outer_child.model_block)
+                print(' mid: ' , curr_block.sklearn_model_function_call)
+                for k in range(0 , curr_block.x):
+                    print('     label: ',curr_block.parameters_box.get_child_at(0 , k).get_text())
+                    print('     value: ',curr_block.parameters_box.get_child_at(1 , k).get_text())
+
+
             # if there is data that we can't proccess, leave the option out.
 
         # train the pipline on the data
-        print(self.x_values_entry)
-        print(self.y_values_entry)
+        print("x: " , self.x_values_entry.get_text())
+        print("y: " , self.y_values_entry.get_text())

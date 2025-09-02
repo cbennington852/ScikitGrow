@@ -83,15 +83,16 @@ def render_csv():
 
 
 def render_pipeline():
+    # pipeline section
+    pipeline_box = pipeline.SklearnPipeline() 
+
     # make top control buttons
     top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     control_button = Gtk.Button(label="Run Sklearn! ▶️")
+    control_button.connect("clicked",pipeline_box.get_sklearn_pipeline )
     add_style(control_button , 'control-button')
     top_control_box.append(control_button)
 
-    # pipeline section
-    pipeline_box = pipeline.SklearnPipeline() 
-    
     # create a standard box
     main_box = standard_box.StdBox(
         header_box=top_control_box,

@@ -116,6 +116,7 @@ class ModelBlock(Gtk.Box):
             self.parameters_box.attach(curr_label , 0 , x , 1, 1)
             self.parameters_box.attach(curr_entry , 1 , x , 1, 1)
             x += 1
+        self.x = x
         # assemble blocks
         sub_body = Gtk.Expander(label=sklearn_model_function_call.__name__)
         sub_body.set_child(scrollable_view)
