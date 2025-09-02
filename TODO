@@ -17,6 +17,7 @@ The user might want to input diffrent types of files, we could parse for diffren
         - .json
         - SQL
         - parquet
+    also make it take a command line arg for what we want it to parse.
 
 
 STRETCH:

@@ -14,6 +14,7 @@ import pandas as pd
 
 
 css_file_path = "./styles.css"
+main_dataframe = pd.DataFrame()
 csv_file_path = "./customers-100.csv"
 block_library_var : block_libary.BlockLibary = block_libary.BlockLibary()
 pipeline_box = pipeline.SklearnPipeline() 
@@ -39,6 +40,39 @@ def read_csv_data(filepath):
         for row in csv_reader:
             data.append(row)
     return data
+def process_input_file(filepath):
+    excel_extensions = ['.xls','.xlsx','.xlsm','.xlsb','.ods','.odt']
+    # is a csv
+    if '.csv' in filepath:
+        main_dataframe = pd.read_csv(filepath)
+        return
+    # is excel
+    for possible_extension in excel_extensions:
+        if excel_extensions in filepath:
+            main_dataframe = pd.read_excel(filepath)
+            return
+    # is json
+    if '.json' in filepath:
+        main_dataframe = pd.read_json(filepath)
+        return
+    if '.parquet' in filepath:
+        main_dataframe = pd.read_parquet(filepath)
+        return
+    # filetype not supported
+    print("""
+        File Type not supported, try:
+          .csv
+          .json
+          .parquet
+          .xls
+          .xlsx
+          .xlsm
+          .xlsb
+          .ods.odt
+    """)
+    sys.exit(1)
+
+
 
 def add_style(gui_thing , class_name):
     gui_thing.get_style_context().add_class(class_name)
