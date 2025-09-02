@@ -8,7 +8,6 @@ from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
 
 
-
 class TargetView(Gtk.Box):
     def __init__(self, **kargs):
         super().__init__(**kargs)
@@ -58,24 +57,25 @@ class SklearnPipeline(Gtk.Box):
         #============================================
         # data section box
         #============================================
-        box_data = Gtk.Box()
+        box_data = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+        block_libary.add_style(box_data , 'data-pipeline')
         # add text fields for the data section, each one being a x-value or y-value
         x_value_label = Gtk.Label(label="X-values")
         self.x_values_entry = Gtk.Entry()
         y_value_label = Gtk.Label(label='Y-values')
         self.y_values_entry = Gtk.Entry()
         # build the data section
-        box_data.append(x_value_label)
-        box_data.append(self.x_values_entry)
-        box_data.append(y_value_label)
-        box_data.append(self.y_values_entry)
+        box_data.attach(x_value_label , 0 , 0 ,1 ,1)
+        box_data.attach(self.x_values_entry, 1, 0, 1,1)
+        box_data.attach(y_value_label , 0, 1,1,1)
+        box_data.attach(self.y_values_entry , 1 ,1 ,1 , 1)
 
 
         #============================================
         # pipeline section box
         #============================================
 
-        self.box_pipeline = Gtk.Box()
+        self.box_pipeline = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
@@ -84,15 +84,19 @@ class SklearnPipeline(Gtk.Box):
         button_add_more = Gtk.Button(label='+')
         button_add_more.connect('clicked' , self.add_more_models)
         
-        
         # append things
         self.box_pipeline.append(button_add_more)
-        
 
         # append important stuff
         self.append(box_data)
         self.append(self.box_pipeline)
 
+
     def add_more_models(self , widget):
         self.box_pipeline.prepend(TargetView())
+
+    def get_sklearn_pipeline():
+        """
+        Returns the full sklearn pipeline object, using the input / stuff from the user. 
+        """
 

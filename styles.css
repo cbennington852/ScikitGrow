@@ -18,7 +18,12 @@
 }
 
 
-
+.data-pipeline {
+  margin: 10px;
+  border-radius: 10px;
+  align-content: center;
+  background-color: #ededed;
+}
 
 
 
@@ -94,32 +99,32 @@ Standard frame related things
 */
 .frame {
     margin: 10px;
-    border: 6px solid #424242;
+    border: 6px solid #ffffff;
     border-radius: 6px;
-    background-color: #dddddd;
+    background-color: #ffffff;
 }
 
 .header-box {
-    background-color: #424242;
+    background-color: #ededed;
     padding: 5px;
     min-width: 400px;
 }
 
 .header-button {
-  color: white;
-  background-color: #666666;
+  color: black;
+  background-color: #ffffff;
   background-image : none;
   border: none;
 }
 .header-button:hover {
-  color: white;
-  background-color: #565656;
+  color: black;
+  background-color: #959595;
   background-image : none;
   border: none;
 }
 
 .back-area {
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(186, 186, 186);
   border:none
 }
 

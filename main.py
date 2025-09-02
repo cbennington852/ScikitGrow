@@ -135,6 +135,7 @@ def searching_block_library(search_entry):
                     grid_child.set_visible(False)
 
 
+
 def render_graph():
     main_box = sklearn_proccesses.PlottingBox()
     return main_box
