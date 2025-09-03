@@ -1,15 +1,12 @@
 
-2. Have pipeline automaticly remove or add droppable areas upon drag and droppable
-3. Allow for user to remove drag and drop models
-4. Have the pipeline return a pipeline
 5. Actually plot the thing user wants
     - the plot section x-values only plots the first x-value but shows all of the predicted values. 
     - maybe also allow for the user to select if they want a bar chart
-6. have a run button to run the thing
-7. have an accuracy graph so you can see the accuracu
 
-8. # changing the csv viewer to work with pandas, and allow for many file types.  
-The user might want to input diffrent types of files, we could parse for diffrent types,
+7. have an accuracy graph so you can see the accuracy
+
+8. ### changing the csv viewer to work with pandas, and allow for many file types.  
+The user might want to input different types of files, we could parse for diffrent types,
     and then use pandas dataframe to display the dataframe.
     This would allow for the following to be parsed
         - .excel
@@ -19,6 +16,13 @@ The user might want to input diffrent types of files, we could parse for diffren
         - parquet
     also make it take a command line arg for what we want it to parse.
 
+9. ### Setting up CD/CI pipeline for this project using https://pyinstaller.org/en/stable/
+    Make this a 
+
+10. ### allow for autocomplete when filling in x values and y values
+
+11. ### General UI/UX improvements
+
+12. ### Finish the conversion to pandas dataframe viewing.
 
 STRETCH:
-1. allow for autocompleie when filling in x values and y values

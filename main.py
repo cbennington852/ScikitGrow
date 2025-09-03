@@ -11,10 +11,10 @@ import sklearn_proccesses
 import block_libary
 import pipeline
 import pandas as pd
+import numpy as np
 
 
 css_file_path = "./styles.css"
-main_dataframe = pd.DataFrame()
 csv_file_path = "./customers-100.csv"
 block_library_var : block_libary.BlockLibary = block_libary.BlockLibary()
 pipeline_box = pipeline.SklearnPipeline() 
@@ -33,31 +33,25 @@ def load_css_file():
                 css_provider,
                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )
-def read_csv_data(filepath):
-    data = []
-    with open(filepath, 'r', newline='') as csvfile:
-        csv_reader = csv.reader(csvfile)
-        for row in csv_reader:
-            data.append(row)
-    return data
+
 def process_input_file(filepath):
     excel_extensions = ['.xls','.xlsx','.xlsm','.xlsb','.ods','.odt']
     # is a csv
     if '.csv' in filepath:
         main_dataframe = pd.read_csv(filepath)
-        return
+        return main_dataframe
     # is excel
     for possible_extension in excel_extensions:
         if excel_extensions in filepath:
             main_dataframe = pd.read_excel(filepath)
-            return
+            return main_dataframe
     # is json
     if '.json' in filepath:
         main_dataframe = pd.read_json(filepath)
-        return
+        return main_dataframe
     if '.parquet' in filepath:
         main_dataframe = pd.read_parquet(filepath)
-        return
+        return main_dataframe
     # filetype not supported
     print("""
         File Type not supported, try:
@@ -78,7 +72,6 @@ def add_style(gui_thing , class_name):
     gui_thing.get_style_context().add_class(class_name)
 
 def render_csv():
-    # make top control buttons
     top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     control_button = Gtk.Button(label="Edit CSV")
     top_control_box.append(control_button)
@@ -93,19 +86,30 @@ def render_csv():
     scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     csv_viewer_box = Gtk.Box()
     # read csv
-    csv_data = read_csv_data(csv_file_path)
-    liststore = Gtk.ListStore(*([str] * len(csv_data[0])))
+    main_dataframe = process_input_file(csv_file_path)
+    # retrieve the pandas dataframe
+    # add the top header 
+    # add all of the dataframe rows.
+    # may have to make a conversion map
+    column_types = []
+    for col in main_dataframe.columns:
+        tmp = GObject.type_from_name('gchararray')
+        print(tmp)
+        column_types.append(tmp)
 
-    for line in csv_data:
-        liststore.append(line)
+    liststore = Gtk.ListStore(*column_types)
+
+    for index, row in main_dataframe.iterrows():
+        row = [str(point) for point in row] 
+        liststore.append(list(row))
 
    # Create a TreeView and link it to the model
     treeview = Gtk.TreeView(model=liststore)
 
-    # Create a column for each CSV header
-    for i, column_title in enumerate(csv_data[0]):
+    # Create a column for each dataframe header
+    for i, col_name in enumerate(main_dataframe.columns):
         renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn(column_title, renderer, text=i)
+        column = Gtk.TreeViewColumn(col_name, renderer, text=i)
         treeview.append_column(column)
 
     # Add the TreeView (not the ListStore!) to the container
