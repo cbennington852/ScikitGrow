@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import csv
 import gi
@@ -12,37 +14,21 @@ import block_libary
 import pipeline
 import pandas as pd
 import numpy as np
+import sys
 
 
-css_file_path = "./styles.css"
-csv_file_path = "./customers-100.csv"
-block_library_var : block_libary.BlockLibary = block_libary.BlockLibary()
-pipeline_box = pipeline.SklearnPipeline() 
-
-
-def load_css_file():
-        with open(css_file_path) as f:
-            # Load CSS
-            css = f.read()
-            css_provider = Gtk.CssProvider()
-            css_provider.load_from_data(css)
-
-            # Apply CSS to display
-            Gtk.StyleContext.add_provider_for_display(
-                Gdk.Display.get_default(),
-                css_provider,
-                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-            )
 
 def process_input_file(filepath):
     excel_extensions = ['.xls','.xlsx','.xlsm','.xlsb','.ods','.odt']
+    filepath = filepath
+    print(filepath)
     # is a csv
     if '.csv' in filepath:
         main_dataframe = pd.read_csv(filepath)
         return main_dataframe
     # is excel
     for possible_extension in excel_extensions:
-        if excel_extensions in filepath:
+        if possible_extension in filepath:
             main_dataframe = pd.read_excel(filepath)
             return main_dataframe
     # is json
@@ -66,62 +52,32 @@ def process_input_file(filepath):
     """)
     sys.exit(1)
 
+css_file_path = "./styles.css"
+block_library_var : block_libary.BlockLibary = block_libary.BlockLibary()
+pipeline_box = pipeline.SklearnPipeline() 
+main_dataframe = pd.DataFrame()
+
+def load_css_file():
+        with open(css_file_path) as f:
+            # Load CSS
+            css = f.read()
+            css_provider = Gtk.CssProvider()
+            css_provider.load_from_data(css)
+
+            # Apply CSS to display
+            Gtk.StyleContext.add_provider_for_display(
+                Gdk.Display.get_default(),
+                css_provider,
+                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
+
+
+
 
 
 def add_style(gui_thing , class_name):
     gui_thing.get_style_context().add_class(class_name)
 
-def render_csv():
-    top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-    control_button = Gtk.Button(label="Edit CSV")
-    top_control_box.append(control_button)
-
-
-    scrolled_window = Gtk.ScrolledWindow()
-    scrolled_window.set_size_request(300,300)
-    scrolled_window.set_hexpand(True)
-    scrolled_window.set_vexpand(True)
-
-
-    scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-    csv_viewer_box = Gtk.Box()
-    # read csv
-    main_dataframe = process_input_file(csv_file_path)
-    # retrieve the pandas dataframe
-    # add the top header 
-    # add all of the dataframe rows.
-    # may have to make a conversion map
-    column_types = []
-    for col in main_dataframe.columns:
-        tmp = GObject.type_from_name('gchararray')
-        print(tmp)
-        column_types.append(tmp)
-
-    liststore = Gtk.ListStore(*column_types)
-
-    for index, row in main_dataframe.iterrows():
-        row = [str(point) for point in row] 
-        liststore.append(list(row))
-
-   # Create a TreeView and link it to the model
-    treeview = Gtk.TreeView(model=liststore)
-
-    # Create a column for each dataframe header
-    for i, col_name in enumerate(main_dataframe.columns):
-        renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn(col_name, renderer, text=i)
-        treeview.append_column(column)
-
-    # Add the TreeView (not the ListStore!) to the container
-    csv_viewer_box.append(treeview)
-    scrolled_window.set_child(csv_viewer_box)
-    add_style(scrolled_window , 'csv-reader ')
-
-    main_box = standard_box.StdBox(
-        header_box=top_control_box,
-        body_box=scrolled_window
-    )
-    return main_box
 
 def train_model():
     """
@@ -131,12 +87,14 @@ def train_model():
     untrained_pipeline = pipeline_box.get_sklearn_pipeline()
 
     # use pandas to load the .csv as a dataframe
-    df = pd.read_csv(csv_file_path)
-    print(df)
+    print(main_dataframe)
+
+    # get the x and y values 
 
 def plot_chart(widget):
     print("Not there yet")
     model = train_model()
+    print(model)
 
 def render_pipeline():
 
@@ -200,11 +158,15 @@ def render_graph():
 
 class MyApplication(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id="com.example.MyGtkApplication")
+        super().__init__(
+            application_id="com.example.MyGtkApplication",
+            flags=Gio.ApplicationFlags.HANDLES_OPEN
+        )
         GLib.set_application_name("SciKitLearn GUI")
 
-    def do_activate(self):
-        # the main window
+    def create_window(self, file):
+        self.main_dataframe = process_input_file(file)
+         # the main window
         window = Gtk.ApplicationWindow(application=self, title="Sklearn GUI software")
         window.set_default_size(1200, 900)
 
@@ -234,7 +196,7 @@ class MyApplication(Gtk.Application):
         right_box.set_end_child(block_library)
     
         # The csv viewer
-        csv_veiwer_box = render_csv()
+        csv_veiwer_box = self.render_csv()
         left_box.set_start_child(csv_veiwer_box )
 
         # pipeline 
@@ -249,6 +211,64 @@ class MyApplication(Gtk.Application):
         window.set_titlebar(render_top_bar())
         load_css_file()
         window.present()
+
+    def do_activate(self):
+        print("No no veery bad")
+
+    def do_open(self, files: list[Gio.File], n_files,  hint: str):
+        for file in files:
+            self.create_window(file.get_path())
+
+    def render_csv(self):
+        top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        control_button = Gtk.Button(label="Edit CSV")
+        top_control_box.append(control_button)
+
+
+        scrolled_window = Gtk.ScrolledWindow()
+        scrolled_window.set_size_request(300,300)
+        scrolled_window.set_hexpand(True)
+        scrolled_window.set_vexpand(True)
+
+
+        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        csv_viewer_box = Gtk.Box()
+        # read csv
+        # retrieve the pandas dataframe
+        # add the top header 
+        # add all of the dataframe rows.
+        # may have to make a conversion map
+        column_types = []
+        for col in self.main_dataframe.columns:
+            tmp = GObject.type_from_name('gchararray')
+            print(tmp)
+            column_types.append(tmp)
+
+        liststore = Gtk.ListStore(*column_types)
+
+        for index, row in self.main_dataframe.iterrows():
+            row = [str(point) for point in row] 
+            liststore.append(list(row))
+
+    # Create a TreeView and link it to the model
+        treeview = Gtk.TreeView(model=liststore)
+
+        # Create a column for each dataframe header
+        for i, col_name in enumerate(self.main_dataframe.columns):
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn(col_name, renderer, text=i)
+            treeview.append_column(column)
+
+        # Add the TreeView (not the ListStore!) to the container
+        csv_viewer_box.append(treeview)
+        scrolled_window.set_child(csv_viewer_box)
+        add_style(scrolled_window , 'csv-reader ')
+
+        main_box = standard_box.StdBox(
+            header_box=top_control_box,
+            body_box=scrolled_window
+        )
+        return main_box
 
 
 
