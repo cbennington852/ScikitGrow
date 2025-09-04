@@ -20,7 +20,7 @@ class PlottingBox(Gtk.Box):
 
         fig, ax = plt.subplots()
         ax.plot([1, 2, 3], [4, 5, 6])
-        canvas = FigureCanvas(fig)  # a Gtk.DrawingArea
-        canvas.set_size_request(500, 500)
-        self.append(canvas)
+        self.canvas = FigureCanvas(fig)  # a Gtk.DrawingArea
+        self.canvas.set_size_request(500, 500)
+        self.append(self.canvas)
 
