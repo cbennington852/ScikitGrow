@@ -157,8 +157,8 @@ class SklearnPipeline(Gtk.Box):
             # Get the current model if there is one here
             if isinstance(outer_child , ModelHolder) and outer_child.model_block != None:
                 curr_model = SklearnPipeline.parse_current_model(outer_child)
-                new_entry_in_model_list = (f"{curr_model.__class__.__name__}__{x}")
-                model_list.append(new_entry_in_model_list)
+                new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
+                model_list.append((new_entry_in_model_list , curr_model))
             x += 1
         untrained_pipeline = sklearn.pipeline.Pipeline(model_list)
         return untrained_pipeline

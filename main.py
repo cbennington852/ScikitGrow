@@ -15,8 +15,10 @@ import pipeline
 import pandas as pd
 import numpy as np
 import sys
-
-
+import sklearn
+from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 
 
@@ -205,26 +207,61 @@ class Main_GUI(Gtk.Application):
             trains the model
         """
         # parse and get the untrained pipeline
-        untrained_pipeline = self.pipeline_box.get_sklearn_pipeline()
+        curr_pipeline = self.pipeline_box.get_sklearn_pipeline()
 
         # use pandas to load the .csv as a dataframe
         print(self.main_dataframe)
 
         # get the x and y values 
-        x = self.pipeline_box.get_x_values()
-        y = self.pipeline_box.get_y_value()
-
-        # consider some pre-processing
-            # ... we could convert all strings to a int for the regression
-            # 
+        x_cols = self.pipeline_box.get_x_values()
+        y_cols = self.pipeline_box.get_y_value()
+        x = self.main_dataframe[x_cols]
+        y = self.main_dataframe[y_cols]
+        print(x)
+        print(y)
         
         # if it is a one - one we should refect that in x-y valyes
-        untrained_pipeline.fit(x , y)
+        print(curr_pipeline)
+        curr_pipeline.fit(x , y)
 
-        y_pred = untrained_pipeline.predict(x)
+        y_pred = curr_pipeline.predict(x)
 
+        # we could have a sections for regression and Classification
+        # get the last step on pipeline to see which it is 
+        # maybe later we make it automatic but user can specify
+        last_step_name , last_step_model = curr_pipeline.steps[-1]
+        # if is classifier 
+        if sklearn.base.is_classifier(last_step_model):
+            # render a classifier graph. 
+            print("Not there yet")
+        elif sklearn.base.is_regressor(last_step_model):
+            # must be regression
+            # Only one x value ... horizontal scatter plot
+            if len(x.columns) == 1:
+                self.plot_single_regression(x , y , y_pred , x_cols , y_cols)
+            else:
+                print("gooning")
+            
+            
+        else:
+            raise ValueError("Ending result is neither a classifier or regressor. ")
         # making the graph / chart
-        self.cavas
+
+    def plot_single_regression(self, x , y , y_pred , x_cols, y_cols):
+        print("gooning ... x cols == 1 and regression")
+        fig, ax = plt.subplots()
+        ax.scatter(x , y , color='red' , label=f"Dataset")
+        ax.plot(x , y_pred , color='blue' , label='AI predictions')
+        ax.set_title(f"{x_cols[0]} and {y_cols[0]}")
+        ax.set_xlabel(f"{x_cols[0]}")
+        ax.set_ylabel(f"{y_cols[0]}")
+        ax.legend(loc='upper left')
+
+        for child in self.main_canvas:
+            child.get_parent().remove(child)
+        
+        self.main_canvas.append(FigureCanvas(fig))  # a Gtk.DrawingArea
+        self.main_canvas.set_size_request(500, 500)
 
 
 
@@ -288,7 +325,10 @@ class Main_GUI(Gtk.Application):
 
 
     def render_graph(self):
-        self.main_canvas = sklearn_proccesses.PlottingBox()
+        self.main_canvas = Gtk.Box()
+        self.main_canvas.set_size_request(500, 500)
+        canvas = FigureCanvas()  # a Gtk.DrawingArea
+        self.main_canvas.append(canvas)
         return self.main_canvas
 
 

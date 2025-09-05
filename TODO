@@ -5,6 +5,8 @@
 
 7. have an accuracy graph so you can see the accuracy
 
+# have the sklearn plotter check to see if there are two open slots, then delete one
+
 8. ### changing the csv viewer to work with pandas, and allow for many file types.  
 The user might want to input different types of files, we could parse for diffrent types,
     and then use pandas dataframe to display the dataframe.
