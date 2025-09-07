@@ -30,6 +30,9 @@ class ModelHolder(Gtk.Box):
         self.add_controller(drop_controller)
         self.model_block = None
 
+    def has_model(self):
+        return self.model_block != None
+
     def on_drop(self, _ctrl, value, _x, _y):
         if isinstance(value, block_libary.ModelBlock):
             for child in self.box:
@@ -39,8 +42,8 @@ class ModelHolder(Gtk.Box):
                 color=value.block_color
             )
             self.box.append(new_block)
-            self.parent.add_more_models(None)
             self.model_block = new_block
+            self.parent.add_more_models(None)
         else:
             print(f"some kinda bug? {value}")
 
@@ -142,27 +145,20 @@ class SklearnPipeline(Gtk.Box):
         specific_entry.set_completion(completion)
 
     def add_more_models(self , widget):
-        # if we have an empty one it go bye bye
-        # if have more than two empty, one go by by
-        count_labels = 0
-        print("================================")
-        for child in self.box_pipeline:
-            print("child" , child)
-            print(child.get_first_child())
-            print(child.get_visible())
-
-            if not isinstance(child , Gtk.Label):
-                print(child.get_first_child())
-                if not child.get_first_child():
-                    child.get_parent().remove(child)
-                else:
-                    if isinstance(child.get_first_child(), Gtk.Label):
-                        count_labels += 1
-                        if count_labels >= 2:
-                            child.get_parent().remove(child)
-
+        # count the number of non-empty models
+        print("==============PIPELINE================")
+        print("current: " , widget)
+        list_model_holders = list(self.box_pipeline)
+        # skip the label
+        count  = 0
+        for x in range(1 , len(list_model_holders)):
+            child = list_model_holders[x]
+            if not child.has_model():
+                count += 1
+        if count == 0:
+            self.box_pipeline.append(ModelHolder(self))
+        print("==============END================")
         
-        self.box_pipeline.append(ModelHolder(self))
 
     def get_sklearn_pipeline(self ):
         """
