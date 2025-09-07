@@ -23,7 +23,7 @@ class ModelHolder(Gtk.Box):
         self.append(self.box)
 
         drop_controller = Gtk.DropTarget.new(
-            type=GObject.TYPE_NONE, actions=Gdk.DragAction.COPY
+            type=GObject.TYPE_NONE, actions=Gdk.DragAction.MOVE
         )
         drop_controller.set_gtypes([block_libary.ModelBlock])
         drop_controller.connect("drop", self.on_drop)
@@ -113,6 +113,7 @@ class SklearnPipeline(Gtk.Box):
 
 
     def consider_adding_new_box(self, value):
+        
         # Check to see if value in the set of column names
         num_empty = 0
         for child in self.x_values_entry:
@@ -141,6 +142,26 @@ class SklearnPipeline(Gtk.Box):
         specific_entry.set_completion(completion)
 
     def add_more_models(self , widget):
+        # if we have an empty one it go bye bye
+        # if have more than two empty, one go by by
+        count_labels = 0
+        print("================================")
+        for child in self.box_pipeline:
+            print("child" , child)
+            print(child.get_first_child())
+            print(child.get_visible())
+
+            if not isinstance(child , Gtk.Label):
+                print(child.get_first_child())
+                if not child.get_first_child():
+                    child.get_parent().remove(child)
+                else:
+                    if isinstance(child.get_first_child(), Gtk.Label):
+                        count_labels += 1
+                        if count_labels >= 2:
+                            child.get_parent().remove(child)
+
+        
         self.box_pipeline.append(ModelHolder(self))
 
     def get_sklearn_pipeline(self ):
@@ -156,6 +177,7 @@ class SklearnPipeline(Gtk.Box):
         for outer_child in self.box_pipeline:
             # Get the current model if there is one here
             if isinstance(outer_child , ModelHolder) and outer_child.model_block != None:
+                print(outer_child.model_block)
                 curr_model = SklearnPipeline.parse_current_model(outer_child)
                 new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
                 model_list.append((new_entry_in_model_list , curr_model))

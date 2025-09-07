@@ -48,10 +48,6 @@ def add_sklearn_submodule(passed_box, submodule , color):
     passed_box.append(label_thing)
     passed_box.append(main_box)
 
-def remove_block_parent( _ctrl, value, _x, _y):
-    pear = value.get_parent()
-    if not isinstance(pear , Gtk.Grid):
-        pear.remove(value)
 
 STACKING_AMOUNT = 3
 class BlockLibary(Gtk.ScrolledWindow):
@@ -64,12 +60,18 @@ class BlockLibary(Gtk.ScrolledWindow):
         # adding styles
         add_style(self , 'block-library')
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        #
+        #
+        #
         drop_controller= Gtk.DropTarget.new(
-            type=GObject.TYPE_NONE, actions=Gdk.DragAction.COPY
+            type=GObject.TYPE_NONE, actions=Gdk.DragAction.MOVE
         )
         drop_controller.set_gtypes([ModelBlock])
-        drop_controller.connect("drop", remove_block_parent)
+        drop_controller.connect("drop", self.remove_block)
         main_box.add_controller(drop_controller)
+        #
+        #
+        #
         main_box.set_hexpand(True)
         main_box.set_vexpand(True)
         add_style(main_box , 'block-library')
@@ -84,6 +86,15 @@ class BlockLibary(Gtk.ScrolledWindow):
         # save as self
         self.main_box = main_box
         self.set_child(main_box)
+
+    def remove_block(self, _ctrl, value, _x, _y):
+            if isinstance(value, ModelBlock):
+                print("dropped into the library")
+                print(_ctrl)
+                model_holder = value.get_parent().get_parent()
+                pipeline_obj = value.get_parent().get_parent().get_parent().get_parent()
+                # remove model_holder
+                model_holder.get_parent().remove(model_holder)
 
 
 
@@ -121,7 +132,7 @@ class ModelBlock(Gtk.Box):
         sub_body = Gtk.Expander(label=sklearn_model_function_call.__name__)
         sub_body.set_child(scrollable_view)
         self.append(sub_body)
-        drag_controller = Gtk.DragSource(actions=Gdk.DragAction.COPY)
+        drag_controller = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
         drag_controller.connect("prepare", self.on_drag_prepare)
         drag_controller.connect("drag-begin", self.on_drag_begin)
         self.add_controller(drag_controller)
@@ -136,6 +147,14 @@ class ModelBlock(Gtk.Box):
     def on_drag_begin(self, ctrl, _drag):
         icon = Gtk.WidgetPaintable.new(self)
         ctrl.set_icon(icon, 0, 0)
+
+    def on_drag_end(self, drag_source, drag, success):
+        # The drag operation is complete.
+        # Check if the move was successful and perform cleanup.
+        if success and drag.get_selected_action() == Gdk.DragAction.MOVE:
+            # The widget was successfully dropped, so we can remove it from its source.
+            self.source_box.remove(self.drag_widget)
+            print("Widget removed from source container.")
 
     
 
