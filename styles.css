@@ -25,6 +25,10 @@
   background-color: #ededed;
 }
 
+.error-message {
+  color: red;
+}
+
 .control-button {
   color: black;
   background-color: #00b548;

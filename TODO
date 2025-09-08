@@ -27,4 +27,6 @@ The user might want to input different types of files, we could parse for diffre
 
 12. ### Finish the conversion to pandas dataframe viewing.
 
+13. ### Get accuracy scores for the things!!!
+
 STRETCH:

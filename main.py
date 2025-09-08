@@ -40,8 +40,8 @@ class Main_GUI(Gtk.Application):
         self.main_dataframe = self.process_input_file(file)
         self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
          # the main window
-        window = Gtk.ApplicationWindow(application=self, title="Sklearn GUI software")
-        window.set_default_size(1200, 900)
+        self.window = Gtk.ApplicationWindow(application=self, title="Sklearn GUI software")
+        self.window.set_default_size(1200, 900)
 
         # left side
         left_box = Gtk.Paned(
@@ -80,10 +80,10 @@ class Main_GUI(Gtk.Application):
         main_box.set_start_child(left_box)
         main_box.set_end_child(right_box)
         # adding main box
-        window.set_child(main_box)
-        window.set_titlebar(self.render_top_bar())
+        self.window.set_child(main_box)
+        self.window.set_titlebar(self.render_top_bar())
         self.load_css_file()
-        window.present()
+        self.window.present()
 
     def do_activate(self):
         print("No no veery bad")
@@ -216,7 +216,7 @@ class Main_GUI(Gtk.Application):
         x_cols = self.pipeline_box.get_x_values()
         y_cols = self.pipeline_box.get_y_value()
         x = self.main_dataframe[x_cols]
-        y = self.main_dataframe[y_cols]
+        y = self.main_dataframe[y_cols].iloc[:, 0]
         print(x)
         print(y)
         
@@ -233,19 +233,70 @@ class Main_GUI(Gtk.Application):
         # if is classifier 
         if sklearn.base.is_classifier(last_step_model):
             # render a classifier graph. 
-            print("Not there yet")
+            self.plot_classifier(x , y , y_pred , curr_pipeline , x_cols , y_cols)
         elif sklearn.base.is_regressor(last_step_model):
             # must be regression
             # Only one x value ... horizontal scatter plot
             if len(x.columns) == 1:
                 self.plot_single_regression(x , y , y_pred , x_cols , y_cols)
-            else:
-                print("gooning")
-            
+            elif len(x.columns) == 2:
+                self.plot_2d_regressor(x , y, curr_pipeline, x_cols , y_cols)
             
         else:
             raise ValueError("Ending result is neither a classifier or regressor. ")
         # making the graph / chart
+
+    def plot_2d_regressor(self , x , y , model ,  x_cols , y_cols):
+        # Step 3: Create grid for plotting
+        x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
+        x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
+        x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
+
+        # Create a DataFrame from the grid for prediction
+        grid_df = pd.DataFrame({
+            x_cols[0]: x1_grid.ravel(),
+            x_cols[1]: x2_grid.ravel()
+        })
+
+        # Step 4: Predict y values over the grid
+        y_pred = model.predict(grid_df).reshape(x1_grid.shape)
+
+        # Step 5: Plotting
+        fig = plt.figure(figsize=(10, 7))
+        ax = fig.add_subplot(111, projection='3d')
+
+        # Plot surface
+        ax.plot_surface(x1_grid, x2_grid, y_pred, cmap='viridis', alpha=0.7)
+
+        # Plot actual data points
+        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c='red', edgecolor='k')
+
+        # Labels
+        ax.set_xlabel(f"{x_cols[0]}")
+        ax.set_ylabel(f"{x_cols[1]}")
+        ax.set_zlabel(f"{y_cols[0]}")
+        ax.set_title(f"3D Surface for {y_cols[0]}")
+        self.plot_figure_canvas(fig)
+
+
+    def plot_classifier(self, x , y, y_pred, clf, x_cols , y_cols ):
+        # Plot the decision boundary
+        fig, ax = plt.subplots()
+        sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
+            clf,
+            x,
+            cmap=plt.cm.coolwarm,
+            alpha=0.6,
+            ax=ax
+        )
+
+        # Plot the data points
+        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], c=y, cmap=plt.cm.coolwarm, edgecolors='k')
+        ax.set_title(f"Classifier for {y_cols[0]}")
+        ax.set_xlabel(f"{x_cols[0]}")
+        ax.set_ylabel(f"{x_cols[1]}")
+        ax.legend(loc='upper left')
+        self.plot_figure_canvas(fig)
 
     def plot_single_regression(self, x , y , y_pred , x_cols, y_cols):
         print("gooning ... x cols == 1 and regression")
@@ -256,19 +307,28 @@ class Main_GUI(Gtk.Application):
         ax.set_xlabel(f"{x_cols[0]}")
         ax.set_ylabel(f"{y_cols[0]}")
         ax.legend(loc='upper left')
-
+        self.plot_figure_canvas(fig)
+        
+    def plot_figure_canvas(self, fig):
         for child in self.main_canvas:
             child.get_parent().remove(child)
-        
         self.main_canvas.append(FigureCanvas(fig))  # a Gtk.DrawingArea
         self.main_canvas.set_size_request(500, 500)
 
 
-
     def plot_chart(self, widget):
-        print("Not there yet")
-        model = self.train_model()
-        print(model)
+        try:
+            model = self.train_model()
+        except Exception as e:
+            msg = str(e)
+            if len(msg) > 80:
+                msg = msg[:80]
+            dialog = Gtk.AlertDialog()
+            dialog.set_message(f"{type(e).__name__}")
+            dialog.set_detail(msg)
+            dialog.set_modal(True)
+            dialog.set_buttons(["OK"])
+            dialog.show()
 
     def render_pipeline(self):
 
@@ -278,6 +338,8 @@ class Main_GUI(Gtk.Application):
         control_button.connect("clicked", self.plot_chart)
         self.add_style(control_button , 'control-button')
         top_control_box.append(control_button)
+        
+
 
         # create a standard box
         main_box = standard_box.StdBox(
