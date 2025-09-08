@@ -29,4 +29,7 @@ The user might want to input different types of files, we could parse for diffre
 
 13. ### Get accuracy scores for the things!!!
 
+14. ### Allow for a k-fold validation.
+    Add this as a pipeline object.
+
 STRETCH:

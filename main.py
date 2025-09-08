@@ -201,141 +201,20 @@ class Main_GUI(Gtk.Application):
     def add_style(self, gui_thing , class_name):
         gui_thing.get_style_context().add_class(class_name)
 
-
-    def train_model(self):
-        """
-            trains the model
-        """
-        # parse and get the untrained pipeline
-        curr_pipeline = self.pipeline_box.get_sklearn_pipeline()
-
-        # use pandas to load the .csv as a dataframe
-        print(self.main_dataframe)
-
-        # get the x and y values 
-        x_cols = self.pipeline_box.get_x_values()
-        y_cols = self.pipeline_box.get_y_value()
-        x = self.main_dataframe[x_cols]
-        y = self.main_dataframe[y_cols].iloc[:, 0]
-        print(x)
-        print(y)
-        
-        # if it is a one - one we should refect that in x-y valyes
-        print(curr_pipeline)
-        curr_pipeline.fit(x , y)
-
-        y_pred = curr_pipeline.predict(x)
-
-        # we could have a sections for regression and Classification
-        # get the last step on pipeline to see which it is 
-        # maybe later we make it automatic but user can specify
-        last_step_name , last_step_model = curr_pipeline.steps[-1]
-        # if is classifier 
-        if sklearn.base.is_classifier(last_step_model):
-            # render a classifier graph. 
-            self.plot_classifier(x , y , y_pred , curr_pipeline , x_cols , y_cols)
-        elif sklearn.base.is_regressor(last_step_model):
-            # must be regression
-            # Only one x value ... horizontal scatter plot
-            if len(x.columns) == 1:
-                self.plot_single_regression(x , y , y_pred , x_cols , y_cols)
-            elif len(x.columns) == 2:
-                self.plot_2d_regressor(x , y, curr_pipeline, x_cols , y_cols)
-            
-        else:
-            raise ValueError("Ending result is neither a classifier or regressor. ")
-        # making the graph / chart
-
-    def plot_2d_regressor(self , x , y , model ,  x_cols , y_cols):
-        # Step 3: Create grid for plotting
-        x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
-        x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
-        x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
-
-        # Create a DataFrame from the grid for prediction
-        grid_df = pd.DataFrame({
-            x_cols[0]: x1_grid.ravel(),
-            x_cols[1]: x2_grid.ravel()
-        })
-
-        # Step 4: Predict y values over the grid
-        y_pred = model.predict(grid_df).reshape(x1_grid.shape)
-
-        # Step 5: Plotting
-        fig = plt.figure(figsize=(10, 7))
-        ax = fig.add_subplot(111, projection='3d')
-
-        # Plot surface
-        ax.plot_surface(x1_grid, x2_grid, y_pred, cmap='viridis', alpha=0.7)
-
-        # Plot actual data points
-        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c='red', edgecolor='k')
-
-        # Labels
-        ax.set_xlabel(f"{x_cols[0]}")
-        ax.set_ylabel(f"{x_cols[1]}")
-        ax.set_zlabel(f"{y_cols[0]}")
-        ax.set_title(f"3D Surface for {y_cols[0]}")
-        self.plot_figure_canvas(fig)
-
-
-    def plot_classifier(self, x , y, y_pred, clf, x_cols , y_cols ):
-        # Plot the decision boundary
-        fig, ax = plt.subplots()
-        sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
-            clf,
-            x,
-            cmap=plt.cm.coolwarm,
-            alpha=0.6,
-            ax=ax
+    def higher_order_wrapper_main_sklearn_pipeline(self, _):
+        self.main_canvas.main_sklearn_pipe(
+            main_dataframe=self.main_dataframe,
+            curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
+            pipeline_x_values= self.pipeline_box.get_x_values(),
+            pipeline_y_value=self.pipeline_box.get_y_value(),
         )
-
-        # Plot the data points
-        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], c=y, cmap=plt.cm.coolwarm, edgecolors='k')
-        ax.set_title(f"Classifier for {y_cols[0]}")
-        ax.set_xlabel(f"{x_cols[0]}")
-        ax.set_ylabel(f"{x_cols[1]}")
-        ax.legend(loc='upper left')
-        self.plot_figure_canvas(fig)
-
-    def plot_single_regression(self, x , y , y_pred , x_cols, y_cols):
-        print("gooning ... x cols == 1 and regression")
-        fig, ax = plt.subplots()
-        ax.scatter(x , y , color='red' , label=f"Dataset")
-        ax.plot(x , y_pred , color='blue' , label='AI predictions')
-        ax.set_title(f"{x_cols[0]} and {y_cols[0]}")
-        ax.set_xlabel(f"{x_cols[0]}")
-        ax.set_ylabel(f"{y_cols[0]}")
-        ax.legend(loc='upper left')
-        self.plot_figure_canvas(fig)
-        
-    def plot_figure_canvas(self, fig):
-        for child in self.main_canvas:
-            child.get_parent().remove(child)
-        self.main_canvas.append(FigureCanvas(fig))  # a Gtk.DrawingArea
-        self.main_canvas.set_size_request(500, 500)
-
-
-    def plot_chart(self, widget):
-        try:
-            model = self.train_model()
-        except Exception as e:
-            msg = str(e)
-            if len(msg) > 80:
-                msg = msg[:80]
-            dialog = Gtk.AlertDialog()
-            dialog.set_message(f"{type(e).__name__}")
-            dialog.set_detail(msg)
-            dialog.set_modal(True)
-            dialog.set_buttons(["OK"])
-            dialog.show()
 
     def render_pipeline(self):
 
         # make top control buttons
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         control_button = Gtk.Button(label="Run Sklearn! ▶️")
-        control_button.connect("clicked", self.plot_chart)
+        control_button.connect("clicked", self.higher_order_wrapper_main_sklearn_pipeline)
         self.add_style(control_button , 'control-button')
         top_control_box.append(control_button)
         
@@ -387,10 +266,8 @@ class Main_GUI(Gtk.Application):
 
 
     def render_graph(self):
-        self.main_canvas = Gtk.Box()
+        self.main_canvas = sklearn_proccesses.SklearnPlotter()
         self.main_canvas.set_size_request(500, 500)
-        canvas = FigureCanvas()  # a Gtk.DrawingArea
-        self.main_canvas.append(canvas)
         return self.main_canvas
 
 
