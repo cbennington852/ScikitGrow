@@ -1,6 +1,7 @@
 import sys
 import csv
 import gi
+import traceback
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
@@ -18,17 +19,31 @@ import pandas as pd
 import numpy as np
 
 
-class SklearnPlotter(Gtk.Box):
+class SklearnPlotter(Gtk.Notebook):
     def __init__(self , **kargs):
         super().__init__(**kargs)
+        # Create content for the first page
+        self.plotting_page = Gtk.Box()
+        plotting_page_label = Gtk.Label(label="Plot")
+        self.append_page(self.plotting_page, plotting_page_label)
+
+        # Create content for the second page
+        self.accuracy_page = Gtk.Box()
+        accuracy_page_label = Gtk.Label(label="Accuracy")
+        self.append_page(self.accuracy_page, accuracy_page_label)
 
     def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value):
         try:
+            # plotting the normal regular plotting chart
             self.train_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
             figure = self.filter_pipeline()
-            print(figure)
-            self.plot_figure_canvas(figure)
+            self.plot_figure_canvas(figure , self.plotting_page)
+            # plotting the accuracy chart
+            print("HI")
+            accuracy_plot = self.filter_accuracy_plotting(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+            self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
         except Exception as e:
+            traceback.print_exc()
             msg = str(e)
             if len(msg) > 80:
                 msg = msg[:80]
@@ -39,13 +54,52 @@ class SklearnPlotter(Gtk.Box):
             dialog.set_buttons(["OK"])
             dialog.show()
         
+    def filter_accuracy_plotting(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+        print(curr_pipeline , "sfdsd")
         
+        last_step_name , last_step_model = curr_pipeline.steps[-1]
+        # if is classifier 
+        if sklearn.base.is_classifier(last_step_model):
+            return self.classifier_accuracy_plot(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        elif sklearn.base.is_regressor(last_step_model):
+            return self.regressor_accuracy_plot(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        else:
+            raise ValueError("The last step must be a regressor or a classifier ")
+
+
+    def classifier_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+        pass
+
+    def regressor_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+        y_pred = curr_pipeline.predict(self.x)
+
+        rmse = sklearn.metrics.mean_squared_error(self.y, y_pred)
+
+        fig, ax = plt.subplots()
+        ax.scatter(self.y, y_pred, alpha=0.6, color='teal', edgecolor='k', label='Predicted Points')
+        ax.plot([self.y.min(), self.y.max()], [self.y.min(), self.y.max()], 'r--', lw=2, label='Ideal Fit (y = x)')
+        ax.set_xlabel("Actual Values")
+        ax.set_ylabel("Predicted Values")
+        ax.set_title(f"Predicted vs. Actual Values\nRMSE = {rmse:.2f}")
+        ax.legend()
+        ax.grid(True)
+        # adding other stuff
+        textstr = (
+            f"RMSE                : {rmse}" + 
+            f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(self.y, y_pred)}" + 
+            f"\nr2                  : {sklearn.metrics.r2_score(self.y, y_pred)}"
+        )
+        props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.7) # Customize box style
+        ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=12,
+                verticalalignment='top', horizontalalignment='right', bbox=props)
+        print("accuracy")
+        return fig
+
         
-    def plot_figure_canvas(self, fig):
-        for child in self:
-            child.get_parent().remove(child)
-        self.append(FigureCanvas(fig))  # a Gtk.DrawingArea
-        self.set_size_request(600, 600)
+    def plot_figure_canvas(self, fig , page):
+        for child in page:
+            page.remove(child)
+        page.append(FigureCanvas(fig))  # a Gtk.DrawingArea
         print("Done plotting ")
 
     def train_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
