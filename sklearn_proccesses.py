@@ -20,6 +20,14 @@ import numpy as np
 
 
 class SklearnPlotter(Gtk.Notebook):
+    """A GTK notebook that contains all of the plotting info. 
+
+        self.main_sklearn_pipe() 
+        ^^^ calls the main plotting function
+
+    Args:
+        Gtk (_type_): _description_
+    """
     def __init__(self , **kargs):
         super().__init__(**kargs)
         # Create content for the first page
@@ -32,7 +40,30 @@ class SklearnPlotter(Gtk.Notebook):
         accuracy_page_label = Gtk.Label(label="Accuracy")
         self.append_page(self.accuracy_page, accuracy_page_label)
 
+    def factorize_string_cols(self, main_dataframe , pipeline_x_values , pipeline_y_value):
+        """Takes all of the string like columns and serializes them, with each unique 
+        value getting a new serial number
+
+        Args:
+            main_dataframe (_type_): _description_
+            pipeline_x_values (_type_): _description_
+            pipeline_y_value (_type_): _description_
+        """
+        # returns as new main dataframe. 
+        # uses # Use factorize() to serialize the 'products' column
+        # codes, uniques = pd.factorize(df['products'])
+        pass
+
     def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value):
+        """Runs the main sklearn pipeline, filtering through the different options that
+          the user could have inputted into this software. 
+
+        Args:
+            main_dataframe (pd.Dataframe): main inputted dataframe
+            curr_pipeline (sklearn.pipeline): sklearn_pipeline object
+            pipeline_x_values ([str]): _description_
+            pipeline_y_value ([str]): _description_
+        """
         try:
             # plotting the normal regular plotting chart
             self.train_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
@@ -55,6 +86,23 @@ class SklearnPlotter(Gtk.Notebook):
             dialog.show()
         
     def filter_accuracy_plotting(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+        """
+        ACCURACY ONLY 
+        Filters the dataset based on the pipeline, trying to see specifically what type
+        of input the user wants to get back out at them. 
+
+        Args:
+            main_dataframe (pd.Dataframe): main inputted dataframe
+            curr_pipeline (sklearn.pipeline): sklearn_pipeline object
+            pipeline_x_values ([str]): _description_
+            pipeline_y_value ([str]): _description_
+
+        Raises:
+            ValueError: Not a regressor or classifier
+
+        Returns:
+            Figure: the figure containing the chart to be plotted. 
+        """
         print(curr_pipeline , "sfdsd")
         
         last_step_name , last_step_model = curr_pipeline.steps[-1]
@@ -66,6 +114,82 @@ class SklearnPlotter(Gtk.Notebook):
         else:
             raise ValueError("The last step must be a regressor or a classifier ")
 
+        
+    def plot_figure_canvas(self, fig , page):
+        """Small helper function to plot the output from matplotlib into GTK. 
+
+        Args:
+            fig (Figure): The matplotlib figure output
+            page (Gtk.Page): The pointer to the notebook page we want to plot to.
+        """
+        for child in page:
+            page.remove(child)
+        page.append(FigureCanvas(fig))  # a Gtk.DrawingArea
+        print("Done plotting ")
+
+    def train_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+        """
+        Trains the model using the main dataframe and pipeline_x_values. This is also
+        where we will see what type of test train split the user has implemented into 
+        their pipeline.
+
+        Args:
+            main_dataframe (pd.Dataframe): main inputted dataframe
+            curr_pipeline (sklearn.pipeline): sklearn_pipeline object
+            pipeline_x_values ([str]): _description_
+            pipeline_y_value ([str]): _description_
+        """
+        # parse and get the untrained pipeline
+        self.curr_pipeline = curr_pipeline
+
+        # get the x and y values 
+        self.x_cols = pipeline_x_values
+        self.y_cols = pipeline_y_value
+        self.x = main_dataframe[self.x_cols]
+        self.y = main_dataframe[self.y_cols].iloc[:, 0]
+        
+        # later here we will get and fit the training validation thing the user wants. 
+        self.curr_pipeline.fit(self.x , self.y)
+
+    def filter_pipeline(self):
+        """
+        PLOTTING ONLY 
+        Filters the dataset based on the pipeline, trying to see specifically what type
+        of input the user wants to get back out at them. 
+
+        Args:
+            main_dataframe (pd.Dataframe): main inputted dataframe
+            curr_pipeline (sklearn.pipeline): sklearn_pipeline object
+            pipeline_x_values ([str]): _description_
+            pipeline_y_value ([str]): _description_
+
+        Raises:
+            ValueError: Not a regressor or classifier
+
+        Returns:
+            Figure: the figure containing the chart to be plotted. 
+        """
+        y_pred = self.curr_pipeline.predict(self.x)
+        last_step_name , last_step_model = self.curr_pipeline.steps[-1]
+        # if is classifier 
+        if sklearn.base.is_classifier(last_step_model):
+            # render a classifier graph. 
+            return self.plot_classifier(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+        elif sklearn.base.is_regressor(last_step_model):
+            # render a regressor graph
+            if len(self.x.columns) == 1:
+                return self.plot_single_regression(self.x , self.y , y_pred , self.x_cols , self.y_cols)
+            elif len(self.x.columns) == 2:
+                return self.plot_2d_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
+        
+        else:
+            raise ValueError("Ending result is neither a classifier or regressor. ")
+        # making the graph / chart
+
+
+    #=============================================================
+    # sections of graphing
+    #=============================================================
 
     def classifier_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         pass
@@ -94,54 +218,6 @@ class SklearnPlotter(Gtk.Notebook):
                 verticalalignment='top', horizontalalignment='right', bbox=props)
         print("accuracy")
         return fig
-
-        
-    def plot_figure_canvas(self, fig , page):
-        for child in page:
-            page.remove(child)
-        page.append(FigureCanvas(fig))  # a Gtk.DrawingArea
-        print("Done plotting ")
-
-    def train_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
-        """
-            trains the model
-        """
-        # parse and get the untrained pipeline
-        self.curr_pipeline = curr_pipeline
-
-        # get the x and y values 
-        self.x_cols = pipeline_x_values
-        self.y_cols = pipeline_y_value
-        print(self.x_cols)
-        print(self.y_cols)
-        self.x = main_dataframe[self.x_cols]
-        self.y = main_dataframe[self.y_cols].iloc[:, 0]
-        
-        # if it is a one - one we should refect that in x-y valyes
-        self.curr_pipeline.fit(self.x , self.y)
-
-    def filter_pipeline(self):
-        y_pred = self.curr_pipeline.predict(self.x)
-        last_step_name , last_step_model = self.curr_pipeline.steps[-1]
-        # if is classifier 
-        if sklearn.base.is_classifier(last_step_model):
-            # render a classifier graph. 
-            return self.plot_classifier(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
-        elif sklearn.base.is_regressor(last_step_model):
-            # render a regressor graph
-            if len(self.x.columns) == 1:
-                return self.plot_single_regression(self.x , self.y , y_pred , self.x_cols , self.y_cols)
-            elif len(self.x.columns) == 2:
-                return self.plot_2d_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
-        
-        else:
-            raise ValueError("Ending result is neither a classifier or regressor. ")
-        # making the graph / chart
-
-
-    #=============================================================
-    # sections of graphing
-    #=============================================================
 
     def plot_2d_regressor(self , x , y , model ,  x_cols , y_cols):
         # Step 3: Create grid for plotting

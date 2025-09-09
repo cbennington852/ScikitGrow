@@ -32,4 +32,6 @@ The user might want to input different types of files, we could parse for diffre
 14. ### Allow for a k-fold validation.
     Add this as a pipeline object.
 
+15. ### use pd.factorise on the string type columns
+
 STRETCH:

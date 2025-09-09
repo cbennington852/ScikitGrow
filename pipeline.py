@@ -11,6 +11,11 @@ import sklearn
 
 
 class ModelHolder(Gtk.Box):
+    """A GTK object that "holds" the custom GTK model block. 
+
+    Args:
+        Gtk (_type_): _description_
+    """
     def __init__(self, parent = None, **kargs):
         super().__init__(**kargs)
 

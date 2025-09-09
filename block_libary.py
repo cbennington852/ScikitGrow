@@ -22,33 +22,6 @@ def get_public_methods(library):
     return res
 
 
-def add_sklearn_submodule(passed_box, submodule , color):
-    """Adds a sklearn submodule to the class. 
-
-    Args:
-        passed_box (_type_): _description_
-        submodule (_type_): _description_
-        color (_type_): _description_
-    """
-    #setup grid
-    main_box = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
-    main_box.set_hexpand(True)
-    main_box.set_vexpand(True)
-    # for all of the models in linear_model add them
-    linear_model_list = get_public_methods(submodule)
-    for k in range(0 , len(linear_model_list)):
-        curr = ModelBlock(linear_model_list[k] , color)
-        y = k // STACKING_AMOUNT
-        x = k % STACKING_AMOUNT
-        # apply a style that is a certain color
-        main_box.attach(curr , x , y , 1 , 1)
-    # add label
-    label_thing = Gtk.Label(label=submodule.__name__)
-    add_style(label_thing , 'block-label')
-    passed_box.append(label_thing)
-    passed_box.append(main_box)
-
-
 STACKING_AMOUNT = 3
 class BlockLibary(Gtk.ScrolledWindow):
     """
@@ -59,7 +32,7 @@ class BlockLibary(Gtk.ScrolledWindow):
 
         # adding styles
         add_style(self , 'block-library')
-        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         #
         #
         #
@@ -68,24 +41,47 @@ class BlockLibary(Gtk.ScrolledWindow):
         )
         drop_controller.set_gtypes([ModelBlock])
         drop_controller.connect("drop", self.remove_block)
-        main_box.add_controller(drop_controller)
+        self.main_box.add_controller(drop_controller)
         #
         #
         #
-        main_box.set_hexpand(True)
-        main_box.set_vexpand(True)
-        add_style(main_box , 'block-library')
+        self.main_box.set_hexpand(True)
+        self.main_box.set_vexpand(True)
+        add_style(self.main_box , 'block-library')
 
         # adding linear libary
-        add_sklearn_submodule(main_box , sklearn.linear_model , 'green')
-        add_sklearn_submodule(main_box , sklearn.preprocessing , 'purple')
-        add_sklearn_submodule(main_box , sklearn.neural_network , 'orange')
-        add_sklearn_submodule(main_box , sklearn.tree , 'blue')
-
+        self.add_sklearn_submodule(sklearn.linear_model , 'green')
+        self.add_sklearn_submodule(sklearn.preprocessing , 'purple')
+        self.add_sklearn_submodule(sklearn.neural_network , 'orange')
+        self.add_sklearn_submodule(sklearn.tree , 'blue')
 
         # save as self
-        self.main_box = main_box
-        self.set_child(main_box)
+        self.set_child(self.main_box)
+
+    def add_sklearn_submodule(self, submodule , color):
+        """Adds a sklearn submodule to the class. 
+
+        Args:
+            submodule (sklearn.submodule): sklearn submodule to be parsed.
+            color (str): string color that points to a css class in the css file.
+        """
+        #setup grid
+        main_box = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+        main_box.set_hexpand(True)
+        main_box.set_vexpand(True)
+        # for all of the models in linear_model add them
+        linear_model_list = get_public_methods(submodule)
+        for k in range(0 , len(linear_model_list)):
+            curr = ModelBlock(linear_model_list[k] , color)
+            y = k // STACKING_AMOUNT
+            x = k % STACKING_AMOUNT
+            # apply a style that is a certain color
+            main_box.attach(curr , x , y , 1 , 1)
+        # add label
+        label_thing = Gtk.Label(label=submodule.__name__)
+        add_style(label_thing , 'block-label')
+        self.main_box.append(label_thing)
+        self.main_box.append(main_box)
 
     def remove_block(self, _ctrl, value, _x, _y):
             if isinstance(value, ModelBlock):
