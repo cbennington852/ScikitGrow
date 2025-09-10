@@ -36,7 +36,7 @@ class Main_GUI(Gtk.Application):
         GLib.set_application_name("SciKitLearn GUI")
 
     def create_window(self, file):
-        
+        print("gggg")
         self.main_dataframe = self.process_input_file(file)
         self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
          # the main window
@@ -232,6 +232,18 @@ class Main_GUI(Gtk.Application):
     def render_top_bar(self):
         header_bar = Gtk.HeaderBar.new()
         header_bar.set_show_title_buttons(True)
+        button_start = Gtk.Button()
+        icon_start = Gio.ThemedIcon(name="document-new-symbolic")
+        image_start = Gtk.Image.new_from_gicon(icon_start)
+        button_start.set_child(image_start)
+        header_bar.pack_start(button_start)
+
+        # Add a button to the end of the HeaderBar
+        button_end = Gtk.Button()
+        icon_end = Gio.ThemedIcon(name="mail-send-receive-symbolic")
+        image_end = Gtk.Image.new_from_gicon(icon_end)
+        button_end.set_child(image_end)
+        header_bar.pack_end(button_end)
         return header_bar
 
     def render_block_library(self):

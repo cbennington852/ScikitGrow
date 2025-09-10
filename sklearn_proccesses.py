@@ -127,6 +127,15 @@ class SklearnPlotter(Gtk.Notebook):
         page.append(FigureCanvas(fig))  # a Gtk.DrawingArea
         print("Done plotting ")
 
+    def validate_column_inputs(self, main_dataframe, pipeline_x_values , pipeline_y_value):
+        lst_cols = main_dataframe.columns
+        for x_col in pipeline_x_values:
+            if x_col not in lst_cols:
+                raise ValueError(f"Error: {x_col} is not in the dataset")
+        for y_col in pipeline_y_value:
+            if y_col not in lst_cols:
+                raise ValueError(f"Error: {y_col} is not in the dataset")
+
     def train_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         """
         Trains the model using the main dataframe and pipeline_x_values. This is also
@@ -145,6 +154,7 @@ class SklearnPlotter(Gtk.Notebook):
         # get the x and y values 
         self.x_cols = pipeline_x_values
         self.y_cols = pipeline_y_value
+        self.validate_column_inputs(main_dataframe , pipeline_x_values , pipeline_y_value)
         self.x = main_dataframe[self.x_cols]
         self.y = main_dataframe[self.y_cols].iloc[:, 0]
         
@@ -181,7 +191,9 @@ class SklearnPlotter(Gtk.Notebook):
                 return self.plot_single_regression(self.x , self.y , y_pred , self.x_cols , self.y_cols)
             elif len(self.x.columns) == 2:
                 return self.plot_2d_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
-        
+            else:
+                return self.plot_n_plus_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
+                
         else:
             raise ValueError("Ending result is neither a classifier or regressor. ")
         # making the graph / chart
@@ -192,7 +204,17 @@ class SklearnPlotter(Gtk.Notebook):
     #=============================================================
 
     def classifier_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
-        pass
+        y_pred = curr_pipeline.predict(self.x)
+        fig, ax = plt.subplots()
+        textstr = (
+            f"Accuracy  : {sklearn.metrics.accuracy(self.y, y_pred)}" +
+            f"\nBrier score loss  : {sklearn.metrics.brier_score_loss(self.y, y_pred)}"
+            f"\nBrier score loss  : {sklearn.metrics.log_loss(self.y, y_pred)}"
+        )
+        props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.7) # Customize box style
+        ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=12,
+                verticalalignment='top', horizontalalignment='right', bbox=props)
+        return fig
 
     def regressor_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         y_pred = curr_pipeline.predict(self.x)
@@ -204,19 +226,25 @@ class SklearnPlotter(Gtk.Notebook):
         ax.plot([self.y.min(), self.y.max()], [self.y.min(), self.y.max()], 'r--', lw=2, label='Ideal Fit (y = x)')
         ax.set_xlabel("Actual Values")
         ax.set_ylabel("Predicted Values")
-        ax.set_title(f"Predicted vs. Actual Values\nRMSE = {rmse:.2f}")
         ax.legend()
         ax.grid(True)
         # adding other stuff
         textstr = (
-            f"RMSE                : {rmse}" + 
-            f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(self.y, y_pred)}" + 
-            f"\nr2                  : {sklearn.metrics.r2_score(self.y, y_pred)}"
+            f"\nPredicted vs. Actual Values"
+            f"\nRMSE                : {rmse}" + 
+            f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(self.y, y_pred):.2f}" + 
+            f"\nr2                  : {sklearn.metrics.r2_score(self.y, y_pred):.2f}"
         )
-        props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.7) # Customize box style
-        ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=12,
-                verticalalignment='top', horizontalalignment='right', bbox=props)
+        ax.set_title(textstr)
         print("accuracy")
+        return fig
+    
+    def plot_n_plus_regressor(self , x , y , model ,  x_cols , y_cols):
+        fig, ax = plt.subplots()
+
+        ax.text(x=0.5 , y=0.5, s="Your plot is in the 4th dimension, the accuracy graph still works, " \
+                "however, the \"plot\"graph will onl show the first three dimensions", transform=axs[0].transAxes,
+                horizontalalignment='center', verticalalignment='center',)
         return fig
 
     def plot_2d_regressor(self , x , y , model ,  x_cols , y_cols):

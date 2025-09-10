@@ -10,6 +10,12 @@ def add_style(gui_thing , class_name):
     gui_thing.get_style_context().add_class(class_name)
 
 class StdBox(Gtk.Box):
+    """The code / boiler plate for a "box" with a header of buttons. 
+    This applies to every box that contains something. 
+
+    Args:
+        Gtk (_type_): _description_
+    """
     def __init__(self, header_box , body_box, **kargs):
         super().__init__(**kargs)
         # make the main frame
