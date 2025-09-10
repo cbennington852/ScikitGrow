@@ -69,8 +69,8 @@ class Main_GUI(Gtk.Application):
         right_box.set_end_child(block_library)
     
         # The csv viewer
-        csv_veiwer_box = self.render_csv()
-        left_box.set_start_child(csv_veiwer_box )
+        csv_viewer_box = self.render_pandas_dataframe()
+        left_box.set_start_child(csv_viewer_box)
 
         # pipeline 
         pipeline_main_box = self.render_pipeline()
@@ -86,13 +86,17 @@ class Main_GUI(Gtk.Application):
         self.window.present()
 
     def do_activate(self):
-        print("No no veery bad")
+        """
+        This function is called upon the user when the user calls this app
+        not on a .csv or tangential file type. 
+        """
+        print("Splash screen not implemented yet.... work on it later")
 
     def do_open(self, files: list[Gio.File], n_files,  hint: str):
         for file in files:
             self.create_window(file.get_path())
 
-    def render_csv(self):
+    def render_pandas_dataframe(self):
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         control_button = Gtk.Button(label="Edit CSV")
         top_control_box.append(control_button)
