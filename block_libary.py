@@ -192,6 +192,9 @@ class ModelBlock(Gtk.Box):
         add_style(self , f"block-{color}")
         self.block_color = color
 
+    def copy(thing_to_be_copied):
+        
+
     def on_drag_prepare(self, _ctrl, _x, _y):
         item = Gdk.ContentProvider.new_for_value(self)
         string = Gdk.ContentProvider.new_for_value(self.sklearn_model_function_call)

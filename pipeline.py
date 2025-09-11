@@ -10,27 +10,25 @@ import sklearn
 
 
 
-class ModelHolder(Gtk.Box , ):
+class DroppableHolder(Gtk.Box ):
     """A GTK object that "holds" the custom GTK model block. 
 
     Args:
         Gtk (_type_): _description_
     """
-    def __init__(self, parent = None, **kargs):
+    def __init__(self, style, thing_to_hold,  parent = None, **kargs):
         super().__init__(**kargs)
-
+        self.thing_to_hold = thing_to_hold
         self.parent = parent
-
-        block_libary.add_style(self , 'pipeline-model-holder')
-
+        block_libary.add_style(self , style)
         self.box = Gtk.Box()
-        self.box.append(Gtk.Label(label="drop models here!"))
+        self.box.append(Gtk.Label(label=f"drop {thing_to_hold.__name__} here!"))
         self.append(self.box)
 
         drop_controller = Gtk.DropTarget.new(
             type=GObject.TYPE_NONE, actions=Gdk.DragAction.MOVE
         )
-        drop_controller.set_gtypes([block_libary.ModelBlock])
+        drop_controller.set_gtypes([thing_to_hold])
         drop_controller.connect("drop", self.on_drop)
         self.add_controller(drop_controller)
         self.model_block = None
@@ -39,13 +37,11 @@ class ModelHolder(Gtk.Box , ):
         return self.model_block != None
 
     def on_drop(self, _ctrl, value, _x, _y):
-        if isinstance(value, block_libary.ModelBlock):
+        if isinstance(value, self.thing_to_hold):
             for child in self.box:
                 self.box.remove(child)
-            new_block = block_libary.ModelBlock(
-                sklearn_model_function_call=value.sklearn_model_function_call,
-                color=value.block_color
-            )
+            new_block = self.thing_to_hold.copy(value) 
+            # TODO: add a copy method that returns a copy of said object.
             self.box.append(new_block)
             self.model_block = new_block
             self.parent.add_more_models(None)
@@ -102,7 +98,7 @@ class SklearnPipeline(Gtk.Box):
         self.box_pipeline.append(Gtk.Label(label="Sklearn Models"))
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
-        self.box_pipeline.append(ModelHolder(self))
+        self.box_pipeline.append(DroppableHolder(self))
         # append important stuff
         self.append(box_data)
         self.append(self.box_pipeline)
@@ -150,7 +146,7 @@ class SklearnPipeline(Gtk.Box):
             if not child.has_model():
                 count += 1
         if count == 0:
-            self.box_pipeline.append(ModelHolder(self))
+            self.box_pipeline.append(DroppableHolder(self))
         print("==============END================")
         
 
@@ -166,7 +162,7 @@ class SklearnPipeline(Gtk.Box):
         x = 0
         for outer_child in self.box_pipeline:
             # Get the current model if there is one here
-            if isinstance(outer_child , ModelHolder) and outer_child.model_block != None:
+            if isinstance(outer_child , DroppableHolder) and outer_child.model_block != None:
                 print(outer_child.model_block)
                 curr_model = SklearnPipeline.parse_current_model(outer_child)
                 new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
@@ -177,7 +173,7 @@ class SklearnPipeline(Gtk.Box):
         
 
     def parse_current_model(outer_child):
-        # now we have all of the ModelHolder objects
+        # now we have all of the DroppableHolder objects
         map_of_parameters = {}
         curr_block = outer_child.model_block
         print(' mid: ' , outer_child.model_block)
