@@ -143,6 +143,8 @@ class ColumnBlock(Gtk.Box):
         ctrl.set_icon(icon, 0, 0)
 
     def on_drag_end(self, drag_source, drag, success):
+        print('source: ',drag_source, ' drag:' , drag, ' success:' , success)
+
         # Check if the move was successful and perform cleanup.
         if success and drag.get_selected_action() == Gdk.DragAction.MOVE:
             # The widget was successfully dropped, so we can remove it from its source.

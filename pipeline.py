@@ -10,7 +10,7 @@ import sklearn
 
 
 
-class ModelHolder(Gtk.Box):
+class ModelHolder(Gtk.Box , ):
     """A GTK object that "holds" the custom GTK model block. 
 
     Args:
@@ -83,12 +83,10 @@ class SklearnPipeline(Gtk.Box):
         self.x_values_entry = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL) 
         first_entry = Gtk.Entry()
         first_entry.connect('changed' , self.consider_adding_new_box)
-        self.add_search_completion_thingy(first_entry)
         self.x_values_entry.append(first_entry)
         # make a y_value, with completions
         y_value_label = Gtk.Label(label='Y-values')
         self.y_values_entry = Gtk.Entry()
-        self.add_search_completion_thingy(self.y_values_entry)
         # build the data section
         box_data.attach(x_value_label , 0 , 0 ,1 ,1)
         box_data.attach(self.x_values_entry, 1, 0, 1,1)
@@ -119,10 +117,11 @@ class SklearnPipeline(Gtk.Box):
     def get_y_value(self):
         return [self.y_values_entry.get_text()]
 
-
     def consider_adding_new_box(self, value):
-        
         # Check to see if value in the set of column names
+        if value.get_text() not in self.columns:
+            value.set_text("")
+        print("Changed: ", value)
         num_empty = 0
         for child in self.x_values_entry:
             print(child , child.get_text())
@@ -135,19 +134,9 @@ class SklearnPipeline(Gtk.Box):
         if num_empty == 0:
             first_entry = Gtk.Entry()
             first_entry.connect('changed' , self.consider_adding_new_box)
-            self.add_search_completion_thingy(first_entry)
             self.x_values_entry.append(first_entry)
         # Check to see if we have two empty columns, if so delete one. 
 
-    def add_search_completion_thingy(self, specific_entry):
-        list_store = Gtk.ListStore(str)
-        for item in self.columns:
-            list_store.append([item])
-            completion = Gtk.EntryCompletion()
-        completion.set_model(list_store)
-        completion.set_text_column(0)
-        completion.set_inline_completion(True)
-        specific_entry.set_completion(completion)
 
     def add_more_models(self , widget):
         # count the number of non-empty models
