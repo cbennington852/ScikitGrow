@@ -58,6 +58,18 @@ Block related things
   min-height: 300px;
 }
 
+.data-block {
+  background-color : #115879;
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
 .block-green {
   background-color : #11793b;
   margin: 10px;

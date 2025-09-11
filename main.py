@@ -31,8 +31,6 @@ class Main_GUI(Gtk.Application):
         )
 
         self.css_file_path = "./styles.css"
-        self.block_library_var = block_libary.BlockLibary()
-        self.main_dataframe = pd.DataFrame()
         GLib.set_application_name("SciKitLearn GUI")
 
     def create_window(self, file):
@@ -255,6 +253,7 @@ class Main_GUI(Gtk.Application):
         # make a search bar
         search_bar = Gtk.SearchEntry()
         search_bar.set_placeholder_text("Search for blocks...")
+        self.block_library_var = block_libary.BlockLibary(self.main_dataframe.columns)
         search_bar.connect("search-changed", self.searching_block_library)
 
         main_box = standard_box.StdBox(

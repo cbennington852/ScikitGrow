@@ -27,10 +27,11 @@ class BlockLibary(Gtk.ScrolledWindow):
     """
     This is the "library" of available functions from sklearn that we can use in this package for this project. 
     """
-    def __init__(self, **kargs):
+    def __init__(self, column_names , **kargs):
         super().__init__(**kargs)
 
         # adding styles
+        self.column_names = column_names
         add_style(self , 'block-library')
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         #
@@ -39,7 +40,7 @@ class BlockLibary(Gtk.ScrolledWindow):
         drop_controller= Gtk.DropTarget.new(
             type=GObject.TYPE_NONE, actions=Gdk.DragAction.MOVE
         )
-        drop_controller.set_gtypes([ModelBlock])
+        drop_controller.set_gtypes([ModelBlock , ColumnBlock])
         drop_controller.connect("drop", self.remove_block)
         self.main_box.add_controller(drop_controller)
         #
@@ -50,15 +51,41 @@ class BlockLibary(Gtk.ScrolledWindow):
         add_style(self.main_box , 'block-library')
 
         # adding linear libary
-        self.add_sklearn_submodule(sklearn.linear_model , 'green')
-        self.add_sklearn_submodule(sklearn.preprocessing , 'purple')
-        self.add_sklearn_submodule(sklearn.neural_network , 'orange')
-        self.add_sklearn_submodule(sklearn.tree , 'blue')
+        self.add_submodule(
+            class_to_wrap=ColumnBlock , 
+            color='green' ,
+            list_of_things=self.column_names,
+            name_of_section= 'Data Blocks' 
+        )
+        self.add_submodule(
+            class_to_wrap=ModelBlock , 
+            color='green' ,
+            list_of_things=get_public_methods(sklearn.linear_model),
+            name_of_section= 'Linear Models' 
+        )
+        self.add_submodule(
+            class_to_wrap=ModelBlock , 
+            color='orange' ,
+            list_of_things=get_public_methods(sklearn.neural_network),
+            name_of_section= 'Deep Neural Networks' 
+        )
+        self.add_submodule(
+            class_to_wrap=ModelBlock , 
+            color='purple' ,
+            list_of_things=get_public_methods(sklearn.preprocessing),
+            name_of_section= 'Data Preprocessing' 
+        )
+        self.add_submodule(
+            class_to_wrap=ModelBlock , 
+            color='blue' ,
+            list_of_things=get_public_methods(sklearn.tree),
+            name_of_section= 'Decision Tree Models' 
+        )
 
         # save as self
         self.set_child(self.main_box)
 
-    def add_sklearn_submodule(self, submodule , color):
+    def add_submodule(self, class_to_wrap , color , list_of_things,name_of_section):
         """Adds a sklearn submodule to the class. 
 
         Args:
@@ -70,15 +97,15 @@ class BlockLibary(Gtk.ScrolledWindow):
         main_box.set_hexpand(True)
         main_box.set_vexpand(True)
         # for all of the models in linear_model add them
-        linear_model_list = get_public_methods(submodule)
+        linear_model_list = list_of_things
         for k in range(0 , len(linear_model_list)):
-            curr = ModelBlock(linear_model_list[k] , color)
+            curr = class_to_wrap(linear_model_list[k] , color)
             y = k // STACKING_AMOUNT
             x = k % STACKING_AMOUNT
             # apply a style that is a certain color
             main_box.attach(curr , x , y , 1 , 1)
         # add label
-        label_thing = Gtk.Label(label=submodule.__name__)
+        label_thing = Gtk.Label(label=name_of_section)
         add_style(label_thing , 'block-label')
         self.main_box.append(label_thing)
         self.main_box.append(main_box)
@@ -92,8 +119,34 @@ class BlockLibary(Gtk.ScrolledWindow):
                 # remove model_holder
                 model_holder.get_parent().remove(model_holder)
 
+class ColumnBlock(Gtk.Box):
+    """
+    Represents a draggable column block that can go into the x and y values section
+    """
+    def __init__(self, column_name , color, **kargs):
+        super().__init__(**kargs)
+        self.column_name = column_name
+        add_style(self, 'data-block')
+        self.append(Gtk.Label(label=self.column_name))
+        drag_controller = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
+        drag_controller.connect("prepare", self.on_drag_prepare)
+        drag_controller.connect("drag-begin", self.on_drag_begin)
+        self.add_controller(drag_controller)
 
+    def on_drag_prepare(self, _ctrl, _x, _y):
+        item = Gdk.ContentProvider.new_for_value(self)
+        string = Gdk.ContentProvider.new_for_value(self.column_name)
+        return Gdk.ContentProvider.new_union([item, string])
 
+    def on_drag_begin(self, ctrl, _drag):
+        icon = Gtk.WidgetPaintable.new(self)
+        ctrl.set_icon(icon, 0, 0)
+
+    def on_drag_end(self, drag_source, drag, success):
+        # Check if the move was successful and perform cleanup.
+        if success and drag.get_selected_action() == Gdk.DragAction.MOVE:
+            # The widget was successfully dropped, so we can remove it from its source.
+            self.source_box.remove(self.drag_widget)
 
 
 class ModelBlock(Gtk.Box):
