@@ -62,19 +62,20 @@ class Main_GUI(Gtk.Application):
 
         # chart stuff
         chart_box = self.render_graph()
-        right_box.set_start_child(chart_box)
 
         # block library stuff
         block_library = self.render_block_library()
-        right_box.set_end_child(block_library)
     
         # The csv viewer
         csv_viewer_box = self.render_pandas_dataframe()
-        left_box.set_start_child(csv_viewer_box)
 
         # pipeline 
         pipeline_main_box = self.render_pipeline()
-        left_box.set_end_child(pipeline_main_box )
+
+        right_box.set_end_child(pipeline_main_box)
+        right_box.set_start_child(chart_box)
+        #left_box.set_start_child(csv_viewer_box)
+        left_box.set_end_child(block_library)
 
         # adding left and right boxes
         main_box.set_start_child(left_box)

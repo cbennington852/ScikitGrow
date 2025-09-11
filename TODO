@@ -1,27 +1,7 @@
 
-5. Actually plot the thing user wants
-    - the plot section x-values only plots the first x-value but shows all of the predicted values. 
-    - maybe also allow for the user to select if they want a bar chart
-
-7. have an accuracy graph so you can see the accuracy
-
-# have the sklearn plotter check to see if there are two open slots, then delete one
-
-8. ### changing the csv viewer to work with pandas, and allow for many file types.  
-The user might want to input different types of files, we could parse for diffrent types,
-    and then use pandas dataframe to display the dataframe.
-    This would allow for the following to be parsed
-        - .excel
-        - .csv
-        - .json
-        - SQL
-        - parquet
-    also make it take a command line arg for what we want it to parse.
 
 9. ### Setting up CD/CI pipeline for this project using https://pyinstaller.org/en/stable/
     Make this a 
-
-10. ### allow for autocomplete when filling in x values and y values
 
 11. ### General UI/UX improvements
 
@@ -34,4 +14,16 @@ The user might want to input different types of files, we could parse for diffre
 
 15. ### use pd.factorise on the string type columns
 
-STRETCH:
+16. ### Fix minor UI/UX bug where autocomplete needs enter to go away.
+
+17. ### Fix major UI/UX bug where library search is in all different places.
+    - WHY: This is happening because we are just hiding the blocks that do not fit the requirement.
+    - HOW FIX: after a certian num of character, just hide the whole libary, and append / render these into a smaller horizontally scaling grid / box, rather than a grid.
+18. ### Add way to export user generated charts. 
+    Maybe build this into the chart view. 
+19. ### Remove Base models(non-runnable) from block library
+    There are several abstract models included in the library. 
+20. ### 
+
+DO IT DO IT NOWWWWW!!!
+    - convert the x and y cols into draggable objects. Make those appendable to the pipeline object. This drag and drop is good for easy to use stuff. 
