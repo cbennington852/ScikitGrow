@@ -22,7 +22,7 @@ def get_public_methods(library):
     return res
 
 
-STACKING_AMOUNT = 3
+STACKING_AMOUNT = 2
 class BlockLibary(Gtk.ScrolledWindow):
     """
     This is the "library" of available functions from sklearn that we can use in this package for this project. 
@@ -126,12 +126,22 @@ class ColumnBlock(Gtk.Box):
     def __init__(self, column_name , color, **kargs):
         super().__init__(**kargs)
         self.column_name = column_name
+        self.color = color
         add_style(self, 'data-block')
         self.append(Gtk.Label(label=self.column_name))
         drag_controller = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
         drag_controller.connect("prepare", self.on_drag_prepare)
         drag_controller.connect("drag-begin", self.on_drag_begin)
         self.add_controller(drag_controller)
+    
+    def get_value(self):
+        return self.column_name
+
+    def copy(thing_to_be_copied):
+        return ColumnBlock(
+            column_name=thing_to_be_copied.column_name,
+            color=thing_to_be_copied.color
+        )
 
     def on_drag_prepare(self, _ctrl, _x, _y):
         item = Gdk.ContentProvider.new_for_value(self)
@@ -192,8 +202,14 @@ class ModelBlock(Gtk.Box):
         add_style(self , f"block-{color}")
         self.block_color = color
 
+    def get_value(self):
+        return self.sklearn_model_function_call.__name__.lower()
+
     def copy(thing_to_be_copied):
-        
+        return ModelBlock(
+            thing_to_be_copied.sklearn_model_function_call,
+            color=thing_to_be_copied.block_color
+        )
 
     def on_drag_prepare(self, _ctrl, _x, _y):
         item = Gdk.ContentProvider.new_for_value(self)

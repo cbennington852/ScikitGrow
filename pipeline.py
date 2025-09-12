@@ -17,6 +17,13 @@ class DroppableHolder(Gtk.Box ):
         Gtk (_type_): _description_
     """
     def __init__(self, style, thing_to_hold,  parent = None, **kargs):
+        """Make thing
+
+        Args:
+            style (str): the string containing the name of the style.
+            thing_to_hold (_type_): The thing that the model holder contains. 
+            parent (_type_, optional): _description_. Defaults to None.
+        """
         super().__init__(**kargs)
         self.thing_to_hold = thing_to_hold
         self.parent = parent
@@ -33,6 +40,9 @@ class DroppableHolder(Gtk.Box ):
         self.add_controller(drop_controller)
         self.model_block = None
 
+    def get_thing(self):
+        return self.model_block
+
     def has_model(self):
         return self.model_block != None
 
@@ -44,7 +54,10 @@ class DroppableHolder(Gtk.Box ):
             # TODO: add a copy method that returns a copy of said object.
             self.box.append(new_block)
             self.model_block = new_block
-            self.parent.add_more_models(None)
+            try:
+                self.parent.add_more_models(None)
+            except:
+                print("do nothing")
         else:
             print(f"some kinda bug? {value}")
 
@@ -77,12 +90,11 @@ class SklearnPipeline(Gtk.Box):
         x_value_label = Gtk.Label(label="X-values")
         # making a thing with autocompletion
         self.x_values_entry = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL) 
-        first_entry = Gtk.Entry()
-        first_entry.connect('changed' , self.consider_adding_new_box)
+        first_entry = DroppableHolder('' , block_libary.ColumnBlock , self)
         self.x_values_entry.append(first_entry)
         # make a y_value, with completions
         y_value_label = Gtk.Label(label='Y-values')
-        self.y_values_entry = Gtk.Entry()
+        self.y_values_entry = DroppableHolder('' , block_libary.ColumnBlock , self)
         # build the data section
         box_data.attach(x_value_label , 0 , 0 ,1 ,1)
         box_data.attach(self.x_values_entry, 1, 0, 1,1)
@@ -98,7 +110,7 @@ class SklearnPipeline(Gtk.Box):
         self.box_pipeline.append(Gtk.Label(label="Sklearn Models"))
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
-        self.box_pipeline.append(DroppableHolder(self))
+        self.box_pipeline.append(DroppableHolder( 'data-pipeline', block_libary.ModelBlock, self ))
         # append important stuff
         self.append(box_data)
         self.append(self.box_pipeline)
@@ -113,31 +125,10 @@ class SklearnPipeline(Gtk.Box):
     def get_y_value(self):
         return [self.y_values_entry.get_text()]
 
-    def consider_adding_new_box(self, value):
-        # Check to see if value in the set of column names
-        if value.get_text() not in self.columns:
-            value.set_text("")
-        print("Changed: ", value)
-        num_empty = 0
-        for child in self.x_values_entry:
-            print(child , child.get_text())
-            if child.get_text() == '':
-                num_empty += 1
-                if num_empty == 2:
-                    child.get_parent().remove(child)
-                    num_empty -= 1 
-            # if so add a new column
-        if num_empty == 0:
-            first_entry = Gtk.Entry()
-            first_entry.connect('changed' , self.consider_adding_new_box)
-            self.x_values_entry.append(first_entry)
-        # Check to see if we have two empty columns, if so delete one. 
-
 
     def add_more_models(self , widget):
         # count the number of non-empty models
         print("==============PIPELINE================")
-        print("current: " , widget)
         list_model_holders = list(self.box_pipeline)
         # skip the label
         count  = 0
@@ -146,9 +137,16 @@ class SklearnPipeline(Gtk.Box):
             if not child.has_model():
                 count += 1
         if count == 0:
-            self.box_pipeline.append(DroppableHolder(self))
+            self.box_pipeline.append(DroppableHolder( 'data-pipeline', block_libary.ModelBlock, self ))
         print("==============END================")
-        
+        print("==============DATA_SECTION================")
+        count_false = 0
+        for child in self.x_values_entry:
+            if child.has_model() == False:
+                count_false += 1
+            print(child.has_model())
+        print("==============END================")
+
 
     def get_sklearn_pipeline(self ):
         """

@@ -273,7 +273,8 @@ class Main_GUI(Gtk.Application):
                     children.set_visible(False)
             elif isinstance(children , Gtk.Grid):
                 for grid_child in children:
-                    curr_func_name = grid_child.sklearn_model_function_call.__name__.lower()
+                    curr_func_name = grid_child.get_value().lower()
+                    print(curr_func_name , search_entry , search_entry in curr_func_name)
                     if search_entry in curr_func_name:
                         grid_child.set_visible(True)
                     else:
