@@ -118,12 +118,15 @@ class SklearnPipeline(Gtk.Box):
     def get_x_values(self):
         res = []
         for child in self.x_values_entry:
-            if child.get_text() in self.columns:
-                res.append(child.get_text())
+            block = child.get_thing()
+            print(block)
+            if child.has_model():
+                if block.get_value() in self.columns:
+                    res.append(child.get_thing().get_value())
         return res
     
     def get_y_value(self):
-        return [self.y_values_entry.get_text()]
+        return [self.y_values_entry.get_thing().get_value()]
 
 
     def add_more_models(self , widget):
@@ -141,10 +144,13 @@ class SklearnPipeline(Gtk.Box):
         print("==============END================")
         print("==============DATA_SECTION================")
         count_false = 0
-        for child in self.x_values_entry:
+        lst_models_holders_data = list(self.x_values_entry)
+        for child in lst_models_holders_data:
             if child.has_model() == False:
                 count_false += 1
             print(child.has_model())
+        if count_false == 0 or len(lst_models_holders_data) == 0:
+            self.x_values_entry.append(DroppableHolder('' , block_libary.ColumnBlock , self))
         print("==============END================")
 
 

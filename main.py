@@ -63,9 +63,6 @@ class Main_GUI(Gtk.Application):
 
         # block library stuff
         block_library = self.render_block_library()
-    
-        # The csv viewer
-        csv_viewer_box = self.render_pandas_dataframe()
 
         # pipeline 
         pipeline_main_box = self.render_pipeline()
@@ -95,10 +92,9 @@ class Main_GUI(Gtk.Application):
         for file in files:
             self.create_window(file.get_path())
 
-    def render_pandas_dataframe(self):
+    def render_pandas_dataframe(self , _):
+        
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        control_button = Gtk.Button(label="Edit CSV")
-        top_control_box.append(control_button)
 
 
         scrolled_window = Gtk.ScrolledWindow()
@@ -148,7 +144,11 @@ class Main_GUI(Gtk.Application):
             header_box=top_control_box,
             body_box=scrolled_window
         )
-        return main_box
+        window = Gtk.ApplicationWindow(application=self)
+        window.set_title("Dataframe")
+        window.set_default_size(400, 300)
+        window.set_child(main_box)
+        window.show()
 
 
     def process_input_file(self, filepath):
@@ -241,12 +241,12 @@ class Main_GUI(Gtk.Application):
         button_start.set_child(image_start)
         header_bar.pack_start(button_start)
 
-        # Add a button to the end of the HeaderBar
-        button_end = Gtk.Button()
-        icon_end = Gio.ThemedIcon(name="mail-send-receive-symbolic")
-        image_end = Gtk.Image.new_from_gicon(icon_end)
-        button_end.set_child(image_end)
-        header_bar.pack_end(button_end)
+        # add the dataframe viewer
+        show_df_button = Gtk.Button(label='Show Dataframe')
+        show_df_button.connect('clicked' , self.render_pandas_dataframe)
+        header_bar.pack_start(show_df_button)
+
+        
         return header_bar
 
     def render_block_library(self):

@@ -111,13 +111,12 @@ class BlockLibary(Gtk.ScrolledWindow):
         self.main_box.append(main_box)
 
     def remove_block(self, _ctrl, value, _x, _y):
-            if isinstance(value, ModelBlock):
-                print("dropped into the library")
-                print(_ctrl)
-                model_holder = value.get_parent().get_parent()
-                pipeline_obj = value.get_parent().get_parent().get_parent().get_parent()
-                # remove model_holder
-                model_holder.get_parent().remove(model_holder)
+        print("dropped into the library")
+        print(_ctrl)
+        model_holder = value.get_parent().get_parent()
+        pipeline_obj = value.get_parent().get_parent().get_parent().get_parent()
+        # remove model_holder
+        model_holder.get_parent().remove(model_holder)
 
 class ColumnBlock(Gtk.Box):
     """
