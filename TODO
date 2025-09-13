@@ -23,7 +23,10 @@
 
 21. ### Add a splash screen
 
-22. ### 
+22. ### Have a pre-proccessor section and a regressor section. 
+    - Subtask: Make a abstract class for draggable things
+
+23. ### make sytring classes
 
 DO IT DO IT NOWWWWW!!!
     - convert the x and y cols into draggable objects. Make those appendable to the pipeline object. This drag and drop is good for easy to use stuff. 

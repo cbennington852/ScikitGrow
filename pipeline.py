@@ -71,7 +71,7 @@ class SklearnPipeline(Gtk.Box):
 
     This contains two "parts" one of which is the data section, and the other of which is the pipeline section. 
 
-    We should also use entry compleetion to help user put in correct stuff! 
+    We should also use entry completion to help user put in correct stuff! 
 
     Args:
         Gtk (_type_): _description_
@@ -100,6 +100,8 @@ class SklearnPipeline(Gtk.Box):
         box_data.attach(self.x_values_entry, 1, 0, 1,1)
         box_data.attach(y_value_label , 0, 1,1,1)
         box_data.attach(self.y_values_entry , 1 ,1 ,1 , 1)
+        
+
 
 
         #============================================
@@ -107,11 +109,13 @@ class SklearnPipeline(Gtk.Box):
         #============================================
 
         self.box_pipeline = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.box_pipeline.append(Gtk.Label(label="Pre-processing"))
         self.box_pipeline.append(Gtk.Label(label="Sklearn Models"))
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
         self.box_pipeline.append(DroppableHolder( 'data-pipeline', block_libary.ModelBlock, self ))
         # append important stuff
+        self.append(Gtk.Label(label="X and Y axis"))
         self.append(box_data)
         self.append(self.box_pipeline)
 
