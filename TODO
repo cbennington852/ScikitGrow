@@ -22,7 +22,10 @@
 20. ### Add way to "save" our models
 
 21. ### Add a splash screen
+    - 1. ability to "download examples"
+    - 2. ability to save models ? maybe later?
+        - use the model "pickle" to save the entire GUI to a file
+    - 3. ability to open the saved models. 
+    - 4. 
 
-
-23. ### make string classes
- - or ... use pd.factorise on the string type columns
+24. ### graph theme selection
