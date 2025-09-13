@@ -5,16 +5,12 @@
 
 11. ### General UI/UX improvements
 
-12. ### Finish the conversion to pandas dataframe viewing.
-
 13. ### Get accuracy scores for the things!!!
 
 14. ### Allow for a k-fold validation.
     Add this as a pipeline object.
 
 15. ### use pd.factorise on the string type columns
-
-16. ### Fix minor UI/UX bug where autocomplete needs enter to go away.
 
 17. ### Fix major UI/UX bug where library search is in all different places.
     - WHY: This is happening because we are just hiding the blocks that do not fit the requirement.
@@ -23,7 +19,11 @@
     Maybe build this into the chart view. 
 19. ### Remove Base models(non-runnable) from block library
     There are several abstract models included in the library. 
-20. ### 
+20. ### Add way to "save" our models
+
+21. ### Add a splash screen
+
+22. ### 
 
 DO IT DO IT NOWWWWW!!!
     - convert the x and y cols into draggable objects. Make those appendable to the pipeline object. This drag and drop is good for easy to use stuff. 

@@ -1,5 +1,22 @@
+.toolbar-top button.toggle {
+  border: none;
+  background-color: none;
+  background-image: none;
+  border: none;
 
+}
+.toolbar-top button.toggle :hover {
+  border: none;
+  background-color: none;
+  background-image: none;
+  border: none;
 
+}
+
+.top-bar-button {
+  
+
+}
 
 .bordered-box {
             border: 2px solid #4a90e2;

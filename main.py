@@ -20,6 +20,8 @@ from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCan
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
+from TopMenu import TopMenuButton
+
 
 
 
@@ -235,17 +237,25 @@ class Main_GUI(Gtk.Application):
     def render_top_bar(self):
         header_bar = Gtk.HeaderBar.new()
         header_bar.set_show_title_buttons(True)
-        button_start = Gtk.Button()
-        icon_start = Gio.ThemedIcon(name="document-new-symbolic")
-        image_start = Gtk.Image.new_from_gicon(icon_start)
-        button_start.set_child(image_start)
-        header_bar.pack_start(button_start)
+
+        #File Menu button
+        file_menu = TopMenuButton("File")
+        file_menu.add_function("Open" , lambda b: app.quit())
+        file_menu.add_function("Save" , lambda b: app.quit())
+        file_menu.add_function("Save As" , lambda b: app.quit())
+
+        graph_menu = TopMenuButton("Graph Settings")
+        graph_menu.add_function("Graph theme" , lambda b: app.quit())
+        graph_menu.add_function("Export Accuracy chart" , lambda b: app.quit())
+        graph_menu.add_function("Export Plot chart" , lambda b: app.quit())
 
         # add the dataframe viewer
         show_df_button = Gtk.Button(label='Show Dataframe')
         show_df_button.connect('clicked' , self.render_pandas_dataframe)
-        header_bar.pack_start(show_df_button)
 
+        header_bar.pack_start(file_menu)
+        header_bar.pack_start(graph_menu)
+        header_bar.pack_start(show_df_button)
         
         return header_bar
 
