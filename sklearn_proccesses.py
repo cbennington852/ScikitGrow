@@ -45,14 +45,20 @@ class SklearnPlotter(Gtk.Notebook):
         value getting a new serial number
 
         Args:
-            main_dataframe (_type_): _description_
-            pipeline_x_values (_type_): _description_
-            pipeline_y_value (_type_): _description_
+            main_dataframe (pd.Dataframe): main inputted dataframe
+            pipeline_x_values ([str]): _description_
+            pipeline_y_value ([str]): _description_
         """
         # returns as new main dataframe. 
-        # uses # Use factorize() to serialize the 'products' column
-        # codes, uniques = pd.factorize(df['products'])
-        pass
+        cols = pipeline_x_values + pipeline_y_value
+        for col in cols:
+            if pd.api.types.is_string_dtype(main_dataframe[col]):
+                # uses # Use factorize() to serialize the 'products' column
+                codes, uniques = pd.factorize(main_dataframe[col])
+                print(codes)
+                print(uniques)
+                main_dataframe[col] = codes
+        return main_dataframe
 
     def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value):
         """Runs the main sklearn pipeline, filtering through the different options that
@@ -65,6 +71,7 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_y_value ([str]): _description_
         """
         try:
+            main_dataframe = self.factorize_string_cols(main_dataframe , pipeline_x_values , pipeline_y_value)
             # plotting the normal regular plotting chart
             self.train_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
             figure = self.filter_pipeline()
