@@ -114,37 +114,38 @@ class BlockLibary(Gtk.ScrolledWindow):
         print("dropped into the library")
         print(_ctrl)
         model_holder = value.get_parent().get_parent()
-        pipeline_obj = value.get_parent().get_parent().get_parent().get_parent()
-        # remove model_holder
-        model_holder.get_parent().remove(model_holder)
+        print(model_holder)
+        if model_holder.get_parent().get_only_one_entry() == False:
+            model_holder.get_parent().remove(model_holder)
 
-class ColumnBlock(Gtk.Box):
+class DraggableBlock(Gtk.Box):
     """
-    Represents a draggable column block that can go into the x and y values section
+    Parent class that defines a draggable box, something to make drag and drop easier 
+    in the future. 
     """
-    def __init__(self, column_name , color, **kargs):
+    def __init__(self, data_held , color, display_name , **kargs):
         super().__init__(**kargs)
-        self.column_name = column_name
+        self.data_held = data_held
         self.color = color
         add_style(self, 'data-block')
-        self.append(Gtk.Label(label=self.column_name))
+        self.append(Gtk.Label(label=display_name))
         drag_controller = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
         drag_controller.connect("prepare", self.on_drag_prepare)
         drag_controller.connect("drag-begin", self.on_drag_begin)
         self.add_controller(drag_controller)
     
     def get_value(self):
-        return self.column_name
-
+        return self.data_held
+    
     def copy(thing_to_be_copied):
-        return ColumnBlock(
-            column_name=thing_to_be_copied.column_name,
+        return DraggableBlock(
+            column_name=thing_to_be_copied.data_held,
             color=thing_to_be_copied.color
         )
 
     def on_drag_prepare(self, _ctrl, _x, _y):
         item = Gdk.ContentProvider.new_for_value(self)
-        string = Gdk.ContentProvider.new_for_value(self.column_name)
+        string = Gdk.ContentProvider.new_for_value(self.data_held)
         return Gdk.ContentProvider.new_union([item, string])
 
     def on_drag_begin(self, ctrl, _drag):
@@ -153,20 +154,41 @@ class ColumnBlock(Gtk.Box):
 
     def on_drag_end(self, drag_source, drag, success):
         print('source: ',drag_source, ' drag:' , drag, ' success:' , success)
-
         # Check if the move was successful and perform cleanup.
         if success and drag.get_selected_action() == Gdk.DragAction.MOVE:
             # The widget was successfully dropped, so we can remove it from its source.
             self.source_box.remove(self.drag_widget)
 
 
-class ModelBlock(Gtk.Box):
+class ColumnBlock(DraggableBlock):
+    """
+    Represents a draggable column block that can go into the x and y values section
+    """
+    def __init__(self, column_name , color, **kargs):
+        super().__init__(
+            data_held = column_name,
+            color = color,
+            display_name = column_name, 
+            **kargs
+        )
+    def copy(thing_to_be_copied):
+        return ColumnBlock(
+            column_name=thing_to_be_copied.data_held,
+            color=thing_to_be_copied.color
+        )
+
+class ModelBlock(DraggableBlock):
     """
     This represents one draggable "block" that we can drag and drop from one section of the GUI to 
     another section of the GUI. 
     """
     def __init__(self, sklearn_model_function_call , color,  **kargs):
-        super().__init__(**kargs)
+        super().__init__(
+            data_held=sklearn_model_function_call,
+            color=color,
+            display_name="",
+            **kargs
+        )
         self.sklearn_model_function_call = sklearn_model_function_call
         
         # getting all possible input metrics for this function and default values
@@ -185,7 +207,6 @@ class ModelBlock(Gtk.Box):
             curr_label = Gtk.Label(label=param_name)
             curr_entry = Gtk.Entry()
             curr_entry.set_text(str(param.default))
-            # add an object to the grid
             self.parameters_box.attach(curr_label , 0 , x , 1, 1)
             self.parameters_box.attach(curr_entry , 1 , x , 1, 1)
             x += 1
@@ -209,27 +230,5 @@ class ModelBlock(Gtk.Box):
             thing_to_be_copied.sklearn_model_function_call,
             color=thing_to_be_copied.block_color
         )
-
-    def on_drag_prepare(self, _ctrl, _x, _y):
-        item = Gdk.ContentProvider.new_for_value(self)
-        string = Gdk.ContentProvider.new_for_value(self.sklearn_model_function_call)
-        return Gdk.ContentProvider.new_union([item, string])
-
-    def on_drag_begin(self, ctrl, _drag):
-        icon = Gtk.WidgetPaintable.new(self)
-        ctrl.set_icon(icon, 0, 0)
-
-    def on_drag_end(self, drag_source, drag, success):
-        # The drag operation is complete.
-        # Check if the move was successful and perform cleanup.
-        if success and drag.get_selected_action() == Gdk.DragAction.MOVE:
-            # The widget was successfully dropped, so we can remove it from its source.
-            self.source_box.remove(self.drag_widget)
-            print("Widget removed from source container.")
-
-    
-
-
-
 
        

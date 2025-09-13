@@ -1,5 +1,6 @@
 import sys
 import csv
+import traceback
 import gi
 
 gi.require_version("Gtk", "4.0")
@@ -43,7 +44,7 @@ class DroppableHolder(Gtk.Box ):
     def get_thing(self):
         return self.model_block
 
-    def has_model(self):
+    def contains_draggable(self):
         return self.model_block != None
 
     def on_drop(self, _ctrl, value, _x, _y):
@@ -55,12 +56,54 @@ class DroppableHolder(Gtk.Box ):
             self.box.append(new_block)
             self.model_block = new_block
             try:
-                self.parent.add_more_models(None)
-            except:
+                self.parent.consider_changing_num_holders(value)
+            except Exception:
+                print(traceback.format_exc())
                 print("do nothing")
         else:
             print(f"some kinda bug? {value}")
 
+
+class ListDroppableHolder(Gtk.Box):
+    """A class to hold multiple droppable holders, and manage them. 
+    """
+    def __init__(self, style, droppable_this_holds, only_one_entry = False, **kargs):
+        super().__init__(**kargs)
+        first_entry = DroppableHolder(style , droppable_this_holds , self)
+        self.append(first_entry)
+        self.droppable_this_holds = droppable_this_holds
+        self.style = style
+        self.only_one_entry = only_one_entry
+
+    def get_only_one_entry(self):
+        return self.only_one_entry
+
+    def get_all_values(self):
+        res = []
+        for child in self:
+            print(child)
+            if child.contains_draggable():
+                res.append(child.get_thing().get_value())
+        return res
+    def get_all_gtk_objects(self):
+        res = []
+        for child in self:
+            res.append(child.get_thing())
+        return res
+
+    def consider_changing_num_holders(self , value):
+        list_model_holders = list(self)
+        if self.only_one_entry :
+            return
+        else:
+            count  = 0
+            for x in range(0 , len(list_model_holders)):
+                child = list_model_holders[x]
+                print(child)
+                if not child.contains_draggable():
+                    count += 1
+            if count == 0:
+                self.append(DroppableHolder(self.style, self.droppable_this_holds, self ))
 
 
 class SklearnPipeline(Gtk.Box):
@@ -89,20 +132,23 @@ class SklearnPipeline(Gtk.Box):
         # add text fields for the data section, each one being a x-value or y-value
         x_value_label = Gtk.Label(label="X-values")
         # making a thing with autocompletion
-        self.x_values_entry = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL) 
-        first_entry = DroppableHolder('' , block_libary.ColumnBlock , self)
-        self.x_values_entry.append(first_entry)
+        self.x_values_entry = ListDroppableHolder(
+            'data-pipeline',
+            block_libary.ColumnBlock
+        )
         # make a y_value, with completions
         y_value_label = Gtk.Label(label='Y-values')
-        self.y_values_entry = DroppableHolder('' , block_libary.ColumnBlock , self)
+        self.y_values_entry = ListDroppableHolder(
+            'data-pipeline',
+            block_libary.ColumnBlock,
+            only_one_entry=True
+        )
         # build the data section
         box_data.attach(x_value_label , 0 , 0 ,1 ,1)
         box_data.attach(self.x_values_entry, 1, 0, 1,1)
         box_data.attach(y_value_label , 0, 1,1,1)
         box_data.attach(self.y_values_entry , 1 ,1 ,1 , 1)
         
-
-
 
         #============================================
         # pipeline section box
@@ -113,49 +159,22 @@ class SklearnPipeline(Gtk.Box):
         self.box_pipeline.append(Gtk.Label(label="Sklearn Models"))
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
-        self.box_pipeline.append(DroppableHolder( 'data-pipeline', block_libary.ModelBlock, self ))
+        self.pipeline = ListDroppableHolder(
+            'data-pipeline',
+            block_libary.ModelBlock,
+            orientation=Gtk.Orientation.VERTICAL
+        )
+        self.box_pipeline.append(self.pipeline)
         # append important stuff
         self.append(Gtk.Label(label="X and Y axis"))
         self.append(box_data)
         self.append(self.box_pipeline)
 
     def get_x_values(self):
-        res = []
-        for child in self.x_values_entry:
-            block = child.get_thing()
-            print(block)
-            if child.has_model():
-                if block.get_value() in self.columns:
-                    res.append(child.get_thing().get_value())
-        return res
+        return self.x_values_entry.get_all_values()
     
     def get_y_value(self):
-        return [self.y_values_entry.get_thing().get_value()]
-
-
-    def add_more_models(self , widget):
-        # count the number of non-empty models
-        print("==============PIPELINE================")
-        list_model_holders = list(self.box_pipeline)
-        # skip the label
-        count  = 0
-        for x in range(1 , len(list_model_holders)):
-            child = list_model_holders[x]
-            if not child.has_model():
-                count += 1
-        if count == 0:
-            self.box_pipeline.append(DroppableHolder( 'data-pipeline', block_libary.ModelBlock, self ))
-        print("==============END================")
-        print("==============DATA_SECTION================")
-        count_false = 0
-        lst_models_holders_data = list(self.x_values_entry)
-        for child in lst_models_holders_data:
-            if child.has_model() == False:
-                count_false += 1
-            print(child.has_model())
-        if count_false == 0 or len(lst_models_holders_data) == 0:
-            self.x_values_entry.append(DroppableHolder('' , block_libary.ColumnBlock , self))
-        print("==============END================")
+        return self.y_values_entry.get_all_values()
 
 
     def get_sklearn_pipeline(self ):
@@ -168,9 +187,9 @@ class SklearnPipeline(Gtk.Box):
         model_list = []
         # loop thru each model and add them to the pipeline 
         x = 0
-        for outer_child in self.box_pipeline:
+        for outer_child in self.pipeline:
             # Get the current model if there is one here
-            if isinstance(outer_child , DroppableHolder) and outer_child.model_block != None:
+            if outer_child.model_block != None:
                 print(outer_child.model_block)
                 curr_model = SklearnPipeline.parse_current_model(outer_child)
                 new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
