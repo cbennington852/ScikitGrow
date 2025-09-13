@@ -58,6 +58,12 @@ class BlockLibary(Gtk.ScrolledWindow):
             name_of_section= 'Data Blocks' 
         )
         self.add_submodule(
+            class_to_wrap=PreProcessingBlock, 
+            color='purple' ,
+            list_of_things=get_public_methods(sklearn.preprocessing),
+            name_of_section= 'Data Preprocessing' 
+        )
+        self.add_submodule(
             class_to_wrap=ModelBlock , 
             color='green' ,
             list_of_things=get_public_methods(sklearn.linear_model),
@@ -69,12 +75,7 @@ class BlockLibary(Gtk.ScrolledWindow):
             list_of_things=get_public_methods(sklearn.neural_network),
             name_of_section= 'Deep Neural Networks' 
         )
-        self.add_submodule(
-            class_to_wrap=ModelBlock , 
-            color='purple' ,
-            list_of_things=get_public_methods(sklearn.preprocessing),
-            name_of_section= 'Data Preprocessing' 
-        )
+        
         self.add_submodule(
             class_to_wrap=ModelBlock , 
             color='blue' ,
@@ -231,4 +232,10 @@ class ModelBlock(DraggableBlock):
             color=thing_to_be_copied.block_color
         )
 
-       
+class PreProcessingBlock(ModelBlock):
+       def __init__(self, sklearn_model_function_call , color,  **kargs):
+        super().__init__(
+            sklearn_model_function_call=sklearn_model_function_call,
+            color=color,
+            **kargs
+        )

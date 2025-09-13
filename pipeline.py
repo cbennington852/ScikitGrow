@@ -156,6 +156,12 @@ class SklearnPipeline(Gtk.Box):
 
         self.box_pipeline = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box_pipeline.append(Gtk.Label(label="Pre-processing"))
+        self.preprocessing = ListDroppableHolder(
+            'data-pipeline',
+            block_libary.PreProcessingBlock,
+            orientation=Gtk.Orientation.VERTICAL
+        )
+        self.box_pipeline.append(self.preprocessing)
         self.box_pipeline.append(Gtk.Label(label="Sklearn Models"))
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
@@ -177,7 +183,7 @@ class SklearnPipeline(Gtk.Box):
         return self.y_values_entry.get_all_values()
 
 
-    def get_sklearn_pipeline(self ):
+    def get_sklearn_pipeline(self):
         """
         Returns the full sklearn pipeline object, using the input / stuff from the user. 
 
@@ -185,16 +191,22 @@ class SklearnPipeline(Gtk.Box):
         """
         # create a list of the models going into the pipeline
         model_list = []
-        # loop thru each model and add them to the pipeline 
-        x = 0
-        for outer_child in self.pipeline:
-            # Get the current model if there is one here
-            if outer_child.model_block != None:
-                print(outer_child.model_block)
-                curr_model = SklearnPipeline.parse_current_model(outer_child)
-                new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
-                model_list.append((new_entry_in_model_list , curr_model))
-            x += 1
+        def parse_sklearn_model_holder_list(pointer_to_list_model_holder):
+            x = 0
+            for outer_child in pointer_to_list_model_holder:
+                # Get the current model if there is one here
+                if outer_child.model_block != None:
+                    print(outer_child.model_block)
+                    curr_model = SklearnPipeline.parse_current_model(outer_child)
+                    new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
+                    model_list.append((new_entry_in_model_list , curr_model))
+                x += 1
+                
+        parse_sklearn_model_holder_list(self.preprocessing)
+        parse_sklearn_model_holder_list(self.pipeline)
+
+        print("UNTRAINED PIEPLEINE")
+        print(model_list)
         untrained_pipeline = sklearn.pipeline.Pipeline(model_list)
         return untrained_pipeline
         
