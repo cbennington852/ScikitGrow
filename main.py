@@ -238,6 +238,8 @@ class Main_GUI(Gtk.Application):
         header_bar = Gtk.HeaderBar.new()
         header_bar.set_show_title_buttons(True)
 
+       
+
         #File Menu button
         file_menu = TopMenuButton("File")
         file_menu.add_function("Open" , lambda b: app.quit())
@@ -245,7 +247,7 @@ class Main_GUI(Gtk.Application):
         file_menu.add_function("Save As" , lambda b: app.quit())
 
         graph_menu = TopMenuButton("Graph Settings")
-        graph_menu.add_function("Graph theme" , lambda b: app.quit())
+        graph_menu.add_function("Graph theme" , self.select_graph_theme_popup)
         graph_menu.add_function("Export Accuracy chart" , lambda b: app.quit())
         graph_menu.add_function("Export Plot chart" , lambda b: app.quit())
 
@@ -258,6 +260,37 @@ class Main_GUI(Gtk.Application):
         header_bar.pack_start(show_df_button)
         
         return header_bar
+    
+    def theme_selected(self ,button,  new_theme):
+        plt.style.use(new_theme)
+        try: 
+            self.higher_order_wrapper_main_sklearn_pipeline(None)
+        except:
+            print("Not ready yet ... hehe")
+
+    def select_graph_theme_popup(self , _):
+        main_box_small = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        
+        plt.style.use('dark_background')
+        print(plt.style.available)
+        # make all of the radio buttons 
+        available_styles = plt.style.available
+        # make the first radio button
+        radio1 = Gtk.CheckButton(label=available_styles[0])
+        radio1.connect("toggled", self.theme_selected, available_styles[0])
+        main_box_small.append(radio1)
+        for x in range(1 , len(available_styles)):
+            radio_curr = Gtk.CheckButton(label=available_styles[x])
+            radio_curr.connect("toggled", self.theme_selected, available_styles[x])
+            main_box_small.append(radio_curr)
+            radio_curr.set_group(radio1)
+
+        window_small = Gtk.ApplicationWindow(application=self)
+        window_small.set_title("Graph ColorScheme")
+        window_small.set_default_size(400, 300)
+        window_small.set_child(main_box_small)
+        window_small.show()
+
 
     def render_block_library(self):
         # make a search bar

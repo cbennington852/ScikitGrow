@@ -2,9 +2,11 @@ import sys
 import csv
 import gi
 import traceback
+import seaborn
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
+from cycler import cycler
 
 
 import matplotlib
@@ -168,6 +170,9 @@ class SklearnPlotter(Gtk.Notebook):
         # later here we will get and fit the training validation thing the user wants. 
         self.curr_pipeline.fit(self.x , self.y)
 
+    def get_color_map(self):
+        return plt.rcParams['axes.prop_cycle'].by_key()['color']
+
     def filter_pipeline(self):
         """
         PLOTTING ONLY 
@@ -309,8 +314,9 @@ class SklearnPlotter(Gtk.Notebook):
     def plot_single_regression(self, x , y , y_pred , x_cols, y_cols):
         print("gooning ... x cols == 1 and regression")
         fig, ax = plt.subplots()
-        ax.scatter(x , y , color='red' , label=f"Dataset")
-        ax.plot(x , y_pred , color='blue' , label='AI predictions')
+        color_cycle = self.get_color_map()
+        ax.scatter(x , y , color=color_cycle[0], label=f"Dataset")
+        ax.plot(x , y_pred ,  color=color_cycle[1] , label='AI predictions')
         ax.set_title(f"{x_cols[0]} and {y_cols[0]}")
         ax.set_xlabel(f"{x_cols[0]}")
         ax.set_ylabel(f"{y_cols[0]}")
