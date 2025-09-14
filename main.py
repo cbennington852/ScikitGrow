@@ -21,7 +21,8 @@ from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCan
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-
+import pickle
+import joblib
 from TopMenu import TopMenuButton
 
 
@@ -259,19 +260,21 @@ class Main_GUI(Gtk.Application):
         )
 
         return main_box
+    
+    def save_as_button_pressed(self, button):
+        with open("my_object.pickle", "wb") as f:
+            pickle.dump(self, f)
 
 
     def render_top_bar(self):
         header_bar = Gtk.HeaderBar.new()
         header_bar.set_show_title_buttons(True)
 
-       
-
         #File Menu button
         file_menu = TopMenuButton("File")
         file_menu.add_function("Open" , lambda b: app.quit())
         file_menu.add_function("Save" , lambda b: app.quit())
-        file_menu.add_function("Save As" , lambda b: app.quit())
+        file_menu.add_function("Save As" , self.save_as_button_pressed)
 
         graph_menu = TopMenuButton("Graph Settings")
         graph_menu.add_function("Graph theme" , self.select_graph_theme_popup)

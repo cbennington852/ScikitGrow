@@ -74,15 +74,15 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
-    
-        main_dataframe = self.factorize_string_cols(main_dataframe , pipeline_x_values , pipeline_y_value)
+        main_dataframe_copy = main_dataframe.copy(deep=True)
+        main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
         # plotting the normal regular plotting chart
-        self.train_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
         figure = self.filter_pipeline()
         self.plot_figure_canvas(figure , self.plotting_page)
         # plotting the accuracy chart
         print("HI")
-        accuracy_plot = self.filter_accuracy_plotting(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
         self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
        
         
@@ -276,18 +276,20 @@ class SklearnPlotter(Gtk.Notebook):
         y_pred = model.predict(grid_df).reshape(x1_grid.shape)
 
         # Step 5: Plotting
-        fig = plt.figure(figsize=(10, 7))
+        fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
         # Plot surface
-        ax.plot_surface(x1_grid, x2_grid, y_pred, cmap='viridis', alpha=0.7)
+        cmap = self.get_clf_color_map()
+        ax.plot_surface(x1_grid, x2_grid, y_pred,  alpha=0.7)
 
         # Plot actual data points
-        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[0], edgecolor='k')
+        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[1], edgecolor='k')
 
         # Labels
         ax.set_xlabel(f"{x_cols[0]}")
         ax.set_ylabel(f"{x_cols[1]}")
+        ax.set_position([0.05, 0.05, 0.9, 0.9]) 
         ax.set_zlabel(f"{y_cols[0]}")
         ax.set_title(f"3D Surface for {y_cols[0]}")
         return fig
@@ -356,12 +358,14 @@ class SklearnPlotter(Gtk.Notebook):
         ax.set_xlabel(f"{x_cols[0]}")
         ax.set_ylabel(f"{x_cols[1]}")
         handles = []
-        classes = np.unique(y_enc)
+        classes = np.unique(self.og_mainframe[y_cols])
+        classes_color_encoding = np.unique(y_enc)
         print(self.og_mainframe[y_cols])
-        for class_val in classes:
+        for x in range(0 , len(classes)):
+            class_val = classes_color_encoding[x]
             handles.append(
                 ax.plot([], [], marker='o', linestyle='', color=cmap(class_val),
-                        label=f'Class {class_val}', markeredgecolor='k')
+                        label=f'Class {classes[x]}', markeredgecolor='k')
             )
         ax.legend(loc='upper left')
         return fig

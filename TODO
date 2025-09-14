@@ -25,6 +25,13 @@
     - 1. ability to "download examples"
     - 2. ability to save models ? maybe later?
         - use the model "pickle" to save the entire GUI to a file
+            - sadly can't save entire gui to file, not possible, we'll have to think of a workaround ... 
+                - we'll have to build in some way to .. save the pandas dataframe.
+                - also save the current model ... and re-serialize the current model.
+                    TO SAVE:
+                        - *models + blocks* ... using ListDroppableHolder(), which should have a text based serialize and re-seralize.
+                        - *pandas df*
+                        - no need to save chart, we can just have it run if works on startup. 
     - 3. ability to open the saved models. 
     - 4. 
 
