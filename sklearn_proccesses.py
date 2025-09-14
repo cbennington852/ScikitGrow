@@ -2,6 +2,7 @@ import sys
 import csv
 import gi
 import traceback
+from matplotlib.colors import ListedColormap
 import seaborn
 
 gi.require_version("Gtk", "4.0")
@@ -52,6 +53,7 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_y_value ([str]): _description_
         """
         # returns as new main dataframe. 
+        self.og_mainframe = main_dataframe.copy(deep=True)
         cols = pipeline_x_values + pipeline_y_value
         for col in cols:
             if pd.api.types.is_string_dtype(main_dataframe[col]):
@@ -72,27 +74,17 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
-        try:
-            main_dataframe = self.factorize_string_cols(main_dataframe , pipeline_x_values , pipeline_y_value)
-            # plotting the normal regular plotting chart
-            self.train_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
-            figure = self.filter_pipeline()
-            self.plot_figure_canvas(figure , self.plotting_page)
-            # plotting the accuracy chart
-            print("HI")
-            accuracy_plot = self.filter_accuracy_plotting(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
-            self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
-        except Exception as e:
-            traceback.print_exc()
-            msg = str(e)
-            if len(msg) > 80:
-                msg = msg[:80]
-            dialog = Gtk.AlertDialog()
-            dialog.set_message(f"{type(e).__name__}")
-            dialog.set_detail(msg)
-            dialog.set_modal(True)
-            dialog.set_buttons(["OK"])
-            dialog.show()
+    
+        main_dataframe = self.factorize_string_cols(main_dataframe , pipeline_x_values , pipeline_y_value)
+        # plotting the normal regular plotting chart
+        self.train_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        figure = self.filter_pipeline()
+        self.plot_figure_canvas(figure , self.plotting_page)
+        # plotting the accuracy chart
+        print("HI")
+        accuracy_plot = self.filter_accuracy_plotting(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
+       
         
     def filter_accuracy_plotting(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         """
@@ -172,6 +164,9 @@ class SklearnPlotter(Gtk.Notebook):
 
     def get_color_map(self):
         return plt.rcParams['axes.prop_cycle'].by_key()['color']
+    
+    def get_clf_color_map(self):
+        return matplotlib.colors.ListedColormap(self.get_color_map())
 
     def filter_pipeline(self):
         """
@@ -196,7 +191,13 @@ class SklearnPlotter(Gtk.Notebook):
         # if is classifier 
         if sklearn.base.is_classifier(last_step_model):
             # render a classifier graph. 
-            return self.plot_classifier(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+            if len(self.x.columns) == 1:
+                return self.plot_classifier_1d(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+            elif len(self.x.columns) == 2:
+                return self.plot_classifier_2d(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+            else:
+                return self.plot_classifier_n_plus(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+
         elif sklearn.base.is_regressor(last_step_model):
             # render a regressor graph
             if len(self.x.columns) == 1:
@@ -219,9 +220,7 @@ class SklearnPlotter(Gtk.Notebook):
         y_pred = curr_pipeline.predict(self.x)
         fig, ax = plt.subplots()
         textstr = (
-            f"Accuracy  : {sklearn.metrics.accuracy(self.y, y_pred)}" +
-            f"\nBrier score loss  : {sklearn.metrics.brier_score_loss(self.y, y_pred)}"
-            f"\nBrier score loss  : {sklearn.metrics.log_loss(self.y, y_pred)}"
+            f"Accuracy  : {sklearn.metrics.accuracy_score(self.y, y_pred)}"
         )
         props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.7) # Customize box style
         ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=12,
@@ -264,6 +263,8 @@ class SklearnPlotter(Gtk.Notebook):
         x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
         x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
         x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
+        color_cycle = self.get_color_map()
+
 
         # Create a DataFrame from the grid for prediction
         grid_df = pd.DataFrame({
@@ -282,7 +283,7 @@ class SklearnPlotter(Gtk.Notebook):
         ax.plot_surface(x1_grid, x2_grid, y_pred, cmap='viridis', alpha=0.7)
 
         # Plot actual data points
-        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c='red', edgecolor='k')
+        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[0], edgecolor='k')
 
         # Labels
         ax.set_xlabel(f"{x_cols[0]}")
@@ -291,23 +292,77 @@ class SklearnPlotter(Gtk.Notebook):
         ax.set_title(f"3D Surface for {y_cols[0]}")
         return fig
 
+    def plot_classifier_n_plus(self, x , y, y_pred, clf, x_cols , y_cols ):
+        pass
 
-    def plot_classifier(self, x , y, y_pred, clf, x_cols , y_cols ):
+    def plot_classifier_1d(self, x , y, y_pred, clf, x_cols , y_cols ):
+        x_min, x_max = x.min() - 1, x.max() + 1
+        X = x
+
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+
+        fig, ax = plt.subplots(figsize=(8, 4))
+
+        # Generate test inputs
+        x_min, x_max = X.min() - 1, X.max() + 1
+        x_test = np.linspace(x_min, x_max, 400).reshape(-1, 1)
+
+        if hasattr(clf, "predict_proba"):
+            y_proba = clf.predict_proba(x_test)
+            n_classes = y_proba.shape[1]
+            for class_idx in range(n_classes):
+                ax.plot(x_test, y_proba[:, class_idx],
+                        label=f"P(class {class_idx})")
+            ax.set_ylabel("Probability")
+            ax.set_title(f"Classifier: {clf.__class__.__name__}")
+        elif hasattr(clf, "decision_function"):
+            decision = clf.decision_function(x_test)
+            if decision.ndim == 1:  # binary classification
+                ax.plot(x_test, decision, label="Decision function")
+            else:  # multiclass
+                for i in range(decision.shape[1]):
+                    ax.plot(x_test, decision[:, i], label=f"Score class {i}")
+            ax.set_ylabel("Decision score")
+            ax.set_title(f"Classifier: {clf.__class__.__name__}")
+        else:
+            raise ValueError("Classifier must implement predict_proba or decision_function")
+
+        # Plot training points
+        for class_val in np.unique(y):
+            ax.scatter(X[y == class_val], np.full_like(X[y == class_val], class_val),
+                    label=f"Class {class_val}", alpha=0.6)
+
+        return fig
+
+    def plot_classifier_2d(self, x , y, y_pred, clf, x_cols , y_cols ):
+        y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
         # Plot the decision boundary
         fig, ax = plt.subplots()
+        n_classes = len(np.unique(y_enc))
+        #cmap = self.get_clf_color_map()
+        cmap = ListedColormap(self.get_clf_color_map().colors[:n_classes])
         sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
             clf,
             x,
-            cmap=plt.cm.coolwarm,
-            alpha=0.6,
+            response_method="predict",
+            cmap=cmap,
             ax=ax
         )
 
         # Plot the data points
-        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], c=y, cmap=plt.cm.coolwarm, edgecolors='k')
+        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], cmap=cmap,  c=y_enc, edgecolors='k')
         ax.set_title(f"Classifier for {y_cols[0]}")
         ax.set_xlabel(f"{x_cols[0]}")
         ax.set_ylabel(f"{x_cols[1]}")
+        handles = []
+        classes = np.unique(y_enc)
+        print(self.og_mainframe[y_cols])
+        for class_val in classes:
+            handles.append(
+                ax.plot([], [], marker='o', linestyle='', color=cmap(class_val),
+                        label=f'Class {class_val}', markeredgecolor='k')
+            )
         ax.legend(loc='upper left')
         return fig
 

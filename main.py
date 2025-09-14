@@ -2,6 +2,7 @@
 
 import sys
 import csv
+import traceback
 import gi
 
 gi.require_version("Gtk", "4.0")
@@ -19,6 +20,7 @@ import sklearn
 from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 from TopMenu import TopMenuButton
 
@@ -206,13 +208,38 @@ class Main_GUI(Gtk.Application):
     def add_style(self, gui_thing , class_name):
         gui_thing.get_style_context().add_class(class_name)
 
+    def higher_order_wrapper_main_sklearn_pipeline_no_error(self, _):
+        try:
+            self.main_canvas.main_sklearn_pipe(
+                main_dataframe=self.main_dataframe,
+                curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
+                pipeline_x_values= self.pipeline_box.get_x_values(),
+                pipeline_y_value=self.pipeline_box.get_y_value(),
+            )
+        except Exception as e:
+            traceback.print_exc()
+            msg = str(e)
+            print(msg)
+
     def higher_order_wrapper_main_sklearn_pipeline(self, _):
-        self.main_canvas.main_sklearn_pipe(
-            main_dataframe=self.main_dataframe,
-            curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
-            pipeline_x_values= self.pipeline_box.get_x_values(),
-            pipeline_y_value=self.pipeline_box.get_y_value(),
-        )
+        try:
+            self.main_canvas.main_sklearn_pipe(
+                main_dataframe=self.main_dataframe,
+                curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
+                pipeline_x_values= self.pipeline_box.get_x_values(),
+                pipeline_y_value=self.pipeline_box.get_y_value(),
+            )
+        except Exception as e:
+            traceback.print_exc()
+            msg = str(e)
+            if len(msg) > 80:
+                msg = msg[:80]
+            dialog = Gtk.AlertDialog()
+            dialog.set_message(f"{type(e).__name__}")
+            dialog.set_detail(msg)
+            dialog.set_modal(True)
+            dialog.set_buttons(["OK"])
+            dialog.show()
 
     def render_pipeline(self):
 
@@ -262,9 +289,10 @@ class Main_GUI(Gtk.Application):
         return header_bar
     
     def theme_selected(self ,button,  new_theme):
+        mpl.rcParams.update(mpl.rcParamsDefault)
         plt.style.use(new_theme)
         try: 
-            self.higher_order_wrapper_main_sklearn_pipeline(None)
+            self.higher_order_wrapper_main_sklearn_pipeline_no_error(None)
         except:
             print("Not ready yet ... hehe")
 
