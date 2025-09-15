@@ -138,6 +138,12 @@ class DraggableBlock(Gtk.Box):
     def get_value(self):
         return self.data_held
     
+    def to_json(self):
+        return {
+            'type' : self.__class__.__name__,
+            'data_held' : self.get_value() 
+        }
+    
     def copy(thing_to_be_copied):
         return DraggableBlock(
             column_name=thing_to_be_copied.data_held,
@@ -224,7 +230,14 @@ class ModelBlock(DraggableBlock):
         self.block_color = color
 
     def get_value(self):
-        return self.sklearn_model_function_call.__name__.lower()
+        return self.sklearn_model_function_call.__name__
+    
+    def to_json(self):
+        return {
+            'type' : self.__class__.__name__,
+            'data_held' : self.get_value(),
+            
+        }
 
     def copy(thing_to_be_copied):
         return ModelBlock(

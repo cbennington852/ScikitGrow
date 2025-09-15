@@ -1,3 +1,4 @@
+import json
 import sys
 import csv
 import traceback
@@ -43,6 +44,42 @@ class DroppableHolder(Gtk.Box ):
 
     def get_thing(self):
         return self.model_block
+    
+    def json_parameters(self , curr_block):
+        """Creates a json representation of the parameters than can be put into 
+        this specific sklearn object. 
+
+        Args:
+            curr_block (): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        map_of_parameters = {}
+        print(type(curr_block))
+        print(' model: ' , curr_block.sklearn_model_function_call)
+        for k in range(0 , curr_block.x):
+            parameter = curr_block.parameters_box.get_child_at(0 , k).get_text()
+            para_value = SklearnPipeline.handle_parameter_input(curr_block.parameters_box.get_child_at(1 , k).get_text())
+            map_of_parameters[parameter] = para_value
+        print(map_of_parameters)
+        return map_of_parameters
+    
+    def to_json(self):
+        print('holding thing:' , self.model_block)
+        if isinstance(self.model_block , block_libary.ModelBlock) or isinstance(self.model_block , block_libary.PreProcessingBlock):
+            curr_model = self.json_parameters(self.model_block)
+            return {
+                "sklearn_model" : self.model_block.sklearn_model_function_call.__name__,
+                "model_parameters" : curr_model
+            }
+        elif isinstance(self.model_block , block_libary.ColumnBlock):
+            return {
+                "column" : self.model_block.data_held
+            }
+        else:
+            print("NOT SEEN CHANGE DROPPABLE HOLDER")
+
 
     def contains_draggable(self):
         return self.model_block != None
@@ -67,6 +104,12 @@ class DroppableHolder(Gtk.Box ):
 class ListDroppableHolder(Gtk.Box):
     """A class to hold multiple droppable holders, and manage them. 
     """
+    _references_to_all_objects = []
+    style = 'style'
+    droppable_this_holds = 'droppable_this_holds'
+    only_one_entry = 'only_one_entry'
+    entries = 'entries'
+
     def __init__(self, style, droppable_this_holds, only_one_entry = False, **kargs):
         super().__init__(**kargs)
         first_entry = DroppableHolder(style , droppable_this_holds , self)
@@ -74,9 +117,33 @@ class ListDroppableHolder(Gtk.Box):
         self.droppable_this_holds = droppable_this_holds
         self.style = style
         self.only_one_entry = only_one_entry
+        ListDroppableHolder._references_to_all_objects.append(self)
 
     def get_only_one_entry(self):
         return self.only_one_entry
+    
+    def get_all_json_data():
+        """Class level function to get all of the droppable holders.
+
+        Returns:
+            _type_: _description_
+        """
+        res = []
+        for droppable_holder in ListDroppableHolder._references_to_all_objects:
+            res.append(droppable_holder.to_json())
+        return res
+
+    def to_json(self):
+        lst_entries = []
+        for unknown in self:
+            print(unknown)
+            lst_entries.append(unknown.to_json())
+        return {
+            ListDroppableHolder.style: self.style,
+            ListDroppableHolder.droppable_this_holds: self.droppable_this_holds.__name__,
+            ListDroppableHolder.only_one_entry : self.only_one_entry,
+            ListDroppableHolder.entries : lst_entries
+        }
 
     def get_all_values(self):
         res = []
@@ -85,13 +152,17 @@ class ListDroppableHolder(Gtk.Box):
             if child.contains_draggable():
                 res.append(child.get_thing().get_value())
         return res
+    
     def get_all_gtk_objects(self):
         res = []
         for child in self:
             res.append(child.get_thing())
         return res
 
+
     def consider_changing_num_holders(self , value):
+        print("Current json serialization...")
+        print(json.dumps(ListDroppableHolder.get_all_json_data(), indent=4))
         list_model_holders = list(self)
         if self.only_one_entry :
             return
@@ -99,7 +170,6 @@ class ListDroppableHolder(Gtk.Box):
             count  = 0
             for x in range(0 , len(list_model_holders)):
                 child = list_model_holders[x]
-                print(child)
                 if not child.contains_draggable():
                     count += 1
             if count == 0:
@@ -196,6 +266,7 @@ class SklearnPipeline(Gtk.Box):
             for outer_child in pointer_to_list_model_holder:
                 # Get the current model if there is one here
                 if outer_child.model_block != None:
+                    print('outer child type',type(outer_child))
                     print(outer_child.model_block)
                     curr_model = SklearnPipeline.parse_current_model(outer_child)
                     new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
@@ -209,6 +280,8 @@ class SklearnPipeline(Gtk.Box):
         print(model_list)
         untrained_pipeline = sklearn.pipeline.Pipeline(model_list)
         return untrained_pipeline
+    
+
         
 
     def parse_current_model(outer_child):
