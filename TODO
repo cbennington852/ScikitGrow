@@ -32,6 +32,9 @@
                         - *models + blocks* ... using ListDroppableHolder(), which should have a text based serialize and re-seralize.
                         - *pandas df*
                         - no need to save chart, we can just have it run if works on startup. 
+                            - save as a json containing ..
+                                ... dataframe
+                                ... model + software state
     - 3. ability to open the saved models. 
     - 4. 
 

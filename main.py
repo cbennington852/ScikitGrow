@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import sys
 import csv
 import traceback
@@ -262,9 +263,18 @@ class Main_GUI(Gtk.Application):
         return main_box
     
     def save_as_button_pressed(self, button):
-        with open("my_object.pickle", "wb") as f:
-            pickle.dump(self, f)
+        print("Current json serialization...")
+        json_current_app_context = pipeline.ListDroppableHolder.get_all_json_data()
+        json_main_dataframe = self.main_dataframe.copy(deep=True).to_json(orient='records')
+        
 
+        file_to_save_to = 'test.json'
+        with open(file_to_save_to, "w") as f:
+            json.dump({
+                'current_app_context' : json_current_app_context,
+                'main_dataframe' : json_main_dataframe
+            }, f, indent=4) # indent for pretty printing
+            print(json.dumps(pipeline.ListDroppableHolder.get_all_json_data(), indent=4))
 
     def render_top_bar(self):
         header_bar = Gtk.HeaderBar.new()
