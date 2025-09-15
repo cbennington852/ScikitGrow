@@ -50,7 +50,6 @@ class BlockLibary(Gtk.ScrolledWindow):
         self.main_box.set_vexpand(True)
         add_style(self.main_box , 'block-library')
 
-        # adding linear libary
         self.add_submodule(
             class_to_wrap=ColumnBlock , 
             color='green' ,
@@ -138,6 +137,12 @@ class DraggableBlock(Gtk.Box):
     def get_value(self):
         return self.data_held
     
+    def get_gtk_object_from_json(json_data):
+        """
+        Creates an object of this class from json
+        """
+        raise ValueError("Not written yet. block_libary")
+    
     def to_json(self):
         return {
             'type' : self.__class__.__name__,
@@ -174,9 +179,15 @@ class ColumnBlock(DraggableBlock):
     def __init__(self, column_name , color, **kargs):
         super().__init__(
             data_held = column_name,
-            color = color,
+            color = color,  # not used.... deprecated 
             display_name = column_name, 
             **kargs
+        )
+    def get_gtk_object_from_json(json_data):
+        print("my_json_data" , json_data)
+        return ColumnBlock(
+            column_name=json_data['column'],
+            color='blue'
         )
     def copy(thing_to_be_copied):
         return ColumnBlock(

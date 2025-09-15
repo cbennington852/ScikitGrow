@@ -109,11 +109,14 @@ class ListDroppableHolder(Gtk.Box):
     droppable_this_holds = 'droppable_this_holds'
     only_one_entry = 'only_one_entry'
     entries = 'entries'
+    unique_serialization_name = 'unique_serialization_name'
 
-    def __init__(self, style, droppable_this_holds, only_one_entry = False, **kargs):
+
+    def __init__(self, unique_serialization_name , style, droppable_this_holds, only_one_entry = False, **kargs):
         super().__init__(**kargs)
         first_entry = DroppableHolder(style , droppable_this_holds , self)
         self.append(first_entry)
+        self.unique_serialization_name = unique_serialization_name
         self.droppable_this_holds = droppable_this_holds
         self.style = style
         self.only_one_entry = only_one_entry
@@ -122,6 +125,33 @@ class ListDroppableHolder(Gtk.Box):
     def get_only_one_entry(self):
         return self.only_one_entry
     
+    def load_state_from_json(json_data):
+        """
+        A function to load the current state from json. 
+        """
+        # loop thru all the references in each object, if we hit a serial with 
+        # it's name, we will then fill in the information. 
+        for list_droppable_holder in ListDroppableHolder._references_to_all_objects:
+            # find serial within the json context. 
+            for json_list_droppable_holder in json_data:
+                if list_droppable_holder.unique_serialization_name == json_list_droppable_holder['unique_serialization_name']:
+                    print(json.dumps(json_list_droppable_holder , indent=2))
+                    # we now have the specific list_droppable_holder and the json tangent.
+                    # 1. Delete all children in list droppable holders.
+                    for child in list_droppable_holder:
+                        list_droppable_holder.remove(child)
+
+                    # 2. Loop thru json section, and call each block_libary 
+                    #    draggable, to "re-serialize" this section.
+                    for droppable_holder in json_list_droppable_holder:
+                        # 2.1 Make the block_libary object using the render_from_json()
+                        entries = json_list_droppable_holder['entries']
+                        for entry in entries:
+                            if entry: # check to make sure not none
+                                new_object = list_droppable_holder.droppable_this_holds.get_gtk_object_from_json()
+                                list_droppable_holder.append(new_object)
+
+                    # 3. profit?
     def get_all_json_data():
         """Class level function to get all of the droppable holders.
 
@@ -139,6 +169,7 @@ class ListDroppableHolder(Gtk.Box):
             print(unknown)
             lst_entries.append(unknown.to_json())
         return {
+            ListDroppableHolder.unique_serialization_name : self.unique_serialization_name,
             ListDroppableHolder.style: self.style,
             ListDroppableHolder.droppable_this_holds: self.droppable_this_holds.__name__,
             ListDroppableHolder.only_one_entry : self.only_one_entry,
@@ -203,14 +234,16 @@ class SklearnPipeline(Gtk.Box):
         x_value_label = Gtk.Label(label="X-values")
         # making a thing with autocompletion
         self.x_values_entry = ListDroppableHolder(
-            'data-pipeline',
-            block_libary.ColumnBlock
+            unique_serialization_name='x_values',
+            style='data-pipeline',
+            droppable_this_holds=block_libary.ColumnBlock
         )
         # make a y_value, with completions
         y_value_label = Gtk.Label(label='Y-values')
         self.y_values_entry = ListDroppableHolder(
-            'data-pipeline',
-            block_libary.ColumnBlock,
+            unique_serialization_name='y_values',
+            style='data-pipeline',
+            droppable_this_holds=block_libary.ColumnBlock,
             only_one_entry=True
         )
         # build the data section
@@ -227,8 +260,9 @@ class SklearnPipeline(Gtk.Box):
         self.box_pipeline = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.box_pipeline.append(Gtk.Label(label="Pre-processing"))
         self.preprocessing = ListDroppableHolder(
-            'data-pipeline',
-            block_libary.PreProcessingBlock,
+            unique_serialization_name='preproccessor',
+            style='data-pipeline',
+            droppable_this_holds=block_libary.PreProcessingBlock,
             orientation=Gtk.Orientation.VERTICAL
         )
         self.box_pipeline.append(self.preprocessing)
@@ -236,8 +270,9 @@ class SklearnPipeline(Gtk.Box):
         # upon adding more to this section, it should add another box.
         # for now tho, let's have it be a button? 
         self.pipeline = ListDroppableHolder(
-            'data-pipeline',
-            block_libary.ModelBlock,
+            unique_serialization_name='sklearn_model',
+            style='data-pipeline',
+            droppable_this_holds=block_libary.ModelBlock,
             orientation=Gtk.Orientation.VERTICAL
         )
         self.box_pipeline.append(self.pipeline)

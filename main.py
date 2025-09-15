@@ -262,6 +262,20 @@ class Main_GUI(Gtk.Application):
 
         return main_box
     
+    def load_app_context_from_file(self, file_handle):
+        with open(file_handle , 'r') as f:
+            json_data = json.load(f)
+            # 1. set the current dataframe to be the new dataframe from the file_handle
+            self.main_dataframe = pd.read_json(json_data["main_dataframe"])
+            # 2. load the app context, and have the program "restore" it's state.
+            current_app_context = json_data['current_app_context']
+            pipeline.ListDroppableHolder.load_state_from_json(current_app_context) 
+    
+    def open_button_pressed(self, button):
+        print("opening a file")
+        file_handle = 'test.json'
+        self.load_app_context_from_file(file_handle)
+    
     def save_as_button_pressed(self, button):
         print("Current json serialization...")
         json_current_app_context = pipeline.ListDroppableHolder.get_all_json_data()
@@ -282,7 +296,7 @@ class Main_GUI(Gtk.Application):
 
         #File Menu button
         file_menu = TopMenuButton("File")
-        file_menu.add_function("Open" , lambda b: app.quit())
+        file_menu.add_function("Open" , self.open_button_pressed)
         file_menu.add_function("Save" , lambda b: app.quit())
         file_menu.add_function("Save As" , self.save_as_button_pressed)
 

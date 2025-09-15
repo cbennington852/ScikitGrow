@@ -35,6 +35,7 @@
                             - save as a json containing ..
                                 ... dataframe
                                 ... model + software state
+                                ... ListDroppableHolder could have some way to "re-serialise", by naming each list. 
     - 3. ability to open the saved models. 
     - 4. 
 
