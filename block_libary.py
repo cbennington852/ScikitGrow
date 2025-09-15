@@ -243,12 +243,28 @@ class ModelBlock(DraggableBlock):
     def get_value(self):
         return self.sklearn_model_function_call.__name__
     
-    def to_json(self):
-        return {
-            'type' : self.__class__.__name__,
-            'data_held' : self.get_value(),
-            
-        }
+    
+    
+    def get_gtk_object_from_json(json_data):
+        """
+        inherited ... makes a gtk object from the json serialization 
+        """
+        print(json_data)
+        # 1. Make a new ModelBlock.
+            # The labels should be auto initialized...
+        new_model_block = ModelBlock(
+            # below uses eval.
+                # NOTE: security vulnerability .. eval used
+                # using eval to get this as a class. 
+            sklearn_model_function_call=eval(json_data['sklearn_model']),
+            color= json_data['color']# should be fixed later ... this needs to be passed
+        )
+        # 2. Loop thru and fill in the values from json
+        for parameter in json_data['model_parameters']:
+            print(parameter)
+
+        raise ValueError("Not finished the model_block one yet.")
+
 
     def copy(thing_to_be_copied):
         return ModelBlock(

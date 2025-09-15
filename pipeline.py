@@ -71,6 +71,7 @@ class DroppableHolder(Gtk.Box ):
             curr_model = self.json_parameters(self.model_block)
             return {
                 "sklearn_model" : self.model_block.sklearn_model_function_call.__name__,
+                "color" : self.model_block.color,
                 "model_parameters" : curr_model
             }
         elif isinstance(self.model_block , block_libary.ColumnBlock):
@@ -143,13 +144,22 @@ class ListDroppableHolder(Gtk.Box):
 
                     # 2. Loop thru json section, and call each block_libary 
                     #    draggable, to "re-serialize" this section.
-                    for droppable_holder in json_list_droppable_holder:
-                        # 2.1 Make the block_libary object using the render_from_json()
-                        entries = json_list_droppable_holder['entries']
-                        for entry in entries:
-                            if entry: # check to make sure not none
-                                new_object = list_droppable_holder.droppable_this_holds.get_gtk_object_from_json()
-                                list_droppable_holder.append(new_object)
+                    # 2.1 Make the block_libary object using the render_from_json()
+                    entries = json_list_droppable_holder['entries']
+                    for entry in entries:
+                        if entry: # check to make sure not none
+                            new_draggable = list_droppable_holder.droppable_this_holds.get_gtk_object_from_json(entry)
+                            # make new droppable holder ... then add the new _draggable
+                            new_droppable_holder = DroppableHolder(
+                                style=list_droppable_holder.style,
+                                thing_to_hold=list_droppable_holder.droppable_this_holds,
+                                parent=list_droppable_holder
+                            )
+                            new_droppable_holder.model_block = new_draggable
+                            new_droppable_holder.box.append(new_draggable)
+                            for child in new_droppable_holder.box:
+                                new_droppable_holder.box.remove(child)
+                            list_droppable_holder.append(new_droppable_holder)
 
                     # 3. profit?
     def get_all_json_data():
