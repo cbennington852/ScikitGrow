@@ -3,7 +3,7 @@
 Invented in 2003 scratch is a programming language intended for children ages 10 - 15. The intent of this project was to model programming concepts via large colorful blocks, to teach children the basics of programming. Scratch has since been a massive success, as of 2023 scratch go 95 million monthly visits, some fo those recurring users, other programming novices. 
 
 This language was intended to model real world programming, whilst giving children a streamlined experience, free of the frustrating nature of learning to code. 
-![python versus scratch](python_scratch.png "Optional title text")
+![python versus scratch](images/python_scratch.png "Optional title text")
 *Side by side comparison of scratch versus python*
 
 Upon it's initial completion scratch had three defining features.
@@ -15,7 +15,7 @@ Upon it's initial completion scratch had three defining features.
 The goal of this project is to make a learning software for children and high schoolers to learn core data science concepts, such as overfitting, and linear vs non-linear models. 
 
 I plan to do so using a "Drag and Drop" system, very similar to how scratch operates.
-![blocks v python](blocks_vs_python.png "Optional title text")
+![blocks v python](images/blocks_vs_python.png "Optional title text")
 *A draft of the current drag and drop interface versus python code.*
 
 This would allow students and novices to learn in a similar way to scratch. 
@@ -30,10 +30,10 @@ This would allow students and novices to learn in a similar way to scratch.
 
 ## Current works
 Currently, there is still a lot to work on for this application, most of the core application features have been implemented, but there is still a lot of software development left to do. 
-![blocks v python](plan.png "Optional title text")
+![blocks v python](images/plan.png "Optional title text")
 
 
-![blocks v python](full_app.png "Optional title text")
+![blocks v python](images/full_app.png "Optional title text")
 *Pre-UI/UX redesign Fall 2025*
 ## Running the current GUI
 warning, this is a work in progress, and bugs are guaranteed!!!!
