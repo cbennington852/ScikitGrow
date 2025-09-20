@@ -252,16 +252,17 @@ class ModelBlock(DraggableBlock):
         print(json_data)
         # 1. Make a new ModelBlock.
             # The labels should be auto initialized...
+        print(globals())
         new_model_block = ModelBlock(
             # below uses eval.
                 # NOTE: security vulnerability .. eval used
                 # using eval to get this as a class. 
-            sklearn_model_function_call=eval(json_data['sklearn_model']),
-            color= json_data['color']# should be fixed later ... this needs to be passed
+            sklearn_model_function_call=globals()[json_data['sklearn_model']],
+            color= json_data['color'],# should be fixed later ... this needs to be passed
         )
         # 2. Loop thru and fill in the values from json
-        for parameter in json_data['model_parameters']:
-            print(parameter)
+        for parameter_key , parameter_value in json_data['model_parameters'].items():
+            print(parameter_key , parameter_value)
 
         raise ValueError("Not finished the model_block one yet.")
 
