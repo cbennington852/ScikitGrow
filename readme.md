@@ -26,13 +26,15 @@ This would allow students and novices to learn in a similar way to scratch.
 3. **Examples** This software should have example datasets, and later linked tutorials to enhance learning. 
 4. **Compatibility** This software should allow for the exporting and saving of data, so students can save their projects and share them (presumably with proud parents)
 
-## Software Architecture
-
 
 
 ## Current works
+Currently, there is still a lot to work on for this application, most of the core application features have been implemented, but there is still a lot of software development left to do. 
+![blocks v python](plan.png "Optional title text")
 
 
+![blocks v python](full_app.png "Optional title text")
+*Pre-UI/UX redesign Fall 2025*
 ## Running the current GUI
 warning, this is a work in progress, and bugs are guaranteed!!!!
 
