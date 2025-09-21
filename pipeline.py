@@ -3,6 +3,7 @@ import sys
 import csv
 import traceback
 import gi
+import inspect
 
 gi.require_version("Gtk", "4.0")
 import block_libary
@@ -75,9 +76,10 @@ class DroppableHolder(Gtk.Box ):
         if isinstance(self.model_block , block_libary.ModelBlock) or isinstance(self.model_block , block_libary.PreProcessingBlock):
             curr_model = self.json_parameters(self.model_block)
             return {
-                "sklearn_model" : self.model_block.sklearn_model_function_call.__name__,
+                "sklearn_model_name" : self.model_block.sklearn_model_function_call.__name__,
+                "sklearn_model": self.model_block.sklearn_model_function_call.__module__ + "." + self.model_block.sklearn_model_function_call.__name__,
                 "color" : self.model_block.color,
-                "model_parameters" : curr_model
+                "model_parameters" : curr_model,
             }
         elif isinstance(self.model_block , block_libary.ColumnBlock):
             return {

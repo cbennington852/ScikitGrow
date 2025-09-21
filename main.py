@@ -318,7 +318,7 @@ class Main_GUI(Gtk.Application):
 
         header_bar.pack_start(file_menu)
         header_bar.pack_start(graph_menu)
-        header_bar.pack_start(show_df_button)
+        #header_bar.pack_start(show_df_button)
         
         return header_bar
     

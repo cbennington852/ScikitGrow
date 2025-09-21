@@ -1,6 +1,27 @@
+
+/*
+* {
+  all: unset;
+}
+*/
+headerbar {
+  all: unset;
+}
+
+window {
+  all: unset;
+  background-color: rgba(255, 255, 255, 0.859);;
+  color: black;
+}
+scrolled-window {
+  all: unset;
+}
+
 .toolbar-top button.toggle {
   border: none;
-  background-color: none;
+  background-color: grey;
+  opacity: 50%;
+  color: black;
   background-image: none;
   border: none;
 
@@ -146,9 +167,9 @@ Block related things
 Standard frame related things 
 */
 .frame {
-    margin: 10px;
+    margin: 30px;
     border: 6px solid #ffffff;
-    border-radius: 6px;
+    border-radius: 10px;
     background-color: #ffffff;
 }
 
@@ -156,6 +177,29 @@ Standard frame related things
     background-color: #ededed;
     padding: 5px;
     min-width: 400px;
+}
+
+.block-dropdown-button {
+  color: white;
+  background-color: none;
+  background-image : none;
+  border: none;
+}
+
+.block-dropdown-button button.toggle {
+  border: none;
+  background-color: none;
+  color: white;
+  background-image: none;
+  border: none;
+
+}
+.block-dropdown-button button.toggle :hover {
+  border: none;
+  background-color: none;
+  background-image: none;
+  border: none;
+
 }
 
 .header-button {
@@ -171,8 +215,10 @@ Standard frame related things
   border: none;
 }
 
+
+
 .back-area {
-  background-color: rgb(186, 186, 186);
+  background-color: rgba(0, 0, 0, 0);
   border:none
 }
 
