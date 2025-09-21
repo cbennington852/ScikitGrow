@@ -39,6 +39,9 @@ class Main_GUI(Gtk.Application):
         self.css_file_path = "./styles.css"
         GLib.set_application_name("SciKitLearn GUI")
 
+    def render_left_area(self):
+        pass
+
     def create_window(self, file):
         print("gggg")
         self.main_dataframe = self.process_input_file(file)
@@ -71,11 +74,11 @@ class Main_GUI(Gtk.Application):
         block_library = self.render_block_library()
 
         # pipeline 
-        pipeline_main_box = self.render_pipeline()
+        pipeline_main_box = self.render_pandas_dataframe()#self.render_pipeline()
 
         right_box.set_end_child(pipeline_main_box)
         right_box.set_start_child(chart_box)
-        #left_box.set_start_child(csv_viewer_box)
+        left_box.set_start_child(self.render_pipeline())
         left_box.set_end_child(block_library)
 
         # adding left and right boxes
@@ -98,7 +101,14 @@ class Main_GUI(Gtk.Application):
         for file in files:
             self.create_window(file.get_path())
 
-    def render_pandas_dataframe(self , _):
+    def create_dataframe_window(self, _ ):
+        window = Gtk.ApplicationWindow(application=self)
+        window.set_title("Dataframe")
+        window.set_default_size(400, 300)
+        window.set_child(self.render_pandas_dataframe())
+        window.show()
+
+    def render_pandas_dataframe(self , ):
         
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
@@ -150,11 +160,8 @@ class Main_GUI(Gtk.Application):
             header_box=top_control_box,
             body_box=scrolled_window
         )
-        window = Gtk.ApplicationWindow(application=self)
-        window.set_title("Dataframe")
-        window.set_default_size(400, 300)
-        window.set_child(main_box)
-        window.show()
+        return main_box
+        
 
 
     def process_input_file(self, filepath):
@@ -307,7 +314,7 @@ class Main_GUI(Gtk.Application):
 
         # add the dataframe viewer
         show_df_button = Gtk.Button(label='Show Dataframe')
-        show_df_button.connect('clicked' , self.render_pandas_dataframe)
+        show_df_button.connect('clicked' , self.create_dataframe_window)
 
         header_bar.pack_start(file_menu)
         header_bar.pack_start(graph_menu)

@@ -27,11 +27,16 @@ class DroppableHolder(Gtk.Box ):
             parent (_type_, optional): _description_. Defaults to None.
         """
         super().__init__(**kargs)
+
         self.thing_to_hold = thing_to_hold
         self.parent = parent
+        
         block_libary.add_style(self , style)
         self.box = Gtk.Box()
-        self.box.append(Gtk.Label(label=f"drop {thing_to_hold.__name__} here!"))
+        self.box.set_halign(Gtk.Align.CENTER)
+        self.set_halign(Gtk.Align.CENTER)
+
+        self.box.append(Gtk.Label(label=f"  +  "))
         self.append(self.box)
 
         drop_controller = Gtk.DropTarget.new(
@@ -86,6 +91,7 @@ class DroppableHolder(Gtk.Box ):
         return self.model_block != None
 
     def on_drop(self, _ctrl, value, _x, _y):
+        # clear the background.
         if isinstance(value, self.thing_to_hold):
             for child in self.box:
                 self.box.remove(child)
