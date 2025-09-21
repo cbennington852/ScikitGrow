@@ -7,7 +7,7 @@
             "only_one_entry": false,
             "entries": [
                 {
-                    "column": "sepal.length"
+                    "column": "sepal.width"
                 },
                 null
             ]
@@ -19,7 +19,7 @@
             "only_one_entry": true,
             "entries": [
                 {
-                    "column": "petal.width"
+                    "column": "petal.length"
                 }
             ]
         },
@@ -30,7 +30,8 @@
             "only_one_entry": false,
             "entries": [
                 {
-                    "sklearn_model": "Normalizer",
+                    "sklearn_model_name": "Normalizer",
+                    "sklearn_model": "sklearn.preprocessing._data.Normalizer",
                     "color": "purple",
                     "model_parameters": {
                         "norm": "l2",
@@ -47,24 +48,18 @@
             "only_one_entry": false,
             "entries": [
                 {
-                    "sklearn_model": "LogisticRegression",
+                    "sklearn_model_name": "Ridge",
+                    "sklearn_model": "sklearn.linear_model._ridge.Ridge",
                     "color": "green",
                     "model_parameters": {
-                        "penalty": "l2",
-                        "dual": false,
-                        "tol": 0.0001,
-                        "C": 1.0,
+                        "alpha": 1.0,
                         "fit_intercept": true,
-                        "intercept_scaling": 1,
-                        "class_weight": null,
-                        "random_state": null,
-                        "solver": "lbfgs",
-                        "max_iter": 100,
-                        "multi_class": "deprecated",
-                        "verbose": 0,
-                        "warm_start": false,
-                        "n_jobs": null,
-                        "l1_ratio": null
+                        "copy_X": true,
+                        "max_iter": null,
+                        "tol": 0.0001,
+                        "solver": "auto",
+                        "positive": false,
+                        "random_state": null
                     }
                 },
                 null

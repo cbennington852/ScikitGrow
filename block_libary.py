@@ -146,7 +146,7 @@ class DraggableBlock(Gtk.Box):
     def to_json(self):
         return {
             'type' : self.__class__.__name__,
-            'data_held' : self.get_value() 
+            'data_held' : self.get_value(),
         }
     
     def copy(thing_to_be_copied):
@@ -219,20 +219,16 @@ class ModelBlock(DraggableBlock):
         scrollable_view.set_child(self.parameters_box)
 
         # loop over the possible input arguments
-        possible_args = inspect.signature(sklearn_model_function_call)
-        x = 0
-        for param_name, param in possible_args.parameters.items():
-            curr_label = Gtk.Label(label=param_name)
-            curr_entry = Gtk.Entry()
-            curr_entry.set_text(str(param.default))
-            self.parameters_box.attach(curr_label , 0 , x , 1, 1)
-            self.parameters_box.attach(curr_entry , 1 , x , 1, 1)
-            x += 1
-        self.x = x
+        
+        self.process_args(sklearn_model_function_call)
         # assemble blocks
-        sub_body = Gtk.Expander(label=sklearn_model_function_call.__name__)
+        sub_body = Gtk.Popover()
         sub_body.set_child(scrollable_view)
-        self.append(sub_body)
+        scrollable_view.set_size_request(200 , 200)
+        menu_button = Gtk.MenuButton(label=sklearn_model_function_call.__name__ , popover=sub_body)
+        menu_button.get_style_context().add_class("block-dropdown-button")
+        self.append(menu_button)
+
         drag_controller = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
         drag_controller.connect("prepare", self.on_drag_prepare)
         drag_controller.connect("drag-begin", self.on_drag_begin)
@@ -243,6 +239,17 @@ class ModelBlock(DraggableBlock):
     def get_value(self):
         return self.sklearn_model_function_call.__name__
     
+    def process_args(self , sklearn_model_function_call):
+        possible_args = inspect.signature(sklearn_model_function_call).parameters.items()
+        x = 0
+        for param_name, param in possible_args:
+            curr_label = Gtk.Label(label=param_name)
+            curr_entry = Gtk.Entry()
+            curr_entry.set_text(str(param.default))
+            self.parameters_box.attach(curr_label , 0 , x , 1, 1)
+            self.parameters_box.attach(curr_entry , 1 , x , 1, 1)
+            x += 1
+        self.x = x
     
     
     def get_gtk_object_from_json(json_data):
@@ -257,12 +264,14 @@ class ModelBlock(DraggableBlock):
             # below uses eval.
                 # NOTE: security vulnerability .. eval used
                 # using eval to get this as a class. 
-            sklearn_model_function_call=globals()[json_data['sklearn_model']],
+            sklearn_model_function_call=eval(json_data['sklearn_model']),
             color= json_data['color'],# should be fixed later ... this needs to be passed
         )
+        print(new_model_block)
         # 2. Loop thru and fill in the values from json
         for parameter_key , parameter_value in json_data['model_parameters'].items():
             print(parameter_key , parameter_value)
+        new_model_block.process_args(json_data['model_parameters'].items())
 
         raise ValueError("Not finished the model_block one yet.")
 
@@ -280,3 +289,6 @@ class PreProcessingBlock(ModelBlock):
             color=color,
             **kargs
         )
+        def get_gtk_object_from_json(json_data):
+            print(json_data)
+            print(globals())
