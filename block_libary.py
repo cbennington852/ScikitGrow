@@ -239,8 +239,9 @@ class ModelBlock(DraggableBlock):
     def get_value(self):
         return self.sklearn_model_function_call.__name__
     
-    def process_args(self , sklearn_model_function_call):
+    def process_args(self , sklearn_model_function_call ):
         possible_args = inspect.signature(sklearn_model_function_call).parameters.items()
+        print(possible_args)
         x = 0
         for param_name, param in possible_args:
             curr_label = Gtk.Label(label=param_name)
@@ -269,11 +270,20 @@ class ModelBlock(DraggableBlock):
         )
         print(new_model_block)
         # 2. Loop thru and fill in the values from json
+        for child in new_model_block.parameters_box:
+            new_model_block.parameters_box.remove(child)
+        x = 0
         for parameter_key , parameter_value in json_data['model_parameters'].items():
             print(parameter_key , parameter_value)
-        new_model_block.process_args(json_data['model_parameters'].items())
+            curr_label = Gtk.Label(label=parameter_key)
+            curr_entry = Gtk.Entry()
+            curr_entry.set_text(str(parameter_value))
+            new_model_block.parameters_box.attach(curr_label , 0 , x , 1, 1)
+            new_model_block.parameters_box.attach(curr_entry , 1 , x , 1, 1)
+            x += 1
+        new_model_block.x = x
+        return new_model_block
 
-        raise ValueError("Not finished the model_block one yet.")
 
 
     def copy(thing_to_be_copied):
