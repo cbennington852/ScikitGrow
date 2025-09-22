@@ -39,53 +39,54 @@ class Main_GUI(Gtk.Application):
         self.css_file_path = "./styles.css"
         GLib.set_application_name("SciKitLearn GUI")
 
-    def render_left_area(self):
-        pass
-
-    def create_window(self, file):
-        print("gggg")
-        self.main_dataframe = self.process_input_file(file)
-        self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
-         # the main window
-        self.window = Gtk.ApplicationWindow(application=self, title="Sklearn GUI software")
-        self.window.set_default_size(1200, 900)
-
-        # left side
-        left_box = Gtk.Paned(
+    def render_main_box_from_dataframe(self , ignore_pipeline = False):
+         # left side
+        self.left_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
         )
-        self.add_style(left_box , 'back-area')
+        self.add_style(self.left_box , 'back-area')
         # right side
-        right_box = Gtk.Paned(
+        self.right_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
         )
-        self.add_style(right_box , 'back-area')
+        self.add_style(self.right_box , 'back-area')
 
         # The main box
-        main_box = Gtk.Paned (
+        self.main_box = Gtk.Paned (
             orientation=Gtk.Orientation.HORIZONTAL,
         )
-        self.add_style(main_box , 'back-area')
+        self.add_style(self.main_box , 'back-area')
 
         # chart stuff
         chart_box = self.render_graph()
 
         # block library stuff
-        block_library = self.render_block_library()
+        self.block_library = self.render_block_library()
 
         # pipeline 
-        pipeline_main_box = self.render_pandas_dataframe()#self.render_pipeline()
+        self.dataframe_main_box = self.render_pandas_dataframe()#self.render_pipeline()
 
-        right_box.set_end_child(pipeline_main_box)
-        right_box.set_start_child(chart_box)
-        left_box.set_start_child(self.render_pipeline())
-        left_box.set_end_child(block_library)
+        self.right_box.set_end_child(self.dataframe_main_box)
+        self.right_box.set_start_child(chart_box)
+        if ignore_pipeline == False:
+            self.left_box.set_start_child(self.render_pipeline())
+        self.left_box.set_end_child(self.block_library)
 
         # adding left and right boxes
-        main_box.set_start_child(left_box)
-        main_box.set_end_child(right_box)
+        self.main_box.set_start_child(self.left_box)
+        self.main_box.set_end_child(self.right_box)
+        return self.main_box
+
+    def create_window(self, file):
+        self.main_dataframe = self.process_input_file(file)
+         # the main window
+        self.window = Gtk.ApplicationWindow(application=self, title="Sklearn GUI software")
+        self.window.set_default_size(1200, 900)
+
+        self.render_main_box_from_dataframe()
+        
         # adding main box
-        self.window.set_child(main_box)
+        self.window.set_child(self.main_box)
         self.window.set_titlebar(self.render_top_bar())
         self.load_css_file()
         self.window.present()
@@ -165,25 +166,41 @@ class Main_GUI(Gtk.Application):
 
 
     def process_input_file(self, filepath):
+
         excel_extensions = ['.xls','.xlsx','.xlsm','.xlsb','.ods','.odt']
         filepath = filepath
         print(filepath)
         # is a csv
+        if '.sckl' in filepath:
+            with open(filepath , 'r') as f:
+                json_data = json.load(f)
+                # 1. set the current dataframe to be the new dataframe from the file_handle
+                self.main_dataframe = pd.read_json(json_data["main_dataframe"])
+                # 2. load the app context, and have the program "restore" it's state.
+                current_app_context = json_data['current_app_context']
+            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+            pipeline.ListDroppableHolder.load_state_from_json(current_app_context)
+
+            return self.main_dataframe
         if '.csv' in filepath:
-            main_dataframe = pd.read_csv(filepath)
-            return main_dataframe
+            self.main_dataframe = pd.read_csv(filepath)
+            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+            return self.main_dataframe
         # is excel
         for possible_extension in excel_extensions:
             if possible_extension in filepath:
-                main_dataframe = pd.read_excel(filepath)
-                return main_dataframe
+                self.main_dataframe = pd.read_excel(filepath)
+                self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+                return self.main_dataframe
         # is json
         if '.json' in filepath:
-            main_dataframe = pd.read_json(filepath)
-            return main_dataframe
+            self.main_dataframe = pd.read_json(filepath)
+            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+            return self.main_dataframe
         if '.parquet' in filepath:
-            main_dataframe = pd.read_parquet(filepath)
-            return main_dataframe
+            self.main_dataframe = pd.read_parquet(filepath)
+            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+            return self.main_dataframe
         # filetype not supported
         print("""
             File Type not supported, try:
@@ -269,19 +286,12 @@ class Main_GUI(Gtk.Application):
 
         return main_box
     
-    def load_app_context_from_file(self, file_handle):
-        with open(file_handle , 'r') as f:
-            json_data = json.load(f)
-            # 1. set the current dataframe to be the new dataframe from the file_handle
-            self.main_dataframe = pd.read_json(json_data["main_dataframe"])
-            # 2. load the app context, and have the program "restore" it's state.
-            current_app_context = json_data['current_app_context']
-            pipeline.ListDroppableHolder.load_state_from_json(current_app_context) 
+    
     
     def open_button_pressed(self, button):
         print("opening a file")
         file_handle = 'test.json'
-        self.load_app_context_from_file(file_handle)
+        #self.load_app_context_from_file(file_handle)
     
     def save_as_button_pressed(self, button):
         print("Current json serialization...")
