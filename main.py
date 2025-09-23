@@ -32,7 +32,7 @@ from TopMenu import TopMenuButton
 class Main_GUI(Gtk.Application):
     def __init__(self):
         super().__init__(
-            application_id="com.example.DataSeedlings",
+            application_id="com.charlesbennington.DataSeedlings",
             flags=Gio.ApplicationFlags.HANDLES_OPEN
         )
 
@@ -80,23 +80,9 @@ class Main_GUI(Gtk.Application):
     def create_window(self, file):
         self.main_dataframe = self.process_input_file(file)
 
-        
+    
          # the main window
         self.window = Gtk.ApplicationWindow(application=self, title=f"Data Seedlings {self.filepath}")
-        try:
-            resources = Gio.Resource.load("data")
-            Gio.resources_register(resources)
-        except Exception as e:
-            print(f"Error loading resources: {e}")
-
-        # Get the default icon theme
-        icon_theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
-
-        # Add the GResource path to the icon theme
-        icon_theme.add_resource_path("/data/hicolor/apps/48x48/")
-
-        # Set the window icon
-        self.window.set_icon_name("my-icon")
        
         self.window.set_default_size(1200, 900)
 
