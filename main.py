@@ -406,8 +406,6 @@ class Main_GUI(Gtk.Application):
         return self.main_canvas
 
 
-
-
 app = Main_GUI()
 exit_status = app.run(sys.argv)
 sys.exit(exit_status)
