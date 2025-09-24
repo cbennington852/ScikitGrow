@@ -4,12 +4,8 @@ import json
 import sys
 import csv
 import traceback
-import gi
-
-gi.require_version("Gtk", "4.0")
-from gi.repository import GLib, Gtk, Gio, Gdk, GObject
-
-
+import tkinter as tk
+from tkinter import ttk
 import standard_box
 import sklearn_proccesses
 import block_libary
@@ -29,7 +25,7 @@ from TopMenu import TopMenuButton
 
 
 
-class Main_GUI(Gtk.Application):
+class Main_GUI(tk.Tk):
     def __init__(self):
         super().__init__(
             application_id="com.charlesbennington.DataSeedlings",
@@ -405,7 +401,10 @@ class Main_GUI(Gtk.Application):
         self.main_canvas.set_size_request(500, 500)
         return self.main_canvas
 
+root = Main_GUI()
+# Set window properties
+root.title("My Tkinter Window")
+root.geometry("400x300")
 
-app = Main_GUI()
-exit_status = app.run(sys.argv)
-sys.exit(exit_status)
+# Start the main event loop
+root.mainloop()
