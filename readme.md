@@ -8,35 +8,42 @@ This language was intended to model real world programming, whilst giving childr
 
 Upon it's initial completion scratch had three defining features.
 1. **The scratch compiler ALWAYS compiles** Scratch will never throw an exception or raise a ValueError, this was to shield novices from the frustration of syntax errors.
-2. **Drag and Drop Blocks** Scratch is programmed through drag and drop blocks, allowing for novices to learn in a more intuitive way. As well as preventing students from copying and pasting answers
+2. **Drag and Drop Blocks** Scratch is programmed through drag and drop blocks, allowing for novices to learn in a more intuitive way. As well as preventing students from copying and pasting answers, ensuring that their exploration and interaction with the material remains exploratory. 
 3. **Examples** Scratch comes preloaded with examples and tutorials, leading to a more streamlined experience.    
 
 ##  Project Goals & Summary
-The goal of this project is to make a learning software for children and high schoolers to learn core data science concepts, such as overfitting, and linear vs non-linear models. 
+The goal of this project is to make a learning software for novices and high schoolers to learn core data science concepts, such as overfiting, and linear vs non-linear models. 
 
 I plan to do so using a "Drag and Drop" system, very similar to how scratch operates.
 ![blocks v python](images/blocks_vs_python.png "Optional title text")
 *A draft of the current drag and drop interface versus python code.*
 
-This would allow students and novices to learn in a similar way to scratch. 
+This would allow students and novices to learn in a similar way to scratch, dragging and dropping components, in an intuitive manner. 
 
 ### Project sub-goals:
-1. **Project always compiles** The project should either compile or not change. It should rarely throw an error. 
-2. **Drag and drop datascience components** Drag and drop column values, as well as sklearn componets to build and AI model. 
-3. **Examples** This software should have example datasets, and later linked tutorials to enhance learning. 
+1. **Project always compiles** DataSeedlings should never not compile, the compiler should be written in a way that the project always results in an output, even if that output is a blank graph. 
+2. **Drag and drop data-science components** Drag and drop column values, as well as sklearn components to build and AI model. 
+3. **Examples** This software should have example datasets, and later linked tutorials to facilitate learning. 
 4. **Compatibility** This software should allow for the exporting and saving of data, so students can save their projects and share them (presumably with proud parents)
 
+## Reasoning 
+Currently, data science is a very in-accessible field to novices, and people with low code abilities. 
+
+The goal of this project is to base this off of successful learning tools from the past(such as scratch), and apply those things to this new project. 
+
+With the rise of AI, I found that many of the students that I would tutor would be simply copying and pasting code from chatGPT, without actually understanding it, this outlines on fo the strengths of drag and drop blocks, which are naturally resistant to forms of copy and paste , allowing for students to have a more natural way of learning through exploration . 
 
 
 ## Current works
 Currently, there is still a lot to work on for this application, most of the core application features have been implemented, but there is still a lot of software development left to do. 
-![blocks v python](images/plan.png "Optional title text")
+
+<img src="images/plan.png" alt="plan" width="300"/>
 
 
 ![blocks v python](images/full_app.png "Optional title text")
 *Pre-UI/UX redesign Fall 2025*
 ## Running the current GUI
-warning, this is a work in progress, and bugs are guaranteed!!!!
+Warning; this is a work in progress, and bugs are a near guarantee. 
 
 To run the GUI
 ```
