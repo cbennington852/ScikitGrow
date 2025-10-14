@@ -26,13 +26,11 @@ This would allow students and novices to learn in a similar way to scratch, drag
 3. **Examples** This software should have example datasets, and later linked tutorials to facilitate learning. 
 4. **Compatibility** This software should allow for the exporting and saving of data, so students can save their projects and share them (presumably with proud parents)
 
-## Reasoning 
-Currently, data science is a very in-accessible field to novices, and people with low code abilities. 
+## Natrually AI Resitant
+With the rise of AI, I found that many of the students that I would tutor would be simply copying and pasting code from chatGPT, without actually understanding it. This outlines on of the strengths of drag and drop blocks, which are naturally resistant to forms of copy and paste, allowing for students to have a more natural way of learning through exploration, while also subtely disallowing the use of AI. 
 
-The goal of this project is to base this off of successful learning tools from the past(such as scratch), and apply those things to this new project. 
-
-With the rise of AI, I found that many of the students that I would tutor would be simply copying and pasting code from chatGPT, without actually understanding it, this outlines on fo the strengths of drag and drop blocks, which are naturally resistant to forms of copy and paste , allowing for students to have a more natural way of learning through exploration . 
-
+## Exploratory Learning
+roject is supposed to encourage exploration and experimentation. The modular drag and drop system is part of this, allowing for users to swap out models on the fly, leading to them learning the differences between different models more in-depth, due to a tactile, hands on experience.
 
 ## Current works
 Currently, there is still a lot to work on for this application, most of the core application features have been implemented, but there is still a lot of software development left to do. 
