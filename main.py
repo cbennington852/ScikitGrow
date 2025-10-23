@@ -27,35 +27,33 @@ import joblib
 from TopMenu import TopMenuButton
 
 
-
-
 class Main_GUI(Gtk.Application):
     def __init__(self):
         super().__init__(
             application_id="com.charlesbennington.DataSeedlings",
-            flags=Gio.ApplicationFlags.HANDLES_OPEN
+            flags=Gio.ApplicationFlags.HANDLES_OPEN,
         )
 
         self.css_file_path = "./styles.css"
         GLib.set_application_name("SciKitLearn GUI")
 
-    def render_main_box_from_dataframe(self , ignore_pipeline = False):
-         # left side
+    def render_main_box_from_dataframe(self, ignore_pipeline=False):
+        # left side
         self.left_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
         )
-        self.add_style(self.left_box , 'back-area')
+        self.add_style(self.left_box, "back-area")
         # right side
         self.right_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
         )
-        self.add_style(self.right_box , 'back-area')
+        self.add_style(self.right_box, "back-area")
 
         # The main box
-        self.main_box = Gtk.Paned (
+        self.main_box = Gtk.Paned(
             orientation=Gtk.Orientation.HORIZONTAL,
         )
-        self.add_style(self.main_box , 'back-area')
+        self.add_style(self.main_box, "back-area")
 
         # chart stuff
         chart_box = self.render_graph()
@@ -63,8 +61,10 @@ class Main_GUI(Gtk.Application):
         # block library stuff
         self.block_library = self.render_block_library()
 
-        # pipeline 
-        self.dataframe_main_box = self.render_pandas_dataframe()#self.render_pipeline()
+        # pipeline
+        self.dataframe_main_box = (
+            self.render_pandas_dataframe()
+        )  # self.render_pipeline()
 
         self.right_box.set_end_child(self.dataframe_main_box)
         self.right_box.set_start_child(chart_box)
@@ -80,14 +80,15 @@ class Main_GUI(Gtk.Application):
     def create_window(self, file):
         self.main_dataframe = self.process_input_file(file)
 
-    
-         # the main window
-        self.window = Gtk.ApplicationWindow(application=self, title=f"Data Seedlings {self.filepath}")
-       
+        # the main window
+        self.window = Gtk.ApplicationWindow(
+            application=self, title=f"Data Seedlings {self.filepath}"
+        )
+
         self.window.set_default_size(1200, 900)
 
         self.render_main_box_from_dataframe()
-        
+
         # adding main box
         self.window.set_child(self.main_box)
         self.window.set_titlebar(self.render_top_bar())
@@ -97,42 +98,42 @@ class Main_GUI(Gtk.Application):
     def do_activate(self):
         """
         This function is called upon the user when the user calls this app
-        not on a .csv or tangential file type. 
+        not on a .csv or tangential file type.
         """
         print("Splash screen not implemented yet.... work on it later")
 
-    def do_open(self, files: list[Gio.File], n_files,  hint: str):
+    def do_open(self, files: list[Gio.File], n_files, hint: str):
         for file in files:
             self.create_window(file.get_path())
 
-    def create_dataframe_window(self, _ ):
+    def create_dataframe_window(self, _):
         window = Gtk.ApplicationWindow(application=self)
         window.set_title("Dataframe")
         window.set_default_size(400, 300)
         window.set_child(self.render_pandas_dataframe())
         window.show()
 
-    def render_pandas_dataframe(self , ):
-        
+    def render_pandas_dataframe(
+        self,
+    ):
+
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
-
         scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_size_request(300,300)
+        scrolled_window.set_size_request(300, 300)
         scrolled_window.set_hexpand(True)
         scrolled_window.set_vexpand(True)
-
 
         scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         csv_viewer_box = Gtk.Box()
         # read csv
         # retrieve the pandas dataframe
-        # add the top header 
+        # add the top header
         # add all of the dataframe rows.
         # may have to make a conversion map
         column_types = []
         for col in self.main_dataframe.columns:
-            tmp = GObject.type_from_name('gchararray')
+            tmp = GObject.type_from_name("gchararray")
             print(tmp)
             column_types.append(tmp)
 
@@ -140,13 +141,13 @@ class Main_GUI(Gtk.Application):
 
         limit = 200
         for index, row in self.main_dataframe.iterrows():
-            row = [str(point) for point in row] 
+            row = [str(point) for point in row]
             liststore.append(list(row))
             limit -= 1
             if limit <= 0:
                 break
 
-         # Create a TreeView and link it to the model
+        # Create a TreeView and link it to the model
         treeview = Gtk.TreeView(model=liststore)
 
         # Create a column for each dataframe header
@@ -158,54 +159,62 @@ class Main_GUI(Gtk.Application):
         # Add the TreeView (not the ListStore!) to the container
         csv_viewer_box.append(treeview)
         scrolled_window.set_child(csv_viewer_box)
-        self.add_style(scrolled_window , 'csv-reader ')
+        self.add_style(scrolled_window, "csv-reader ")
 
         main_box = standard_box.StdBox(
-            header_box=top_control_box,
-            body_box=scrolled_window
+            header_box=top_control_box, body_box=scrolled_window
         )
         return main_box
-        
-
 
     def process_input_file(self, filepath):
         self.filepath = filepath
-        excel_extensions = ['.xls','.xlsx','.xlsm','.xlsb','.ods','.odt']
+        excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".ods", ".odt"]
         filepath = filepath
         print(filepath)
         # is a csv
-        if '.sckl' in filepath:
-            with open(filepath , 'r') as f:
+        if ".sckl" in filepath:
+            with open(filepath, "r") as f:
                 json_data = json.load(f)
                 # 1. set the current dataframe to be the new dataframe from the file_handle
                 self.main_dataframe = pd.read_json(json_data["main_dataframe"])
                 # 2. load the app context, and have the program "restore" it's state.
-                current_app_context = json_data['current_app_context']
-            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+                current_app_context = json_data["current_app_context"]
+            self.pipeline_box = pipeline.SklearnPipeline(
+                self.main_dataframe.columns.tolist()
+            )
             pipeline.ListDroppableHolder.load_state_from_json(current_app_context)
 
             return self.main_dataframe
-        if '.csv' in filepath:
+        if ".csv" in filepath:
             self.main_dataframe = pd.read_csv(filepath)
-            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+            self.pipeline_box = pipeline.SklearnPipeline(
+                self.main_dataframe.columns.tolist()
+            )
             return self.main_dataframe
         # is excel
         for possible_extension in excel_extensions:
             if possible_extension in filepath:
                 self.main_dataframe = pd.read_excel(filepath)
-                self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+                self.pipeline_box = pipeline.SklearnPipeline(
+                    self.main_dataframe.columns.tolist()
+                )
                 return self.main_dataframe
         # is json
-        if '.json' in filepath:
+        if ".json" in filepath:
             self.main_dataframe = pd.read_json(filepath)
-            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+            self.pipeline_box = pipeline.SklearnPipeline(
+                self.main_dataframe.columns.tolist()
+            )
             return self.main_dataframe
-        if '.parquet' in filepath:
+        if ".parquet" in filepath:
             self.main_dataframe = pd.read_parquet(filepath)
-            self.pipeline_box = pipeline.SklearnPipeline(self.main_dataframe.columns.tolist()) 
+            self.pipeline_box = pipeline.SklearnPipeline(
+                self.main_dataframe.columns.tolist()
+            )
             return self.main_dataframe
         # filetype not supported
-        print("""
+        print(
+            """
             File Type not supported, try:
             .csv
             .json
@@ -215,26 +224,25 @@ class Main_GUI(Gtk.Application):
             .xlsm
             .xlsb
             .ods.odt
-        """)
+        """
+        )
         sys.exit(1)
 
-
     def load_css_file(self):
-            with open(self.css_file_path) as f:
-                # Load CSS
-                css = f.read()
-                css_provider = Gtk.CssProvider()
-                css_provider.load_from_data(css)
+        with open(self.css_file_path) as f:
+            # Load CSS
+            css = f.read()
+            css_provider = Gtk.CssProvider()
+            css_provider.load_from_data(css)
 
-                # Apply CSS to display
-                Gtk.StyleContext.add_provider_for_display(
-                    Gdk.Display.get_default(),
-                    css_provider,
-                    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-                )
+            # Apply CSS to display
+            Gtk.StyleContext.add_provider_for_display(
+                Gdk.Display.get_default(),
+                css_provider,
+                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+            )
 
-
-    def add_style(self, gui_thing , class_name):
+    def add_style(self, gui_thing, class_name):
         gui_thing.get_style_context().add_class(class_name)
 
     def higher_order_wrapper_main_sklearn_pipeline_no_error(self, _):
@@ -242,7 +250,7 @@ class Main_GUI(Gtk.Application):
             self.main_canvas.main_sklearn_pipe(
                 main_dataframe=self.main_dataframe,
                 curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
-                pipeline_x_values= self.pipeline_box.get_x_values(),
+                pipeline_x_values=self.pipeline_box.get_x_values(),
                 pipeline_y_value=self.pipeline_box.get_y_value(),
             )
         except Exception as e:
@@ -255,7 +263,7 @@ class Main_GUI(Gtk.Application):
             self.main_canvas.main_sklearn_pipe(
                 main_dataframe=self.main_dataframe,
                 curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
-                pipeline_x_values= self.pipeline_box.get_x_values(),
+                pipeline_x_values=self.pipeline_box.get_x_values(),
                 pipeline_y_value=self.pipeline_box.get_y_value(),
             )
         except Exception as e:
@@ -275,86 +283,90 @@ class Main_GUI(Gtk.Application):
         # make top control buttons
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         control_button = Gtk.Button(label="Run Sklearn! ▶️")
-        control_button.connect("clicked", self.higher_order_wrapper_main_sklearn_pipeline)
-        self.add_style(control_button , 'control-button')
+        control_button.connect(
+            "clicked", self.higher_order_wrapper_main_sklearn_pipeline
+        )
+        self.add_style(control_button, "control-button")
         top_control_box.append(control_button)
-        
-
 
         # create a standard box
         main_box = standard_box.StdBox(
-            header_box=top_control_box,
-            body_box=self.pipeline_box
+            header_box=top_control_box, body_box=self.pipeline_box
         )
 
         return main_box
-    
-    
-    
+
     def open_button_pressed(self, button):
         print("opening a file")
-        file_handle = 'test.json'
-        #self.load_app_context_from_file(file_handle)
-    
+        file_handle = "test.json"
+        # self.load_app_context_from_file(file_handle)
+
     def save_as_button_pressed(self, button):
         print("Current json serialization...")
         json_current_app_context = pipeline.ListDroppableHolder.get_all_json_data()
-        json_main_dataframe = self.main_dataframe.copy(deep=True).to_json(orient='records')
-        
+        json_main_dataframe = self.main_dataframe.copy(deep=True).to_json(
+            orient="records"
+        )
 
-        file_to_save_to = 'test.json'
+        file_to_save_to = "test.json"
         with open(file_to_save_to, "w") as f:
-            json.dump({
-                'current_app_context' : json_current_app_context,
-                'main_dataframe' : json_main_dataframe
-            }, f, indent=4) # indent for pretty printing
-            print(json.dumps(pipeline.ListDroppableHolder.get_all_json_data(), indent=4))
+            json.dump(
+                {
+                    "current_app_context": json_current_app_context,
+                    "main_dataframe": json_main_dataframe,
+                },
+                f,
+                indent=4,
+            )  # indent for pretty printing
+            print(
+                json.dumps(pipeline.ListDroppableHolder.get_all_json_data(), indent=4)
+            )
 
     def render_top_bar(self):
         header_bar = Gtk.HeaderBar.new()
         header_bar.set_show_title_buttons(True)
 
-        #File Menu button
+        # File Menu button
         file_menu = TopMenuButton("File")
-        file_menu.add_function("Open" , self.open_button_pressed)
-        file_menu.add_function("Save" , lambda b: app.quit())
-        file_menu.add_function("Save As" , self.save_as_button_pressed)
+        file_menu.add_function("Open", self.open_button_pressed)
+        file_menu.add_function("Save", lambda b: app.quit())
+        file_menu.add_function("Save As", self.save_as_button_pressed)
 
         graph_menu = TopMenuButton("Graph Settings")
-        graph_menu.add_function("Graph theme" , self.select_graph_theme_popup)
-        graph_menu.add_function("Export Accuracy chart" , lambda b: app.quit())
-        graph_menu.add_function("Export Plot chart" , lambda b: app.quit())
+        graph_menu.add_function("Graph theme", self.select_graph_theme_popup)
+        graph_menu.add_function("Export Accuracy chart", lambda b: app.quit())
+        graph_menu.add_function("Export Plot chart", lambda b: app.quit())
 
         # add the dataframe viewer
-        show_df_button = Gtk.Button(label='Show Dataframe')
-        show_df_button.connect('clicked' , self.create_dataframe_window)
+        show_df_button = Gtk.Button(label="Show Dataframe")
+        show_df_button.connect("clicked", self.create_dataframe_window)
 
         header_bar.pack_start(file_menu)
         header_bar.pack_start(graph_menu)
-        #header_bar.pack_start(show_df_button)
-        
+        # header_bar.pack_start(show_df_button)
+
         return header_bar
-    
-    def theme_selected(self ,button,  new_theme):
+
+    def theme_selected(self, button, new_theme):
         mpl.rcParams.update(mpl.rcParamsDefault)
         plt.style.use(new_theme)
-        try: 
+        try:
             self.higher_order_wrapper_main_sklearn_pipeline_no_error(None)
         except:
             print("Not ready yet ... hehe")
 
-    def select_graph_theme_popup(self , _):
+    def select_graph_theme_popup(self, _):
         main_box_small = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        
-        plt.style.use('dark_background')
+
+        plt.style.use("dark_background")
         print(plt.style.available)
-        # make all of the radio buttons 
+        # make all of the radio buttons
         available_styles = plt.style.available
         # make the first radio button
         radio1 = Gtk.CheckButton(label=available_styles[0])
         radio1.connect("toggled", self.theme_selected, available_styles[0])
         main_box_small.append(radio1)
-        for x in range(1 , len(available_styles)):
+        for x in range(1, len(available_styles)):
             radio_curr = Gtk.CheckButton(label=available_styles[x])
             radio_curr.connect("toggled", self.theme_selected, available_styles[x])
             main_box_small.append(radio_curr)
@@ -366,7 +378,6 @@ class Main_GUI(Gtk.Application):
         window_small.set_child(main_box_small)
         window_small.show()
 
-
     def render_block_library(self):
         # make a search bar
         search_bar = Gtk.SearchEntry()
@@ -375,8 +386,7 @@ class Main_GUI(Gtk.Application):
         search_bar.connect("search-changed", self.searching_block_library)
 
         main_box = standard_box.StdBox(
-            header_box=search_bar,
-            body_box=self.block_library_var
+            header_box=search_bar, body_box=self.block_library_var
         )
 
         return main_box
@@ -384,21 +394,19 @@ class Main_GUI(Gtk.Application):
     def searching_block_library(self, search_entry):
         search_entry = search_entry.get_text().lower()
         for children in self.block_library_var.main_box:
-            if isinstance(children , Gtk.Label):
+            if isinstance(children, Gtk.Label):
                 if len(search_entry) < 2:
                     children.set_visible(True)
                 else:
                     children.set_visible(False)
-            elif isinstance(children , Gtk.Grid):
+            elif isinstance(children, Gtk.Grid):
                 for grid_child in children:
                     curr_func_name = grid_child.get_value().lower()
-                    print(curr_func_name , search_entry , search_entry in curr_func_name)
+                    print(curr_func_name, search_entry, search_entry in curr_func_name)
                     if search_entry in curr_func_name:
                         grid_child.set_visible(True)
                     else:
                         grid_child.set_visible(False)
-
-
 
     def render_graph(self):
         self.main_canvas = sklearn_proccesses.SklearnPlotter()
