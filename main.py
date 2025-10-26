@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pickle
 import joblib
+from splash_screen import SplashScreen
 from TopMenu import TopMenuButton
 
 
@@ -100,6 +101,8 @@ class Main_GUI(Gtk.Application):
         This function is called upon the user when the user calls this app
         not on a .csv or tangential file type.
         """
+        splash_screen = SplashScreen()
+        splash_screen.render_splash_screen(self)
         print("Splash screen not implemented yet.... work on it later")
 
     def do_open(self, files: list[Gio.File], n_files, hint: str):
