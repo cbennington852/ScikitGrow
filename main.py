@@ -103,7 +103,6 @@ class Main_GUI(Gtk.Application):
         """
         splash_screen = SplashScreen()
         splash_screen.render_splash_screen(self)
-        print("Splash screen not implemented yet.... work on it later")
 
     def do_open(self, files: list[Gio.File], n_files, hint: str):
         for file in files:
@@ -300,9 +299,8 @@ class Main_GUI(Gtk.Application):
         return main_box
 
     def open_button_pressed(self, button):
-        print("opening a file")
-        file_handle = "test.json"
-        # self.load_app_context_from_file(file_handle)
+        splash_screen = SplashScreen()
+        splash_screen.render_splash_screen(self)
 
     def save_as_button_pressed(self, button):
         print("Current json serialization...")

@@ -32,10 +32,20 @@ class SplashScreen():
         Code to render a splash screen before they open up a actual application. 
     """
     def render_splash_screen(self, parent_application):
-        window = Gtk.ApplicationWindow(application=parent_application)
+        self.window = Gtk.ApplicationWindow(application=parent_application)
         self.parent = parent_application
-        window.set_title("Dataframe")
-        window.set_default_size(1000, 800)
+        self.window.set_title("Dataframe")
+        self.window.set_default_size(1000, 800)
+        
+        # setting the child panel
+        self.load_css_file()
+        self.window.set_child(self.get_splash_screen_panel())
+        self.window.show()
+
+    def get_example_dataset_panel(self):
+        pass
+    
+    def get_splash_screen_panel(self):
         main_panel = Gtk.Grid(
             hexpand=True,
             vexpand=True
@@ -75,9 +85,7 @@ class SplashScreen():
         image = Gtk.Image.new_from_file(icon_path)
         import_project_btn.set_child(image)
         self.add_style(import_project_btn , 'buttons')
-        import_project_btn.connect("clicked" , lambda x: self.open_file_dialog(window))
-
-
+        import_project_btn.connect("clicked" , lambda x: self.open_file_dialog(self.window))
         main_panel.attach(
             Gtk.Label(
                 label=SplashScreen.splash_screen_text,
@@ -90,11 +98,7 @@ class SplashScreen():
         )
         main_panel.attach(example_project_btn, column=0, row=1 , width=1, height=1)
         main_panel.attach(import_project_btn, column=1, row=1 ,width=1, height=1)
-
-        # setting the child panel
-        self.load_css_file()
-        window.set_child(main_panel)
-        window.show()
+        return main_panel
 
     def on_open_response(self, dialog, result):
         try:
@@ -103,13 +107,25 @@ class SplashScreen():
                 print(f"Selected file: {file.get_path()}")
                 # now we want to run the main thingy
                 self.parent.create_window(file.get_path())
-
+                self.window.destroy()
         except GLib.Error as e:
             print(f"Error opening file: {e.message}")
 
 
     def open_file_dialog(self, parent_window):
         dialog = Gtk.FileDialog.new()
+        filter = Gtk.FileFilter()
+        filter.set_name("Datasets")
+        filter.add_pattern("*.sckl")
+        filter.add_pattern("*.csv")
+        filter.add_pattern("*.parquet")
+        filter.add_pattern("*.xls")
+        filter.add_pattern("*.xlsx")
+        filter.add_pattern("*.xlsm")
+        filter.add_pattern("*.xlsb")
+        filter.add_pattern("*.ods")
+        filter.add_pattern("*.odt")
+        dialog.set_default_filter(filter)
         dialog.set_title("Open File")
         dialog.open(parent_window, None, self.on_open_response)
 
