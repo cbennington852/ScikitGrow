@@ -169,9 +169,15 @@ class Main_GUI(Gtk.Application):
         return main_box
 
     def process_input_file(self, filepath):
+        if (isinstance(filepath , pd.DataFrame)):
+            self.main_dataframe = filepath
+            self.pipeline_box = pipeline.SklearnPipeline(
+                self.main_dataframe.columns.tolist()
+            )
+            self.filepath = ''
+            return self.main_dataframe
         self.filepath = filepath
         excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".ods", ".odt"]
-        filepath = filepath
         print(filepath)
         # is a csv
         if ".sckl" in filepath:

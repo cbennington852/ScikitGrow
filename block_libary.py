@@ -224,7 +224,7 @@ class ModelBlock(DraggableBlock):
         # assemble blocks
         sub_body = Gtk.Popover()
         sub_body.set_child(scrollable_view)
-        scrollable_view.set_size_request(200 , 200)
+        scrollable_view.set_size_request(400 , 200)
         menu_button = Gtk.MenuButton(label=sklearn_model_function_call.__name__ , popover=sub_body)
         menu_button.get_style_context().add_class("block-dropdown-button")
         self.append(menu_button)

@@ -44,3 +44,10 @@
 25. ### splash screen import data
 
 26. ### splash screen example datasets. 
+
+27. ### popover modifications
+    - Make some of the controls not fill in the blanks.
+    - make some of them into switches or sliders. 
+    - 
+
+27. ### Consider having the X-axis and Y-axis input variables located on the X and Y of the graph 

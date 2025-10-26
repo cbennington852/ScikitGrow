@@ -22,6 +22,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pickle
+import seaborn as sns
 import joblib
 from TopMenu import TopMenuButton
 
@@ -43,7 +44,14 @@ class SplashScreen():
         self.window.show()
 
     def get_example_dataset_panel(self):
-        pass
+        example_panel = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL)
+        self.start_example('diamonds')
+        return example_panel
+    
+    def start_example(self , example_name):
+        example_dataset = sns.load_dataset(example_name)
+        self.parent.create_window(example_dataset)
+        self.window.destroy()
     
     def get_splash_screen_panel(self):
         main_panel = Gtk.Grid(
@@ -71,6 +79,7 @@ class SplashScreen():
         )
         self.add_style(example_project_btn , 'buttons')
         icon_path = SplashScreen.get_resource_path("Example_dataset.svg") 
+        example_project_btn.connect('clicked' , lambda x: self.start_example('diamonds'))
         image = Gtk.Image.new_from_file(icon_path)
         example_project_btn.set_child(image)
         
