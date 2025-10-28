@@ -56,4 +56,7 @@
 
 29. ### finish adding the save and save as
     - Add unit testing
-    - 
+    - add a filechooser dialog to save the file.
+    - on loading we experience the following issues
+        - pluses to add stuff not there
+        - when empty pre-process n stuff it does not work.

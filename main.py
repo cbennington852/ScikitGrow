@@ -309,25 +309,47 @@ class Main_GUI(Gtk.Application):
         splash_screen.render_splash_screen(self)
 
     def save_as_button_pressed(self, button):
+        dialog = Gtk.FileDialog(
+            title="Save File"       
+        )
+        file_filter = Gtk.FileFilter()
+        file_filter.set_name("Project File")
+        dialog.set_initial_name("my_project.sckl")
+        file_filter.add_pattern("*.sckl")
+        dialog.set_default_filter(file_filter)
+        dialog.save(self.window, None, self.on_save_as_button_pressed)
+        
+
+    def on_save_as_button_pressed(self, dialog, result):
         print("Current json serialization...")
         json_current_app_context = pipeline.ListDroppableHolder.get_all_json_data()
         json_main_dataframe = self.main_dataframe.copy(deep=True).to_json(
             orient="records"
         )
+        try:
+            print("result" , result)
+            print("dialog" , dialog)
+            file = dialog.save_finish(result)
+            if not file:
+                print("Did not select a file")
+                return 
+            print(f"Selected file: {file.get_path()}")
+            with open(file.get_path(), "w") as f:
+                json.dump(
+                    {
+                        "current_app_context": json_current_app_context,
+                        "main_dataframe": json_main_dataframe,
+                    },
+                    f,
+                    indent=4,
+                )  # indent for pretty printing
+                print(
+                    json.dumps(pipeline.ListDroppableHolder.get_all_json_data(), indent=4)
+                )
+        except GLib.Error as e:
+            print(f"Error opening file: {e.message}")
 
-        file_to_save_to = "test.json"
-        with open(file_to_save_to, "w") as f:
-            json.dump(
-                {
-                    "current_app_context": json_current_app_context,
-                    "main_dataframe": json_main_dataframe,
-                },
-                f,
-                indent=4,
-            )  # indent for pretty printing
-            print(
-                json.dumps(pipeline.ListDroppableHolder.get_all_json_data(), indent=4)
-            )
+        
 
     def render_top_bar(self):
         header_bar = Gtk.HeaderBar.new()

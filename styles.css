@@ -1,22 +1,4 @@
 
-.toolbar-top button.toggle {
-  border: none;
-  background-color: grey;
-  opacity: 50%;
-  color: black;
-  background-image: none;
-  border: none;
-
-}
-.toolbar-top button.toggle :hover {
-  border: none;
-  background-color: none;
-
-  background-image: none;
-  border: none;
-
-}
-
 .bordered-box {
             border: 2px solid #4a90e2;
             border-radius: 8px;
