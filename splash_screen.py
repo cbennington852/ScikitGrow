@@ -21,6 +21,7 @@ from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCan
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from gi.repository import Gtk, GdkPixbuf
 import pickle
 import seaborn as sns
 import joblib
@@ -34,10 +35,12 @@ class SplashScreen():
     """
     def render_splash_screen(self, parent_application):
         self.window = Gtk.ApplicationWindow(application=parent_application)
+        
+        # load the icon
         self.parent = parent_application
         self.window.set_title("Dataframe")
         self.window.set_default_size(1000, 800)
-        
+
         # setting the child panel
         self.load_css_file()
         self.window.set_child(self.get_splash_screen_panel())

@@ -30,10 +30,28 @@ from TopMenu import TopMenuButton
 
 class Main_GUI(Gtk.Application):
     def __init__(self):
+
+        RESOURCE_FILE = "resources.gresource"
+
+        def load_resources():
+            try:
+                # Load the binary resource bundle
+                resource = Gio.Resource.load(RESOURCE_FILE)
+                # Register the resource globally
+                Gio.resources_register(resource)
+                print(f"Resources from {RESOURCE_FILE} loaded and registered.")
+            except Exception as e:
+                print(f"Error loading resources: {e}")
+        load_resources()
+
         super().__init__(
-            application_id="com.charlesbennington.DataSeedlings",
+            application_id="com.charlesbennington.scikitgrow",
             flags=Gio.ApplicationFlags.HANDLES_OPEN,
         )
+
+        print(dir(self.props))
+
+        
 
         self.css_file_path = "./styles.css"
         GLib.set_application_name("SciKitLearn GUI")
