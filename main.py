@@ -33,6 +33,8 @@ class Main_GUI(Gtk.Application):
 
         RESOURCE_FILE = "resources.gresource"
 
+        
+
         def load_resources():
             try:
                 # Load the binary resource bundle
@@ -44,14 +46,17 @@ class Main_GUI(Gtk.Application):
                 print(f"Error loading resources: {e}")
         load_resources()
 
+        # Get your default icon theme for the display
+        
         super().__init__(
             application_id="com.charlesbennington.scikitgrow",
             flags=Gio.ApplicationFlags.HANDLES_OPEN,
         )
 
-        print(dir(self.props))
+       
 
-        
+
+        print(dir(self.props))
 
         self.css_file_path = "./styles.css"
         GLib.set_application_name("SciKitLearn GUI")

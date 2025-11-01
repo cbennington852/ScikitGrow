@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="com/charlesbennington/scikitgrow">
-    <file alias="app_icon.png">Mini_Logo_SciKit_Grow.svg</file>
+  <gresource prefix="/com/charlesbennington/scikitgrow/app/icon">
+    <file compressed="true">48x48/apps/Mini_Logo_SciKit_Grow.svg</file>
+    
   </gresource>
 </gresources>

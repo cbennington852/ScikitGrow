@@ -35,7 +35,15 @@ class SplashScreen():
     """
     def render_splash_screen(self, parent_application):
         self.window = Gtk.ApplicationWindow(application=parent_application)
-        
+
+        display = Gdk.Display.get_default()
+        theme = Gtk.IconTheme.get_for_display(display)
+
+        # Add your resource path to the icon theme
+        theme.add_resource_path("/com/charlesbennington/scikitgrow/app/icon")
+        icon_path = "Mini_Logo_SciKit_Grow"
+        self.window.set_icon_name(icon_path)
+
         # load the icon
         self.parent = parent_application
         self.window.set_title("Dataframe")
