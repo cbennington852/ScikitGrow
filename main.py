@@ -52,12 +52,7 @@ class Main_GUI(Gtk.Application):
             application_id="com.charlesbennington.scikitgrow",
             flags=Gio.ApplicationFlags.HANDLES_OPEN,
         )
-
-       
-
-
-        print(dir(self.props))
-
+        
         self.css_file_path = "./styles.css"
         GLib.set_application_name("SciKitLearn GUI")
 
@@ -103,11 +98,14 @@ class Main_GUI(Gtk.Application):
 
     def create_window(self, file):
         self.main_dataframe = self.process_input_file(file)
+        
 
         # the main window
         self.window = Gtk.ApplicationWindow(
             application=self, title=f"Data Seedlings {self.filepath}"
         )
+        icon_path = "Mini_Logo_SciKit_Grow"
+        self.window.set_icon_name(icon_path)
 
         self.window.set_default_size(1200, 900)
 

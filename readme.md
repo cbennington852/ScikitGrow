@@ -1,3 +1,5 @@
+![blocks v python](48x48/apps/Full_logo_SciKit_Grow.svg "Optional title text")
+
 ## Background & Inspiration
 
 Invented in 2003 scratch is a programming language intended for children ages 10 - 15. The intent of this project was to model programming concepts via large colorful blocks, to teach children the basics of programming. Scratch has since been a massive success, as of 2023 scratch go 95 million monthly visits, some fo those recurring users, other programming novices. 
@@ -47,6 +49,10 @@ To run the GUI
 ```
 source .venv/bin/activate
 python3 main.py example_datasets/iris.csv
+```
+To recompile the GTK_resources
+```
+glib-compile-resources reasources.xml --target=resources.gresource
 ```
 There are several other example csv's I have included, They are veiwable thru the "example_datasets" folder. 
 

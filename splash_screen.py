@@ -71,17 +71,6 @@ class SplashScreen():
         )
         self.add_style(main_panel , "mainpanel")
         
-        text_buffer = Gtk.TextBuffer.new()
-        text_buffer.set_text("This is some initial text in the Gtk.TextView.\n"
-                                  "You can edit this text.\n"
-                                  "It supports multiple lines and text wrapping.")
-
-        # Create a Gtk.TextView and associate it with the buffer
-        text_view = Gtk.TextView.new_with_buffer(text_buffer)
-        text_view.set_wrap_mode(Gtk.WrapMode.WORD) 
-
-
-
         # To clarify this is a new project from an already dataset. 
         example_project_btn = Gtk.Button(
             label="new project",
@@ -106,18 +95,26 @@ class SplashScreen():
         import_project_btn.set_child(image)
         self.add_style(import_project_btn , 'buttons')
         import_project_btn.connect("clicked" , lambda x: self.open_file_dialog(self.window))
+        main_title_pic = Gtk.Picture.new_for_resource("/com/charlesbennington/scikitgrow/app/icon/48x48/apps/Full_logo_SciKit_Grow.svg")
+        main_title_pic.set_size_request(200 , 200)
+
+        main_panel.attach(main_title_pic , 
+            column=0,
+            row=0,
+            width=2,
+            height=1,)
         main_panel.attach(
             Gtk.Label(
                 label=SplashScreen.splash_screen_text,
                 wrap=True
             ),
             column=0,
-            row=0,
+            row=1,
             width=2,
             height=1,
         )
-        main_panel.attach(example_project_btn, column=0, row=1 , width=1, height=1)
-        main_panel.attach(import_project_btn, column=1, row=1 ,width=1, height=1)
+        main_panel.attach(example_project_btn, column=0, row=2 , width=1, height=1)
+        main_panel.attach(import_project_btn, column=1, row=2 ,width=1, height=1)
         return main_panel
 
     def on_open_response(self, dialog, result):
