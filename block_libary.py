@@ -82,6 +82,13 @@ class BlockLibary(Gtk.ScrolledWindow):
             name_of_section= 'Decision Tree Models' 
         )
 
+        self.add_submodule(
+            class_to_wrap=ModelBlock , 
+            color='pink' ,
+            list_of_things=get_public_methods(sklearn.ensemble),
+            name_of_section= 'Decision Tree Models' 
+        )
+
         # save as self
         self.set_child(self.main_box)
 
@@ -300,5 +307,5 @@ class PreProcessingBlock(ModelBlock):
             **kargs
         )
         def get_gtk_object_from_json(json_data):
-            print(json_data)
-            print(globals())
+            super().get_gtk_object_from_json(json_data)
+            raise ValueError("Not implemented yet!")

@@ -81,6 +81,19 @@ Block related things
   border: none;
 }
 
+.block-pink {
+  background-color : #720968;
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  border-radius: 10px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
 .block-purple {
   background-color : #431179;
   margin: 10px;

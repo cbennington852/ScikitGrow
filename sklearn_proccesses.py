@@ -53,11 +53,17 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_y_value ([str]): _description_
         """
         # returns as new main dataframe. 
+        print("Before making deepcopy")
         self.og_mainframe = main_dataframe.copy(deep=True)
+        print("After making deepcopy!")
         cols = pipeline_x_values + pipeline_y_value
         for col in cols:
+            print(main_dataframe , main_dataframe.columns.tolist())
+            print(type(col))
+            # the columns are integers? or were serialized as ones.
+            #  
+            print("Type" , pd.api.types.is_string_dtype(main_dataframe[[str(col)]]))
             if pd.api.types.is_string_dtype(main_dataframe[col]):
-                # uses # Use factorize() to serialize the 'products' column
                 codes, uniques = pd.factorize(main_dataframe[col])
                 print(codes)
                 print(uniques)
@@ -74,6 +80,7 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
+        
         main_dataframe_copy = main_dataframe.copy(deep=True)
         main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
         # plotting the normal regular plotting chart
@@ -254,7 +261,7 @@ class SklearnPlotter(Gtk.Notebook):
         fig, ax = plt.subplots()
 
         ax.text(x=0.5 , y=0.5, s="Your plot is in the 4th dimension, the accuracy graph still works, " \
-                "however, the \"plot\"graph will onl show the first three dimensions", transform=axs[0].transAxes,
+                "however, the \"plot\"graph will onl show the first three dimensions", transform=ax[0].transAxes,
                 horizontalalignment='center', verticalalignment='center',)
         return fig
 

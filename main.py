@@ -206,6 +206,9 @@ class Main_GUI(Gtk.Application):
                 json_data = json.load(f)
                 # 1. set the current dataframe to be the new dataframe from the file_handle
                 self.main_dataframe = pd.read_json(json_data["main_dataframe"])
+                # below prevents it from invorectly serializing them as no-strings
+                    # example: name 98 ---> serizes as int named collumn
+                self.main_dataframe.columns = self.main_dataframe.columns.map(str)
                 # 2. load the app context, and have the program "restore" it's state.
                 current_app_context = json_data["current_app_context"]
             self.pipeline_box = pipeline.SklearnPipeline(

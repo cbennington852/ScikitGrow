@@ -3,7 +3,6 @@
 9. ### Setting up CD/CI pipeline for this project using https://pyinstaller.org/en/stable/
     Make this a 
 
-11. ### General UI/UX improvements
 
 13. ### Get accuracy scores for the things!!!
 
@@ -19,29 +18,7 @@
     Maybe build this into the chart view. 
 19. ### Remove Base models(non-runnable) from block library
     There are several abstract models included in the library. 
-20. ### Add way to "save" our models
 
-21. ### Add a splash screen
-    - 1. ability to "download examples"
-    - 2. ability to save models ? maybe later?
-        - use the model "pickle" to save the entire GUI to a file
-            - sadly can't save entire gui to file, not possible, we'll have to think of a workaround ... 
-                - we'll have to build in some way to .. save the pandas dataframe.
-                - also save the current model ... and re-serialize the current model.
-                    TO SAVE:
-                        - *models + blocks* ... using ListDroppableHolder(), which should have a text based serialize and re-seralize.
-                        - *pandas df*
-                        - no need to save chart, we can just have it run if works on startup. 
-                            - save as a json containing ..
-                                ... dataframe
-                                ... model + software state
-                                ... ListDroppableHolder could have some way to "re-serialise", by naming each list. 
-    - 3. ability to open the saved models. 
-    - 4. 
-
-24. ### graph theme selection
-
-25. ### splash screen import data
 
 26. ### splash screen example datasets. 
 
@@ -65,3 +42,5 @@
         - Currently, The Y-axis gets an extra holder on start, which is bad. 
             - add an if statment to check this ...
             pipeline.py 179
+
+30. ### Make pipeline box scrollable!

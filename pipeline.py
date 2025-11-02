@@ -155,6 +155,8 @@ class ListDroppableHolder(Gtk.Box):
                     # 2.1 Make the block_libary object using the render_from_json()
                     entries = json_list_droppable_holder['entries']
                     for entry in entries:
+                        print("New Entry" , entry)
+                        print("Uniuqw" , json_list_droppable_holder['unique_serialization_name'])
                         if entry: # check to make sure not none
                             new_draggable = list_droppable_holder.droppable_this_holds.get_gtk_object_from_json(entry)
                             # make new droppable holder ... then add the new _draggable
@@ -175,10 +177,20 @@ class ListDroppableHolder(Gtk.Box):
 
                             for child in new_droppable_holder.box:
                                 new_droppable_holder.box.remove(child)
+                            
                             list_droppable_holder.append(new_droppable_holder)
+                            print("Hello from json serializer" , list_droppable_holder.droppable_this_holds)
+                            if (json_list_droppable_holder['unique_serialization_name'] != 'y_values'):
+                                list_droppable_holder.append(empty_droppable_holder)
+                        else:
+                            # empty no thing to add
+                            empty_droppable_holder = DroppableHolder(
+                                style=list_droppable_holder.style,
+                                thing_to_hold=list_droppable_holder.droppable_this_holds,
+                                parent=list_droppable_holder
+                            )
                             list_droppable_holder.append(empty_droppable_holder)
 
-                    # 3. profit?
     def get_all_json_data():
         """Class level function to get all of the droppable holders.
 
