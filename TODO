@@ -44,3 +44,7 @@
             pipeline.py 179
 
 30. ### Make pipeline box scrollable!
+
+31. ### maybe for accuracy for classifiers just make a bar chart with accuracy
+    - EX: Green bar for how many right.
+    - EX: Red for how many wrong?

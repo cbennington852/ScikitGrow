@@ -44,16 +44,15 @@ Currently, there is still a lot to work on for this application, most of the cor
 *Pre-UI/UX redesign Fall 2025*
 ## Running the current GUI
 Warning; this is a work in progress, and bugs are a near guarantee. 
+To install dependencies
+```
+./install.sh
+```
 
 To run the GUI
 ```
-source .venv/bin/activate
-python3 main.py example_datasets/iris.csv
+./run.sh
 ```
-To recompile the GTK_resources
-```
-glib-compile-resources reasources.xml --target=resources.gresource
-```
-There are several other example csv's I have included, They are veiwable thru the "example_datasets" folder. 
+There are several other example csv's I have included, They are viewable thru the "example_datasets" folder. 
 
 
