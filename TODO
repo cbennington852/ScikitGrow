@@ -50,8 +50,6 @@
     - make some of them into switches or sliders. 
     - 
 
-
-
 27. ### Consider having the X-axis and Y-axis input variables located on the X and Y of the graph 
 
 28. ### Add a predict tab to the graph section 
@@ -59,6 +57,11 @@
 29. ### finish adding the save and save as
     - Add unit testing
     - add a filechooser dialog to save the file.
+
     - on loading we experience the following issues
         - pluses to add stuff not there
         - when empty pre-process n stuff it does not work.
+
+        - Currently, The Y-axis gets an extra holder on start, which is bad. 
+            - add an if statment to check this ...
+            pipeline.py 179

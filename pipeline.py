@@ -165,9 +165,18 @@ class ListDroppableHolder(Gtk.Box):
                             )
                             new_droppable_holder.model_block = new_draggable
                             new_droppable_holder.box.append(new_draggable)
+                            # oh also, add a new empty droppable holder.
+                            
+                            empty_droppable_holder = DroppableHolder(
+                                style=list_droppable_holder.style,
+                                thing_to_hold=list_droppable_holder.droppable_this_holds,
+                                parent=list_droppable_holder
+                            )
+
                             for child in new_droppable_holder.box:
                                 new_droppable_holder.box.remove(child)
                             list_droppable_holder.append(new_droppable_holder)
+                            list_droppable_holder.append(empty_droppable_holder)
 
                     # 3. profit?
     def get_all_json_data():
@@ -210,8 +219,8 @@ class ListDroppableHolder(Gtk.Box):
 
 
     def consider_changing_num_holders(self , value):
-        print("Current json serialization...")
-        print(json.dumps(ListDroppableHolder.get_all_json_data(), indent=4))
+        #print("Current json serialization...")
+        #print(json.dumps(ListDroppableHolder.get_all_json_data(), indent=4))
         list_model_holders = list(self)
         if self.only_one_entry :
             return
