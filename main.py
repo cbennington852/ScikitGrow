@@ -102,7 +102,7 @@ class Main_GUI(Gtk.Application):
 
         # the main window
         self.window = Gtk.ApplicationWindow(
-            application=self, title=f"Data Seedlings {self.filepath}"
+            application=self, title=f"{self.filepath}"
         )
         icon_path = "Mini_Logo_SciKit_Grow"
         self.window.set_icon_name(icon_path)
@@ -342,23 +342,13 @@ class Main_GUI(Gtk.Application):
         file_filter.add_pattern("*.sckl")
         dialog.set_default_filter(file_filter)
         dialog.save(self.window, None, self.on_save_as_button_pressed)
-        
 
-    def on_save_as_button_pressed(self, dialog, result):
-        print("Current json serialization...")
+    def dump_app_data_to_json(self , path_file):
         json_current_app_context = pipeline.ListDroppableHolder.get_all_json_data()
         json_main_dataframe = self.main_dataframe.copy(deep=True).to_json(
             orient="records"
         )
-        try:
-            print("result" , result)
-            print("dialog" , dialog)
-            file = dialog.save_finish(result)
-            if not file:
-                print("Did not select a file")
-                return 
-            print(f"Selected file: {file.get_path()}")
-            with open(file.get_path(), "w") as f:
+        with open(path_file, "w") as f:
                 json.dump(
                     {
                         "current_app_context": json_current_app_context,
@@ -366,10 +356,21 @@ class Main_GUI(Gtk.Application):
                     },
                     f,
                     indent=4,
-                )  # indent for pretty printing
-                print(
-                    json.dumps(pipeline.ListDroppableHolder.get_all_json_data(), indent=4)
                 )
+        
+    def save_button_pressed(self , button):
+        if str(self.filepath).count(".sckl") == 1:
+            self.dump_app_data_to_json(self.filepath)
+        else:
+            self.save_as_button_pressed(None)
+
+    def on_save_as_button_pressed(self, dialog, result):
+        try:
+            file = dialog.save_finish(result)
+            if not file:
+                print("Did not select a file")
+                return 
+            self.dump_app_data_to_json(file.get_path())
         except GLib.Error as e:
             print(f"Error opening file: {e.message}")
 
@@ -382,7 +383,7 @@ class Main_GUI(Gtk.Application):
         # File Menu button
         file_menu = TopMenuButton("File")
         file_menu.add_function("Open", self.open_button_pressed)
-        file_menu.add_function("Save", lambda b: app.quit())
+        file_menu.add_function("Save", self.save_button_pressed)
         file_menu.add_function("Save As", self.save_as_button_pressed)
 
         graph_menu = TopMenuButton("Graph Settings")
@@ -399,6 +400,8 @@ class Main_GUI(Gtk.Application):
         # header_bar.pack_start(show_df_button)
 
         return header_bar
+    
+
 
     def theme_selected(self, button, new_theme):
         mpl.rcParams.update(mpl.rcParamsDefault)

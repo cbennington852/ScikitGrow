@@ -33,7 +33,6 @@
 
 29. ### finish adding the save and save as
     - Add unit testing
-    - add a filechooser dialog to save the file.
 
     - on loading we experience the following issues
         - pluses to add stuff not there
@@ -48,3 +47,5 @@
 31. ### maybe for accuracy for classifiers just make a bar chart with accuracy
     - EX: Green bar for how many right.
     - EX: Red for how many wrong?
+
+32. ### Make save button work better
