@@ -36,7 +36,7 @@ class SklearnParameterFactory():
         elif isinstance(param_default_value.default , bool):
             return TogglePair(param_name , param_default_value.default)
         else:
-            return TextEntryPair(param_name , str(param_default_value.default))
+            return TextEntryPair(param_name , param_default_value.default)
 
 
 class SklearnParameterPair(ABC):
@@ -69,7 +69,13 @@ class TextEntryPair(SklearnParameterPair):
         self.curr_label = Gtk.Label(label=param_name)
         self.curr_entry = Gtk.Entry()
         self.param_name = param_name
-        self.curr_entry.set_text(param_value)
+        # patch it not appending the delimiters
+        if isinstance(param_value , str):
+            new_param_value = '\'' + str(param_value) +'\''
+            print("HERE!" , param_value , new_param_value)
+            self.curr_entry.set_text(new_param_value)
+        else:
+            self.curr_entry.set_text(str(param_value))
     def get_left_side(self):
         return self.curr_label
     def get_right_side(self):

@@ -295,15 +295,23 @@ class ModelBlock(DraggableBlock):
             new_model_block.parameters_box.remove(child)
         x = 0
         # TODO UPDATE THIS 
-        for parameter_key , parameter_value in json_data['model_parameters'].items():
-            print(parameter_key , parameter_value)
-            curr_label = Gtk.Label(label=parameter_key)
-            curr_entry = Gtk.Entry()
-            curr_entry.set_text(str(parameter_value))
-            new_model_block.parameters_box.attach(curr_label , 0 , x , 1, 1)
-            new_model_block.parameters_box.attach(curr_entry , 1 , x , 1, 1)
+        new_model_block.parameter_list = []
+        for param_name, param in json_data['model_parameters'].items():
+            # curr_label = Gtk.Label(label=param_name)
+            # curr_entry = Gtk.Entry()
+            # curr_entry.set_text(str(param.default))
+            curr = sklearn_parameter.SklearnParameterFactory.get(
+                param,
+                param_name,
+                new_model_block.sklearn_model_function_call
+            )
+            # add the box to list for later use
+            new_model_block.parameter_list.append(curr)
+            new_model_block.parameters_box.attach(curr.get_left_side() , 0 , x , 1, 1)
+            new_model_block.parameters_box.attach(curr.get_right_side() , 1 , x , 1, 1)
             x += 1
         new_model_block.x = x
+    
         return new_model_block
 
 
