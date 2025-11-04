@@ -62,7 +62,7 @@ class DroppableHolder(Gtk.Box ):
             _type_: _description_
         """
         map_of_parameters = {}
-        print(type(curr_block))
+        print("type...." , type(curr_block))
         print(' model: ' , curr_block.sklearn_model_function_call)
         for k in range(0 , curr_block.x):
             parameter = curr_block.parameters_box.get_child_at(0 , k).get_text()
@@ -340,11 +340,20 @@ class SklearnPipeline(Gtk.Box):
             for outer_child in pointer_to_list_model_holder:
                 # Get the current model if there is one here
                 if outer_child.model_block != None:
-                    print('outer child type',type(outer_child))
-                    print(outer_child.model_block)
-                    curr_model = SklearnPipeline.parse_current_model(outer_child)
-                    new_entry_in_model_list = (f"{x}{curr_model.__class__.__name__}")
-                    model_list.append((new_entry_in_model_list , curr_model))
+                    print("Parameter list" , outer_child.model_block.parameter_list)
+                    list_of_parameters = outer_child.model_block.parameter_list
+                    map_of_parameters = {}
+                    
+                    # looping thru out list oEf parameters.
+                    for curr_pair in list_of_parameters:
+                        para_name = curr_pair.get_param_name()
+                        para_value = curr_pair.get_value()
+                        map_of_parameters[para_name] = para_value
+
+                    # assembling the current model
+                    new_entry_in_model_list = (f"{x}_{outer_child.model_block.__class__.__name__}_{outer_child.model_block.sklearn_model_function_call}")
+                    assembled_model = outer_child.model_block.sklearn_model_function_call(**map_of_parameters)
+                    model_list.append((new_entry_in_model_list , assembled_model))
                 x += 1
                 
         parse_sklearn_model_holder_list(self.preprocessing)
@@ -357,7 +366,7 @@ class SklearnPipeline(Gtk.Box):
     
 
         
-
+    """
     def parse_current_model(outer_child):
         # now we have all of the DroppableHolder objects
         map_of_parameters = {}
@@ -379,6 +388,7 @@ class SklearnPipeline(Gtk.Box):
         assembled_model = curr_block.sklearn_model_function_call(**map_of_parameters)
         print(assembled_model)
         return assembled_model
+    """
 
 
     def handle_parameter_input(input):

@@ -2,6 +2,7 @@ import sys
 import csv
 import gi
 import inspect
+import sklearn_parameter
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
@@ -247,15 +248,28 @@ class ModelBlock(DraggableBlock):
         return self.sklearn_model_function_call.__name__
     
     def process_args(self , sklearn_model_function_call ):
+        """This here defines each specific "parameter_name" to "entry"
+            mapping in the block. 
+        Args:
+            sklearn_model_function_call (_type_): _description_
+        """
         possible_args = inspect.signature(sklearn_model_function_call).parameters.items()
         print(possible_args)
         x = 0
+        self.parameter_list = []
         for param_name, param in possible_args:
-            curr_label = Gtk.Label(label=param_name)
-            curr_entry = Gtk.Entry()
-            curr_entry.set_text(str(param.default))
-            self.parameters_box.attach(curr_label , 0 , x , 1, 1)
-            self.parameters_box.attach(curr_entry , 1 , x , 1, 1)
+            # curr_label = Gtk.Label(label=param_name)
+            # curr_entry = Gtk.Entry()
+            # curr_entry.set_text(str(param.default))
+            curr = sklearn_parameter.SklearnParameterFactory.get(
+                param,
+                param_name,
+                sklearn_model_function_call
+            )
+            # add the box to list for later use
+            self.parameter_list.append(curr)
+            self.parameters_box.attach(curr.get_left_side() , 0 , x , 1, 1)
+            self.parameters_box.attach(curr.get_right_side() , 1 , x , 1, 1)
             x += 1
         self.x = x
     

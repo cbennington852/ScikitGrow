@@ -226,12 +226,16 @@ class SklearnPlotter(Gtk.Notebook):
     def classifier_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         y_pred = curr_pipeline.predict(self.x)
         fig, ax = plt.subplots()
-        textstr = (
-            f"Accuracy  : {sklearn.metrics.accuracy_score(self.y, y_pred)}"
-        )
-        props = dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.7) # Customize box style
-        ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=12,
-                verticalalignment='top', horizontalalignment='right', bbox=props)
+        accuracy = sklearn.metrics.accuracy_score(self.y, y_pred)
+        ax.bar(['Accuracy'], [accuracy], color='skyblue')
+
+        # Add text label and formatting
+        ax.set_ylim(0, 1)
+        ax.set_ylabel('Accuracy')
+        ax.set_title('Model Accuracy')
+        ax.text(0, accuracy / 2, f"{accuracy:.2%}", ha='center', va='center', fontsize=12, color='black')
+
+        # Return the figure
         return fig
 
     def regressor_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):

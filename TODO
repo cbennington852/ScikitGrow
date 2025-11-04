@@ -44,8 +44,6 @@
 
 30. ### Make pipeline box scrollable!
 
-31. ### maybe for accuracy for classifiers just make a bar chart with accuracy
-    - EX: Green bar for how many right.
-    - EX: Red for how many wrong?
+32. ### Make the accuracy exportable
 
-32. ### Make save button work better
+33. ### Make plotting exportable.
