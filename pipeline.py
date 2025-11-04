@@ -169,28 +169,25 @@ class ListDroppableHolder(Gtk.Box):
                             new_droppable_holder.model_block = new_draggable
                             new_droppable_holder.box.append(new_draggable)
                             # oh also, add a new empty droppable holder.
-                            
-                            empty_droppable_holder = DroppableHolder(
-                                style=list_droppable_holder.style,
-                                thing_to_hold=list_droppable_holder.droppable_this_holds,
-                                parent=list_droppable_holder
-                            )
-
                             for child in new_droppable_holder.box:
                                 new_droppable_holder.box.remove(child)
                             
                             list_droppable_holder.append(new_droppable_holder)
                             print("Hello from json serializer" , list_droppable_holder.droppable_this_holds)
-                            if (json_list_droppable_holder['unique_serialization_name'] != 'y_values'):
-                                list_droppable_holder.append(empty_droppable_holder)
-                        else:
-                            # empty no thing to add
-                            empty_droppable_holder = DroppableHolder(
+                    empty_droppable_holder = DroppableHolder(
                                 style=list_droppable_holder.style,
                                 thing_to_hold=list_droppable_holder.droppable_this_holds,
                                 parent=list_droppable_holder
                             )
-                            list_droppable_holder.append(empty_droppable_holder)
+                    if (json_list_droppable_holder['unique_serialization_name'] != 'y_values'):
+                        list_droppable_holder.append(empty_droppable_holder)
+                    # if y empty
+                    if (json_list_droppable_holder['unique_serialization_name'] == 'y_values') and list_droppable_holder == []:
+                        list_droppable_holder.append(empty_droppable_holder)
+
+                    
+                    
+
 
     def get_all_json_data():
         """Class level function to get all of the droppable holders.
