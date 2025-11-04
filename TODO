@@ -47,3 +47,5 @@
 32. ### Make the accuracy exportable
 
 33. ### Make plotting exportable.
+
+34. ### make where we can save and load the new model paramters to and from json
