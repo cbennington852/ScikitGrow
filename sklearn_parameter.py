@@ -31,8 +31,10 @@ class SklearnParameterFactory():
 
         """
         print("New FACTORY" ,type(param_default_value.default))
-        if False:
-            raise ValueError("not made yet!")
+        if param_name == "verbose":
+            return VerboseModifier(param_name , param_default_value.default)
+        elif isinstance(param_default_value.default , bool):
+            return TogglePair(param_name , param_default_value.default)
         else:
             return TextEntryPair(param_name , str(param_default_value.default))
 
@@ -77,5 +79,37 @@ class TextEntryPair(SklearnParameterPair):
     def get_param_name(self):
         return self.param_name
     
+class TogglePair(SklearnParameterPair):
+    def __init__(self , param_name , param_value):
+        super().__init__()
+        self.curr_label = Gtk.Label(label=param_name)
+        self.curr_entry = Gtk.Switch()
+        self.param_name = param_name
+        self.curr_entry.set_active(param_value)
+    def get_left_side(self):
+        return self.curr_label
+    def get_right_side(self):
+        return self.curr_entry
+    def get_value(self):
+        return self.curr_entry.props.active
+    def get_param_name(self):
+        return self.param_name
+
+class VerboseModifier(SklearnParameterPair):
+    def __init__(self , param_name , param_value):
+        super().__init__()
+        self.curr_label = Gtk.Label(label=param_name)
+        self.curr_entry = Gtk.Label(label="0")
+        self.param_name = param_name
+    def get_left_side(self):
+        return self.curr_label
+    def get_right_side(self):
+        return self.curr_entry
+    def get_value(self):
+        return 0
+    def get_param_name(self):
+        return self.param_name
+
+
 
         

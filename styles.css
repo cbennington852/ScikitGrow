@@ -1,4 +1,24 @@
 
+
+
+/* Style the slider (the movable part) */
+switch slider {
+    background-color: rgb(87, 87, 87); /* White slider handle */
+    border-radius: 20%; /* Optional: Make the slider perfectly circular */
+    border: unset;
+    background-image : none;
+    margin: 3px; /* Optional: Add some margin */
+}
+
+switch:checked slider {
+    background-color: rgb(216, 216, 216); /* White slider handle */
+    border-radius: 20%; /* Optional: Make the slider perfectly circular */
+    border: unset;
+    background-image : none;
+    margin: 3px; /* Optional: Add some margin */
+}
+
+
 .bordered-box {
             border: 2px solid #4a90e2;
             border-radius: 8px;
