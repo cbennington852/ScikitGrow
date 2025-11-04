@@ -294,6 +294,7 @@ class ModelBlock(DraggableBlock):
         for child in new_model_block.parameters_box:
             new_model_block.parameters_box.remove(child)
         x = 0
+        # TODO UPDATE THIS 
         for parameter_key , parameter_value in json_data['model_parameters'].items():
             print(parameter_key , parameter_value)
             curr_label = Gtk.Label(label=parameter_key)

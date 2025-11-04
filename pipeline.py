@@ -64,11 +64,12 @@ class DroppableHolder(Gtk.Box ):
         map_of_parameters = {}
         print("type...." , type(curr_block))
         print(' model: ' , curr_block.sklearn_model_function_call)
-        for k in range(0 , curr_block.x):
-            parameter = curr_block.parameters_box.get_child_at(0 , k).get_text()
-            para_value = SklearnPipeline.handle_parameter_input(curr_block.parameters_box.get_child_at(1 , k).get_text())
-            map_of_parameters[parameter] = para_value
-        print(map_of_parameters)
+        map_of_parameters = {}
+        for curr_pair in curr_block.parameter_list:
+            # looping thru out list oEf parameters.
+            para_name = curr_pair.get_param_name()
+            para_value = curr_pair.get_value()
+            map_of_parameters[para_name] = para_value
         return map_of_parameters
     
     def to_json(self):
