@@ -169,6 +169,7 @@ class ListDroppableHolder(Gtk.Box):
                             new_droppable_holder.model_block = new_draggable
                             new_droppable_holder.box.append(new_draggable)
                             # oh also, add a new empty droppable holder.
+
                             for child in new_droppable_holder.box:
                                 new_droppable_holder.box.remove(child)
                             
@@ -244,7 +245,7 @@ class ListDroppableHolder(Gtk.Box):
                 self.append(DroppableHolder(self.style, self.droppable_this_holds, self ))
 
 
-class SklearnPipeline(Gtk.Box):
+class SklearnPipeline(Gtk.ScrolledWindow):
     """Should return and actual sklearn pipeline, and if there are issues, this should return some kinda
     error message, so that error message can be checked. This could be done through a try and catch block.
 
@@ -260,7 +261,10 @@ class SklearnPipeline(Gtk.Box):
     def __init__(self, columns , **kargs):
         super().__init__(**kargs)
         self.columns = columns
-        self.set_orientation(Gtk.Orientation.VERTICAL)
+        self.set_hexpand(True)
+        self.set_vexpand(True)
+        self.main = Gtk.Box()
+        self.main.set_orientation(Gtk.Orientation.VERTICAL)
 
         #============================================
         # data section box
@@ -314,9 +318,10 @@ class SklearnPipeline(Gtk.Box):
         )
         self.box_pipeline.append(self.pipeline)
         # append important stuff
-        self.append(Gtk.Label(label="X and Y axis"))
-        self.append(box_data)
-        self.append(self.box_pipeline)
+        self.main.append(Gtk.Label(label="X and Y axis"))
+        self.main.append(box_data)
+        self.main.append(self.box_pipeline)
+        self.set_child(self.main)
 
     def get_x_values(self):
         return self.x_values_entry.get_all_values()
