@@ -300,8 +300,15 @@ class ModelBlock(DraggableBlock):
             # curr_label = Gtk.Label(label=param_name)
             # curr_entry = Gtk.Entry()
             # curr_entry.set_text(str(param.default))
+            # NOTE: param needs to have of the <class 'inspect.Parameter'> class
+            param_as_inspect_param = inspect.Parameter(
+                name=param_name,
+                default=param,
+                annotation=inspect.Parameter.empty,
+                kind=inspect.Parameter.POSITIONAL_OR_KEYWORD
+            )
             curr = sklearn_parameter.SklearnParameterFactory.get(
-                param,
+                param_as_inspect_param,
                 param_name,
                 new_model_block.sklearn_model_function_call
             )

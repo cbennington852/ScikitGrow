@@ -30,6 +30,7 @@ class SklearnParameterFactory():
             maybe even custom overrides.
 
         """
+        print("Thing : " , type(param_default_value))
         print("New FACTORY" ,type(param_default_value.default))
         if param_name == "verbose":
             return VerboseModifier(param_name , param_default_value.default)
@@ -72,7 +73,6 @@ class TextEntryPair(SklearnParameterPair):
         # patch it not appending the delimiters
         if isinstance(param_value , str):
             new_param_value = '\'' + str(param_value) +'\''
-            print("HERE!" , param_value , new_param_value)
             self.curr_entry.set_text(new_param_value)
         else:
             self.curr_entry.set_text(str(param_value))
