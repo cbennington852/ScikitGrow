@@ -5,12 +5,15 @@ import traceback
 from matplotlib.colors import ListedColormap
 import seaborn
 
+from splash_screen import SplashScreen
+
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 from cycler import cycler
 
 
 import matplotlib
+import copy
 
 matplotlib.use("GTK4Agg")  # Or 'GTK3Agg' for GTK3
 import matplotlib.pyplot as plt
@@ -31,9 +34,10 @@ class SklearnPlotter(Gtk.Notebook):
     Args:
         Gtk (_type_): _description_
     """
-    def __init__(self , **kargs):
+    def __init__(self , parent, **kargs):
         super().__init__(**kargs)
         # Create content for the first page
+        self.parent = parent
         self.plotting_page = Gtk.Box()
         plotting_page_label = Gtk.Label(label="Plot")
         self.append_page(self.plotting_page, plotting_page_label)
@@ -123,7 +127,8 @@ class SklearnPlotter(Gtk.Notebook):
             return self.regressor_accuracy_plot(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
         else:
             raise ValueError("The last step must be a regressor or a classifier ")
-
+    def add_style( gui_thing, class_name):
+        gui_thing.get_style_context().add_class(class_name)
         
     def plot_figure_canvas(self, fig , page):
         """Small helper function to plot the output from matplotlib into GTK. 
@@ -132,10 +137,40 @@ class SklearnPlotter(Gtk.Notebook):
             fig (Figure): The matplotlib figure output
             page (Gtk.Page): The pointer to the notebook page we want to plot to.
         """
+        # remove prior plotting
         for child in page:
             page.remove(child)
-        page.append(FigureCanvas(fig))  # a Gtk.DrawingArea
+
+        
+
+        # creating overlay with the full screen button
+        overlay = Gtk.Overlay()
+        overlay.set_child(FigureCanvas(fig))
+        full_screen_button = Gtk.Button()
+        icon_path = SplashScreen.get_resource_path("full_screen.svg") 
+        image = Gtk.Image.new_from_file(icon_path)
+        full_screen_button.set_child(image)
+        full_screen_button.set_size_request(30 , 30)
+        SklearnPlotter.add_style(full_screen_button , 'trans_button')
+        full_screen_button.set_halign(Gtk.Align.END)
+        full_screen_button.set_valign(Gtk.Align.START)
+        full_screen_button.set_margin_bottom(10)
+        full_screen_button.connect("clicked" , lambda x : self.create_window(fig))
+        overlay.add_overlay(full_screen_button)
+        page.append(overlay)  # a Gtk.DrawingArea
         print("Done plotting ")
+
+    
+    
+    # helper to start a full screen thing
+    def create_window(self , fig):
+        new_fig = copy.deepcopy(fig)
+        new_window = Gtk.ApplicationWindow(application=self.parent)
+        new_window.set_title("")
+        new_window.set_default_size(1500, 1000)
+        new_window.set_child(FigureCanvas(new_fig))
+        new_window.show()
+
 
     def validate_column_inputs(self, main_dataframe, pipeline_x_values , pipeline_y_value):
         lst_cols = main_dataframe.columns

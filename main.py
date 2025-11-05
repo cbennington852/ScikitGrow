@@ -514,7 +514,7 @@ class Main_GUI(Gtk.Application):
                         grid_child.set_visible(False)
 
     def render_graph(self):
-        self.main_canvas = sklearn_proccesses.SklearnPlotter()
+        self.main_canvas = sklearn_proccesses.SklearnPlotter(self)
         self.main_canvas.set_size_request(500, 500)
         return self.main_canvas
 

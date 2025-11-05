@@ -1,5 +1,10 @@
 
-
+.trans_button {
+  all: unset;
+}
+.trans_button:hover {
+  size: 110%;
+}
 
 /* Style the slider (the movable part) */
 switch slider {
