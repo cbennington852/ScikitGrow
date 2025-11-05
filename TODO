@@ -1,24 +1,18 @@
 
 
 9. ### Setting up CD/CI pipeline for this project using https://pyinstaller.org/en/stable/
-    Make this a 
-
-
-13. ### Get accuracy scores for the things!!!
+    - Also GIO has tools for this thing
 
 14. ### Allow for a k-fold validation.
     Add this as a pipeline object.
 
 
-
 17. ### Fix major UI/UX bug where library search is in all different places.
     - WHY: This is happening because we are just hiding the blocks that do not fit the requirement.
     - HOW FIX: after a certian num of character, just hide the whole libary, and append / render these into a smaller horizontally scaling grid / box, rather than a grid.
-18. ### Add way to export user generated charts. 
-    Maybe build this into the chart view. 
+ 
 19. ### Remove Base models(non-runnable) from block library
     There are several abstract models included in the library. 
-
 
 26. ### splash screen example datasets. 
 
@@ -31,16 +25,6 @@
 
 28. ### Add a predict tab to the graph section 
 
-29. ### finish adding the save and save as
-    - Add unit testing
-
-    - on loading we experience the following issues
-        - pluses to add stuff not there
-        - when empty pre-process n stuff it does not work.
-
-        - Currently, The Y-axis gets an extra holder on start, which is bad. 
-            - add an if statment to check this ...
-            pipeline.py 179
 
 30. ### Make pipeline box scrollable!
 

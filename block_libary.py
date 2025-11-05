@@ -105,9 +105,14 @@ class BlockLibary(Gtk.ScrolledWindow):
         main_box.set_hexpand(True)
         main_box.set_vexpand(True)
         # for all of the models in linear_model add them
-        linear_model_list = list_of_things
-        for k in range(0 , len(linear_model_list)):
-            curr = class_to_wrap(linear_model_list[k] , color)
+        # remove the abstract classes
+        new_list_of_things = []
+        for potential_class in list_of_things:
+            if not inspect.isabstract(potential_class):
+                new_list_of_things.append(potential_class)
+        # adding the classes as model blocks
+        for k in range(0 , len(new_list_of_things)):
+            curr = class_to_wrap(new_list_of_things[k] , color)
             y = k // STACKING_AMOUNT
             x = k % STACKING_AMOUNT
             # apply a style that is a certain color
@@ -294,7 +299,6 @@ class ModelBlock(DraggableBlock):
         for child in new_model_block.parameters_box:
             new_model_block.parameters_box.remove(child)
         x = 0
-        # TODO UPDATE THIS 
         new_model_block.parameter_list = []
         for param_name, param in json_data['model_parameters'].items():
             # curr_label = Gtk.Label(label=param_name)
