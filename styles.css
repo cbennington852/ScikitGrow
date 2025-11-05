@@ -6,6 +6,14 @@
   size: 110%;
 }
 
+.full_screen_button_image {
+
+}
+
+.full_screen_button_image:hover {
+  size: 130%;
+}
+
 /* Style the slider (the movable part) */
 switch slider {
     background-color: rgb(87, 87, 87); /* White slider handle */

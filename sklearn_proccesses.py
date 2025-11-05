@@ -149,6 +149,7 @@ class SklearnPlotter(Gtk.Notebook):
         full_screen_button = Gtk.Button()
         icon_path = SplashScreen.get_resource_path("full_screen.svg") 
         image = Gtk.Image.new_from_file(icon_path)
+        SklearnPlotter.add_style(image , 'full_screen_button_image')
         full_screen_button.set_child(image)
         full_screen_button.set_size_request(30 , 30)
         SklearnPlotter.add_style(full_screen_button , 'trans_button')
