@@ -10,9 +10,6 @@
 17. ### Fix major UI/UX bug where library search is in all different places.
     - WHY: This is happening because we are just hiding the blocks that do not fit the requirement.
     - HOW FIX: after a certian num of character, just hide the whole libary, and append / render these into a smaller horizontally scaling grid / box, rather than a grid.
- 
-19. ### Remove Base models(non-runnable) from block library
-    There are several abstract models included in the library. 
 
 26. ### splash screen example datasets. 
 
@@ -25,10 +22,8 @@
 
 28. ### Add a predict tab to the graph section 
 
-
-30. ### Make pipeline box scrollable!
-
 32. ### Make the accuracy exportable
 
 33. ### Make plotting exportable.
 
+34. ### Create a "full screen" option for each of the charts! 

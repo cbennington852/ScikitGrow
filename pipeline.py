@@ -262,6 +262,7 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         super().__init__(**kargs)
         self.columns = columns
         self.set_hexpand(True)
+        self.set_size_request(300, 300)
         self.set_vexpand(True)
         self.main = Gtk.Box()
         self.main.set_orientation(Gtk.Orientation.VERTICAL)

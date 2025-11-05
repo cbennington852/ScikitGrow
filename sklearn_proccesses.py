@@ -90,6 +90,8 @@ class SklearnPlotter(Gtk.Notebook):
         # plotting the accuracy chart
         print("HI")
         accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        self.current_figure_plotted = figure
+        self.current_figure_accuracy = accuracy_plot
         self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
        
         

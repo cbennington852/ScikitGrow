@@ -388,8 +388,8 @@ class Main_GUI(Gtk.Application):
 
         graph_menu = TopMenuButton("Graph Settings")
         graph_menu.add_function("Graph theme", self.select_graph_theme_popup)
-        graph_menu.add_function("Export Accuracy chart", lambda b: app.quit())
-        graph_menu.add_function("Export Plot chart", lambda b: app.quit())
+        graph_menu.add_function("Export Accuracy chart", self.export_chart_to_file)
+        graph_menu.add_function("Export Plot chart", self.export_accuracy_chart_to_file)
 
         # add the dataframe viewer
         show_df_button = Gtk.Button(label="Show Dataframe")
@@ -397,11 +397,60 @@ class Main_GUI(Gtk.Application):
 
         header_bar.pack_start(file_menu)
         header_bar.pack_start(graph_menu)
-        # header_bar.pack_start(show_df_button)
 
         return header_bar
     
+    def export_chart_to_file(self , button ):
+        print(self.main_canvas.current_figure_plotted)
+        print(self.main_canvas.current_figure_accuracy)
+        print(button)
+        which_export = "accuracy"
+        dialog = Gtk.FileDialog(
+            title="Save File"       
+        )
+        file_filter = Gtk.FileFilter()
+        file_filter.set_name(f"Export {which_export}")
+        dialog.set_initial_name("chart.png")
+        file_filter.add_pattern("*.png")
+        file_filter.add_pattern("*.jpg")
+        file_filter.add_pattern("*.svg")
+        dialog.set_default_filter(file_filter)
+        def save_image( dialog, result):
+            try:
+                file = dialog.save_finish(result)
+                if not file:
+                    print("Did not select a file")
+                    return 
+                self.main_canvas.current_figure_plotted.savefig(file.get_path())
+            except GLib.Error as e:
+                print(f"Error savinf file image: {e.message}")
+        dialog.save(self.window, None, save_image)
 
+    def export_accuracy_chart_to_file(self , button ):
+        print(self.main_canvas.current_figure_plotted)
+        print(self.main_canvas.current_figure_accuracy)
+        print(button)
+        which_export = "Plot"
+        dialog = Gtk.FileDialog(
+            title="Save File"       
+        )
+        file_filter = Gtk.FileFilter()
+        file_filter.set_name(f"Export {which_export}")
+        dialog.set_initial_name("chart.png")
+        file_filter.add_pattern("*.png")
+        file_filter.add_pattern("*.jpg")
+        file_filter.add_pattern("*.svg")
+        dialog.set_default_filter(file_filter)
+        def save_image( dialog, result):
+            try:
+                file = dialog.save_finish(result)
+                if not file:
+                    print("Did not select a file")
+                    return 
+                self.main_canvas.current_figure_accuracy.savefig(file.get_path())
+            except GLib.Error as e:
+                print(f"Error savinf file image: {e.message}")
+        dialog.save(self.window, None, save_image)
 
     def theme_selected(self, button, new_theme):
         mpl.rcParams.update(mpl.rcParamsDefault)
