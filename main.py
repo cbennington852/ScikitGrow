@@ -388,8 +388,8 @@ class Main_GUI(Gtk.Application):
 
         graph_menu = TopMenuButton("Graph Settings")
         graph_menu.add_function("Graph theme", self.select_graph_theme_popup)
-        graph_menu.add_function("Export Accuracy chart", self.export_chart_to_file)
-        graph_menu.add_function("Export Plot chart", self.export_accuracy_chart_to_file)
+        graph_menu.add_function("Export Accuracy chart", self.export_accuracy_chart_to_file)
+        graph_menu.add_function("Export Plot chart", self.export_chart_to_file)
 
         # add the dataframe viewer
         show_df_button = Gtk.Button(label="Show Dataframe")
