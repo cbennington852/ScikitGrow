@@ -4,7 +4,7 @@ import gi
 import traceback
 from matplotlib.colors import ListedColormap
 import seaborn
-
+import threading
 from splash_screen import SplashScreen
 
 gi.require_version("Gtk", "4.0")
