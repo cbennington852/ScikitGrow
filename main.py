@@ -279,20 +279,17 @@ class Main_GUI(Gtk.Application):
         gui_thing.get_style_context().add_class(class_name)
 
     def higher_order_wrapper_main_sklearn_pipeline_no_error(self, _):
-        def sklearn_thread(): 
-            try:
-                self.main_canvas.main_sklearn_pipe(
-                    main_dataframe=self.main_dataframe,
-                    curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
-                    pipeline_x_values=self.pipeline_box.get_x_values(),
-                    pipeline_y_value=self.pipeline_box.get_y_value(),
-                )
-            except Exception as e:
-                traceback.print_exc()
-                msg = str(e)
-                print(msg)
-        sk_thread_1 = threading.Thread(sklearn_thread)
-        sk_thread_1.start()
+        try:
+            self.main_canvas.main_sklearn_pipe(
+                main_dataframe=self.main_dataframe,
+                curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
+                pipeline_x_values=self.pipeline_box.get_x_values(),
+                pipeline_y_value=self.pipeline_box.get_y_value(),
+            )
+        except Exception as e:
+            traceback.print_exc()
+            msg = str(e)
+            print(msg)
 
     def higher_order_wrapper_main_sklearn_pipeline(self, _):
         try:

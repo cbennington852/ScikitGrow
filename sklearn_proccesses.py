@@ -84,19 +84,26 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
+
+        # on a separate thread?
+        def sklearn_alternate_thread():
+            main_dataframe_copy = main_dataframe.copy(deep=True)
+            main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
+            self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
+            figure = self.filter_pipeline()
+            accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
+            self.current_figure_plotted = figure
+            self.current_figure_accuracy = accuracy_plot
+            self.plot_figure_canvas(figure , self.plotting_page)
+            self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
+
+        sklearn_thread_1 = threading.Thread(target=sklearn_alternate_thread)
+        sklearn_thread_1.start()
+
+        # plotting stuff...
         
-        main_dataframe_copy = main_dataframe.copy(deep=True)
-        main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
-        # plotting the normal regular plotting chart
-        self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-        figure = self.filter_pipeline()
-        self.plot_figure_canvas(figure , self.plotting_page)
-        # plotting the accuracy chart
-        print("HI")
-        accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-        self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
-        self.current_figure_plotted = figure
-        self.current_figure_accuracy = accuracy_plot
+
+
        
         
     def filter_accuracy_plotting(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
