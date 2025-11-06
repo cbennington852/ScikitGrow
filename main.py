@@ -285,19 +285,21 @@ class Main_GUI(Gtk.Application):
                 curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
                 pipeline_x_values=self.pipeline_box.get_x_values(),
                 pipeline_y_value=self.pipeline_box.get_y_value(),
+                ptr_to_button=self.control_button
             )
         except Exception as e:
             traceback.print_exc()
             msg = str(e)
             print(msg)
 
-    def higher_order_wrapper_main_sklearn_pipeline(self, _):
+    def higher_order_wrapper_main_sklearn_pipeline(self, button):
         try:
             self.main_canvas.main_sklearn_pipe(
                 main_dataframe=self.main_dataframe,
                 curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
                 pipeline_x_values=self.pipeline_box.get_x_values(),
                 pipeline_y_value=self.pipeline_box.get_y_value(),
+                ptr_to_button=self.control_button
             )
         except Exception as e:
             traceback.print_exc()
@@ -315,12 +317,12 @@ class Main_GUI(Gtk.Application):
 
         # make top control buttons
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        control_button = Gtk.Button(label="Run Sklearn! ▶️")
-        control_button.connect(
+        self.control_button = Gtk.Button(label="Train Model ")
+        self.control_button.connect(
             "clicked", self.higher_order_wrapper_main_sklearn_pipeline
         )
-        self.add_style(control_button, "control-button")
-        top_control_box.append(control_button)
+        self.add_style(self.control_button, "control-button")
+        top_control_box.append(self.control_button)
 
         # create a standard box
         main_box = standard_box.StdBox(

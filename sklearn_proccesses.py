@@ -74,7 +74,7 @@ class SklearnPlotter(Gtk.Notebook):
                 main_dataframe[col] = codes
         return main_dataframe
 
-    def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value):
+    def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , ptr_to_button):
         """Runs the main sklearn pipeline, filtering through the different options that
           the user could have inputted into this software. 
 
@@ -96,7 +96,9 @@ class SklearnPlotter(Gtk.Notebook):
             self.current_figure_accuracy = accuracy_plot
             self.plot_figure_canvas(figure , self.plotting_page)
             self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
+            ptr_to_button.set_sensitive(True)
 
+        ptr_to_button.set_sensitive(False)
         sklearn_thread_1 = threading.Thread(target=sklearn_alternate_thread)
         sklearn_thread_1.start()
 
