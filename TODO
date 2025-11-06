@@ -1,10 +1,14 @@
 
+37. ### Adding K-fold validation.
+    - **Considerations** 
+        - This could be added a a pre-processing block, something that the user could drag and drop in.
+        - This could also be added as another section to pipeline as drag and drop? 
+        (perhaps validation section?)
+        - We will also need a "special" model block to tell the model to not do cross validation.
+    - **Extra Notes**
+        - We should use multi-threading for the k-fold and other validation. There is built in 
+        functions to do this. Example `scores = cross_val_score(model, X, y, cv=5, n_jobs=-1)`
 
-9. ### Setting up CD/CI pipeline for this project using https://pyinstaller.org/en/stable/
-    - Also GIO has tools for this thing
-
-14. ### Allow for a k-fold validation.
-    Add this as a pipeline object.
 
 
 17. ### Fix major UI/UX bug where library search is in all different places.
@@ -38,4 +42,5 @@
 36. ### check out a python "compiler" to bytecode ... https://nuitka.net/
     - good for packaging? 
 
-37. ### put model predictions on different thread than main GUI  
+
+
