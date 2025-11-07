@@ -133,7 +133,10 @@ Block related things
   padding: 2px;
   margin-left: 50px;
   margin-right: 50px;
-  border-radius: 10px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 0px;
   min-height: 20px;
   min-width: 50px;
   color: white;
@@ -156,16 +159,21 @@ Block related things
 
 
 .block-orange {
-  background-color : #795311;
+  /*Only runs recourse files thru the link below like. */
+  background-image : url('resource:///com/charlesbennington/scikitgrow/app/icon/48x48/apps/triangle_box.svg');
+  background-size: 90%; /* or contain, 100% 100%, etc. */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #00000000;
+  border: none;
   margin: 10px;
-  padding: 2px;
+  padding: 20px;
   margin-left: 50px;
   margin-right: 50px;
   border-radius: 10px;
   min-height: 20px;
   min-width: 50px;
-  color: white;
-  border: none;
+  color: black;
 }
 
 

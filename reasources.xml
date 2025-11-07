@@ -3,5 +3,6 @@
   <gresource prefix="/com/charlesbennington/scikitgrow/app/icon">
     <file compressed="true">48x48/apps/Mini_Logo_SciKit_Grow.svg</file>
     <file compressed="true">48x48/apps/Full_logo_SciKit_Grow.svg</file>
+    <file compressed="true">48x48/apps/triangle_box.svg</file>
   </gresource>
 </gresources>

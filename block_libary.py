@@ -3,7 +3,7 @@ import csv
 import gi
 import inspect
 import sklearn_parameter
-
+import utility
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
@@ -75,7 +75,6 @@ class BlockLibary(Gtk.ScrolledWindow):
             list_of_things=get_public_methods(sklearn.neural_network),
             name_of_section= 'Deep Neural Networks' 
         )
-        
         self.add_submodule(
             class_to_wrap=ModelBlock , 
             color='blue' ,
@@ -93,7 +92,7 @@ class BlockLibary(Gtk.ScrolledWindow):
         # save as self
         self.set_child(self.main_box)
 
-    def add_submodule(self, class_to_wrap , color , list_of_things,name_of_section):
+    def add_submodule(self, class_to_wrap , color , list_of_things, name_of_section , ):
         """Adds a sklearn submodule to the class. 
 
         Args:
@@ -122,6 +121,7 @@ class BlockLibary(Gtk.ScrolledWindow):
         add_style(label_thing , 'block-label')
         self.main_box.append(label_thing)
         self.main_box.append(main_box)
+
 
     def remove_block(self, _ctrl, value, _x, _y):
         print("dropped into the library")
@@ -204,6 +204,27 @@ class ColumnBlock(DraggableBlock):
         )
     def copy(thing_to_be_copied):
         return ColumnBlock(
+            column_name=thing_to_be_copied.data_held,
+            color=thing_to_be_copied.color
+        )
+    
+class ValidatorBlock(DraggableBlock):
+    def __init__(self, column_name , color, **kargs):
+        super().__init__(
+            data_held = column_name,
+            color = color,  # not used.... deprecated 
+            display_name = column_name, 
+            **kargs
+        )
+
+    def get_gtk_object_from_json(json_data):
+        print("my_json_data" , json_data)
+        return ValidatorBlock(
+            column_name=json_data['column'],
+            color='blue'
+        )
+    def copy(thing_to_be_copied):
+        return ValidatorBlock(
             column_name=thing_to_be_copied.data_held,
             color=thing_to_be_copied.color
         )

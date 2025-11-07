@@ -6,6 +6,7 @@ import csv
 import traceback
 import gi
 import threading
+import utility
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
@@ -323,7 +324,7 @@ class Main_GUI(Gtk.Application):
             "clicked", self.higher_order_wrapper_main_sklearn_pipeline
         )
         thing_box = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL)
-        thing_box.append(SplashScreen.load_image_from_file("green_arrow.svg"))
+        thing_box.append(utility.load_image_from_file("green_arrow.svg"))
         thing_box.append(Gtk.Label(label="Train Model"))
         self.control_button.set_child(thing_box)
         self.add_style(self.control_button, "control-button")

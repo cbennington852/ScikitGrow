@@ -3,6 +3,7 @@ import sys
 import csv
 import traceback
 import gi
+import utility
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
@@ -64,13 +65,7 @@ class SplashScreen():
         self.parent.create_window(example_dataset)
         self.window.destroy()
 
-    def load_image_from_file(file_name):
-        """
-            Returns a model, might change later
-        """
-        icon_path = SplashScreen.get_resource_path(file_name) 
-        return Gtk.Image.new_from_file(icon_path)
-    
+
     def get_splash_screen_panel(self):
         main_panel = Gtk.Grid(
             hexpand=True,
@@ -86,7 +81,7 @@ class SplashScreen():
         )
         self.add_style(example_project_btn , 'buttons')
         example_project_btn.connect('clicked' , lambda x: self.start_example('diamonds'))
-        example_project_btn.set_child(SplashScreen.load_image_from_file("Example_dataset.svg"))
+        example_project_btn.set_child(utility.load_image_from_file("Example_dataset.svg"))
         
         # loads an example dataset into existence.
         # Likely from pandas 
@@ -95,7 +90,7 @@ class SplashScreen():
             hexpand=True,
             vexpand=True
         )
-        import_project_btn.set_child(SplashScreen.load_image_from_file("Import_data.svg"))
+        import_project_btn.set_child(utility.load_image_from_file("Import_data.svg"))
         self.add_style(import_project_btn , 'buttons')
         import_project_btn.connect("clicked" , lambda x: self.open_file_dialog(self.window))
         main_title_pic = Gtk.Picture.new_for_resource("/com/charlesbennington/scikitgrow/app/icon/48x48/apps/Full_logo_SciKit_Grow.svg")
@@ -149,11 +144,7 @@ class SplashScreen():
         dialog.set_title("Open File")
         dialog.open(parent_window, None, self.on_open_response)
 
-    def get_resource_path(rel_path):
-        dir_of_py_file = os.path.dirname(__file__)
-        rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)
-        abs_path_to_resource = os.path.abspath(rel_path_to_resource)
-        return abs_path_to_resource
+  
 
     def add_style(self, gui_thing, class_name):
         gui_thing.get_style_context().add_class(class_name)
