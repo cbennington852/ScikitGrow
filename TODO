@@ -42,5 +42,5 @@
 36. ### check out a python "compiler" to bytecode ... https://nuitka.net/
     - good for packaging? 
 
-
+38. ### hardcode any n_jobs to be (n_cores - 1)
 
