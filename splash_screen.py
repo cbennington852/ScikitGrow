@@ -63,6 +63,13 @@ class SplashScreen():
         example_dataset = sns.load_dataset(example_name)
         self.parent.create_window(example_dataset)
         self.window.destroy()
+
+    def load_image_from_file(file_name):
+        """
+            Returns a model, might change later
+        """
+        icon_path = SplashScreen.get_resource_path(file_name) 
+        return Gtk.Image.new_from_file(icon_path)
     
     def get_splash_screen_panel(self):
         main_panel = Gtk.Grid(
@@ -78,10 +85,8 @@ class SplashScreen():
             vexpand=True
         )
         self.add_style(example_project_btn , 'buttons')
-        icon_path = SplashScreen.get_resource_path("Example_dataset.svg") 
         example_project_btn.connect('clicked' , lambda x: self.start_example('diamonds'))
-        image = Gtk.Image.new_from_file(icon_path)
-        example_project_btn.set_child(image)
+        example_project_btn.set_child(SplashScreen.load_image_from_file("Example_dataset.svg"))
         
         # loads an example dataset into existence.
         # Likely from pandas 
@@ -90,9 +95,7 @@ class SplashScreen():
             hexpand=True,
             vexpand=True
         )
-        icon_path = SplashScreen.get_resource_path("Import_data.svg") 
-        image = Gtk.Image.new_from_file(icon_path)
-        import_project_btn.set_child(image)
+        import_project_btn.set_child(SplashScreen.load_image_from_file("Import_data.svg"))
         self.add_style(import_project_btn , 'buttons')
         import_project_btn.connect("clicked" , lambda x: self.open_file_dialog(self.window))
         main_title_pic = Gtk.Picture.new_for_resource("/com/charlesbennington/scikitgrow/app/icon/48x48/apps/Full_logo_SciKit_Grow.svg")

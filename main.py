@@ -317,10 +317,15 @@ class Main_GUI(Gtk.Application):
 
         # make top control buttons
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        self.control_button = Gtk.Button(label="Train Model ")
+        self.control_button = Gtk.Button(label="Train Model")
+        
         self.control_button.connect(
             "clicked", self.higher_order_wrapper_main_sklearn_pipeline
         )
+        thing_box = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL)
+        thing_box.append(SplashScreen.load_image_from_file("green_arrow.svg"))
+        thing_box.append(Gtk.Label(label="Train Model"))
+        self.control_button.set_child(thing_box)
         self.add_style(self.control_button, "control-button")
         top_control_box.append(self.control_button)
 

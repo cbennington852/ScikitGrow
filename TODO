@@ -3,19 +3,22 @@
     - **Considerations** 
         - This could be added a a pre-processing block, something that the user could drag and drop in.
         - This could also be added as another section to pipeline as drag and drop? 
-        (perhaps validation section?)
+        (perhaps a validation section?)
+        - will this make the software too complicated?
+            - likely not?
         - We will also need a "special" model block to tell the model to not do cross validation.
+        This would likely be several work hours of work. 
     - **Extra Notes**
         - We should use multi-threading for the k-fold and other validation. There is built in 
         functions to do this. Example `scores = cross_val_score(model, X, y, cv=5, n_jobs=-1)`
-
-
 
 17. ### Fix major UI/UX bug where library search is in all different places.
     - WHY: This is happening because we are just hiding the blocks that do not fit the requirement.
     - HOW FIX: after a certian num of character, just hide the whole libary, and append / render these into a smaller horizontally scaling grid / box, rather than a grid.
 
 26. ### splash screen example datasets. 
+    - On splash screen transition to a new "page" and then have said page have a back button,
+    and on that page have a list of example datasets from seaborne.
 
 27. ### popover modifications
     - Make some of the controls not fill in the blanks.
@@ -42,5 +45,7 @@
 36. ### check out a python "compiler" to bytecode ... https://nuitka.net/
     - good for packaging? 
 
-38. ### hardcode any n_jobs to be (n_cores - 1)
+37. ### 1_n_regression, on a large dataset, make the dots transparent?
+    - Makes chart more readable?
 
+38. ### consolidate how loading svg from file.
