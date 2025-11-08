@@ -116,6 +116,7 @@ class SklearnPlotter(Gtk.Notebook):
 
         self.control_box_ptr = ptr_to_button.get_parent()
         self.spinner = Gtk.Spinner()
+        utility.add_style(self.spinner , 'spinner')
         self.spinner.start()
         self.control_box_ptr.append(self.spinner)
         ptr_to_button.set_sensitive(False)

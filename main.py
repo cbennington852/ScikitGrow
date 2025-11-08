@@ -294,7 +294,6 @@ class Main_GUI(Gtk.Application):
 
         # make top control buttons
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        self.control_button_box = Gtk.Box()
         self.control_button = Gtk.Button(label="Train Model")
         self.control_button.connect(
             "clicked", self.higher_order_wrapper_main_sklearn_pipeline
@@ -304,8 +303,7 @@ class Main_GUI(Gtk.Application):
         thing_box.append(Gtk.Label(label="Train Model"))
         self.control_button.set_child(thing_box)
         self.add_style(self.control_button, "control-button")
-        self.control_button_box.append(self.control_button)
-        top_control_box.append(self.control_button_box)
+        top_control_box.append(self.control_button)
         utility.add_style(top_control_box , "trans-background")
 
         # create a standard box

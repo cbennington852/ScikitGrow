@@ -100,11 +100,13 @@ class DroppableHolder(Gtk.Box ):
     def contains_draggable(self):
         # also update the background 
         res = self.model_block != None
+        """
         print("Style : " , self.style , res , self.parent.style)
         if res:
             utility.add_style(self.box, "data-pipeline-no-background")
         else:
             utility.add_style(self.box, self.style)
+        """
         return res
 
     def on_drop(self, _ctrl, value, _x, _y):
@@ -114,8 +116,9 @@ class DroppableHolder(Gtk.Box ):
             new_block = self.thing_to_hold.copy(value) 
             self.box.append(new_block)
             self.model_block = new_block
+            """
             utility.add_style(self.box, "data-pipeline-no-background")
-
+            """
             try:
                 self.parent.consider_changing_num_holders(value)
             except Exception:
@@ -337,9 +340,10 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         self.box_pipeline.append(Gtk.Label(label="Validator"))
         self.validator = ListDroppableHolder(
             unique_serialization_name='validator_model',
-            style='data-pipeline',
+            style='pipeline-model-holder-validator',
             droppable_this_holds=block_libary.ValidatorBlock,
-            orientation=Gtk.Orientation.VERTICAL
+            orientation=Gtk.Orientation.VERTICAL,
+            only_one_entry=True
         )
         self.box_pipeline.append(self.validator)
         # append important stuff

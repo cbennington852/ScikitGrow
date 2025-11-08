@@ -91,12 +91,15 @@ Block related things
   min-height: 300px;
 }
 
+.spinner {
+  min-width: 40px;
+  min-height: 40px;
+}
+
 .data-block {
   background-color : #115879;
   margin: 10px;
   padding: 2px;
-  margin-left: 50px;
-  margin-right: 50px;
   min-height: 20px;
   min-width: 50px;
   color: white;
@@ -118,7 +121,7 @@ Block related things
 }
 
 .data-pipeline-cols {
-  background-color: #ffffff;
+  background-color: #ededed;
   margin-left: 10px;
 }
 
@@ -219,6 +222,15 @@ Block related things
   padding: 20px;
   min-height: 20px;
   min-width: 50px;
+}
+
+.pipeline-model-holder-validator {
+  background-image : url('resource:///com/charlesbennington/scikitgrow/app/icon/48x48/apps/triangle_box_grey.svg');
+  background-size: 100%; /* or contain, 100% 100%, etc. */
+  background-repeat: no-repeat;
+  background-position: center;
+  min-width: 100px;
+  min-height: 40px;
 }
 
 
