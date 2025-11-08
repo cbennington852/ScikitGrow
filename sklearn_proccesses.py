@@ -6,6 +6,7 @@ from matplotlib.colors import ListedColormap
 import seaborn
 import threading
 from splash_screen import SplashScreen
+import utility
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
@@ -87,17 +88,36 @@ class SklearnPlotter(Gtk.Notebook):
 
         # on a separate thread?
         def sklearn_alternate_thread():
-            main_dataframe_copy = main_dataframe.copy(deep=True)
-            main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
-            self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-            figure = self.filter_pipeline()
-            accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-            self.current_figure_plotted = figure
-            self.current_figure_accuracy = accuracy_plot
-            self.plot_figure_canvas(figure , self.plotting_page)
-            self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
+            try:
+                main_dataframe_copy = main_dataframe.copy(deep=True)
+                main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
+                self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
+                figure = self.filter_pipeline()
+                accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
+                self.current_figure_plotted = figure
+                self.current_figure_accuracy = accuracy_plot
+                self.plot_figure_canvas(figure , self.plotting_page)
+                self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
+            except Exception as e:
+                traceback.print_exc()
+                msg = str(e)
+                if len(msg) > 80:
+                    msg = msg[:80]
+                dialog = Gtk.AlertDialog()
+                dialog.set_message(f"{type(e).__name__}")
+                dialog.set_detail(msg)
+                dialog.set_modal(True)
+                dialog.set_buttons(["OK"])
+                dialog.show()
             ptr_to_button.set_sensitive(True)
+            self.spinner.stop()
+            self.control_box_ptr.remove(self.spinner)
+            self.control_box_ptr.append(ptr_to_button)
 
+        self.control_box_ptr = ptr_to_button.get_parent()
+        self.spinner = Gtk.Spinner()
+        self.spinner.start()
+        self.control_box_ptr.append(self.spinner)
         ptr_to_button.set_sensitive(False)
         sklearn_thread_1 = threading.Thread(target=sklearn_alternate_thread)
         sklearn_thread_1.start()
@@ -156,7 +176,7 @@ class SklearnPlotter(Gtk.Notebook):
         overlay = Gtk.Overlay()
         overlay.set_child(FigureCanvas(fig))
         full_screen_button = Gtk.Button()
-        icon_path = SplashScreen.get_resource_path("full_screen.svg") 
+        icon_path = utility.get_resource_path("full_screen.svg") 
         image = Gtk.Image.new_from_file(icon_path)
         SklearnPlotter.add_style(image , 'full_screen_button_image')
         full_screen_button.set_child(image)

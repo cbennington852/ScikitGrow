@@ -6,6 +6,7 @@ import sklearn_parameter
 import utility
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
+import sklearn.model_selection as skms
 
 import sklearn
 
@@ -87,6 +88,17 @@ class BlockLibary(Gtk.ScrolledWindow):
             color='pink' ,
             list_of_things=get_public_methods(sklearn.ensemble),
             name_of_section= 'Decision Tree Models' 
+        )
+
+        self.add_submodule(
+            class_to_wrap=ValidatorBlock , 
+            color='validator' ,
+            list_of_things=[
+                skms.KFold,
+                skms.LeaveOneOut,
+                skms.StratifiedKFold
+            ],
+            name_of_section= 'Validators' 
         )
 
         # save as self
@@ -208,26 +220,8 @@ class ColumnBlock(DraggableBlock):
             color=thing_to_be_copied.color
         )
     
-class ValidatorBlock(DraggableBlock):
-    def __init__(self, column_name , color, **kargs):
-        super().__init__(
-            data_held = column_name,
-            color = color,  # not used.... deprecated 
-            display_name = column_name, 
-            **kargs
-        )
 
-    def get_gtk_object_from_json(json_data):
-        print("my_json_data" , json_data)
-        return ValidatorBlock(
-            column_name=json_data['column'],
-            color='blue'
-        )
-    def copy(thing_to_be_copied):
-        return ValidatorBlock(
-            column_name=thing_to_be_copied.data_held,
-            color=thing_to_be_copied.color
-        )
+
 
 class ModelBlock(DraggableBlock):
     """
@@ -363,4 +357,11 @@ class PreProcessingBlock(ModelBlock):
         )
         def get_gtk_object_from_json(json_data):
             super().get_gtk_object_from_json(json_data)
-            raise ValueError("Not implemented yet!")
+
+class ValidatorBlock(ModelBlock):
+    def __init__(self, sklearn_model_function_call , color,  **kargs):
+        super().__init__(
+            sklearn_model_function_call=sklearn_model_function_call,
+            color=color,
+            **kargs
+        )

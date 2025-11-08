@@ -1,3 +1,5 @@
 loading an picture requires the whole path. 
 example below
 "/com/charlesbennington/scikitgrow/app/icon/48x48/apps/Full_logo_SciKit_Grow.svg"
+
+- It also required you to add the image to the .xml "reasources.xml"

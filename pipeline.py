@@ -4,6 +4,7 @@ import csv
 import traceback
 import gi
 import inspect
+import utility
 
 gi.require_version("Gtk", "4.0")
 import block_libary
@@ -28,16 +29,22 @@ class DroppableHolder(Gtk.Box ):
             parent (_type_, optional): _description_. Defaults to None.
         """
         super().__init__(**kargs)
-
         self.thing_to_hold = thing_to_hold
         self.parent = parent
-        
-        block_libary.add_style(self , style)
+        self.parent_style = self.parent.style
+        self.style = style
+        block_libary.add_style(self , self.style)
         self.box = Gtk.Box()
+        #self.box.set_hexpand(True)
+        #self.box.set_vexpand(True)
         self.box.set_halign(Gtk.Align.CENTER)
+        self.box.set_valign(Gtk.Align.CENTER)
         self.set_halign(Gtk.Align.CENTER)
-
-        self.box.append(Gtk.Label(label=f"  +  "))
+        self.set_valign(Gtk.Align.CENTER)
+        default_label = Gtk.Label(label=f"  +  ")
+        utility.add_style(default_label, "center-text")
+        utility.add_style(self.box, "center-text")
+        self.box.append(default_label)
         self.append(self.box)
 
         drop_controller = Gtk.DropTarget.new(
@@ -91,17 +98,24 @@ class DroppableHolder(Gtk.Box ):
 
 
     def contains_draggable(self):
-        return self.model_block != None
+        # also update the background 
+        res = self.model_block != None
+        print("Style : " , self.style , res , self.parent.style)
+        if res:
+            utility.add_style(self.box, "data-pipeline-no-background")
+        else:
+            utility.add_style(self.box, self.style)
+        return res
 
     def on_drop(self, _ctrl, value, _x, _y):
-        # clear the background.
         if isinstance(value, self.thing_to_hold):
             for child in self.box:
                 self.box.remove(child)
             new_block = self.thing_to_hold.copy(value) 
-            # TODO: add a copy method that returns a copy of said object.
             self.box.append(new_block)
             self.model_block = new_block
+            utility.add_style(self.box, "data-pipeline-no-background")
+
             try:
                 self.parent.consider_changing_num_holders(value)
             except Exception:
@@ -220,6 +234,7 @@ class ListDroppableHolder(Gtk.Box):
             print(child)
             if child.contains_draggable():
                 res.append(child.get_thing().get_value())
+
         return res
     
     def get_all_gtk_objects(self):
@@ -243,6 +258,7 @@ class ListDroppableHolder(Gtk.Box):
                     count += 1
             if count == 0:
                 self.append(DroppableHolder(self.style, self.droppable_this_holds, self ))
+        #utility.load_css_file()
 
 
 class SklearnPipeline(Gtk.ScrolledWindow):
@@ -271,20 +287,19 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         # data section box
         #============================================
         box_data = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
-        block_libary.add_style(box_data , 'data-pipeline')
         # add text fields for the data section, each one being a x-value or y-value
         x_value_label = Gtk.Label(label="X-values")
         # making a thing with autocompletion
         self.x_values_entry = ListDroppableHolder(
             unique_serialization_name='x_values',
-            style='data-pipeline',
+            style='data-pipeline-cols',
             droppable_this_holds=block_libary.ColumnBlock
         )
         # make a y_value, with completions
         y_value_label = Gtk.Label(label='Y-values')
         self.y_values_entry = ListDroppableHolder(
             unique_serialization_name='y_values',
-            style='data-pipeline',
+            style='data-pipeline-cols',
             droppable_this_holds=block_libary.ColumnBlock,
             only_one_entry=True
         )
@@ -303,7 +318,7 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         self.box_pipeline.append(Gtk.Label(label="Pre-processing"))
         self.preprocessing = ListDroppableHolder(
             unique_serialization_name='preproccessor',
-            style='data-pipeline',
+            style='preprocessor-model-holder',
             droppable_this_holds=block_libary.PreProcessingBlock,
             orientation=Gtk.Orientation.VERTICAL
         )
@@ -318,6 +333,15 @@ class SklearnPipeline(Gtk.ScrolledWindow):
             orientation=Gtk.Orientation.VERTICAL
         )
         self.box_pipeline.append(self.pipeline)
+
+        self.box_pipeline.append(Gtk.Label(label="Validator"))
+        self.validator = ListDroppableHolder(
+            unique_serialization_name='validator_model',
+            style='data-pipeline',
+            droppable_this_holds=block_libary.ValidatorBlock,
+            orientation=Gtk.Orientation.VERTICAL
+        )
+        self.box_pipeline.append(self.validator)
         # append important stuff
         self.main.append(Gtk.Label(label="X and Y axis"))
         self.main.append(box_data)

@@ -70,6 +70,8 @@ switch:checked slider {
 
 .data-pipeline {
   margin: 10px;
+  min-width: 100px;
+  min-height: 40px;
   border-radius: 10px;
   align-content: center;
   background-color: #ededed;
@@ -101,6 +103,29 @@ Block related things
   border: none;
 }
 
+.center-text {
+  text-align: center;
+  align-items: center;
+  align-content: center;
+}
+
+.data-pipeline-no-background {
+  align-content: center;
+  background: none;
+  border: none;
+  background-color: rgb(220, 220, 220);
+  background-image: none;
+}
+
+.data-pipeline-cols {
+  background-color: #ffffff;
+  margin-left: 10px;
+}
+
+.trans-background {
+  all: unset
+}
+
 .block-green {
   background-color : #11793b;
   margin: 10px;
@@ -129,7 +154,6 @@ Block related things
 
 .block-purple {
   background-color : #431179;
-  margin: 10px;
   padding: 2px;
   margin-left: 50px;
   margin-right: 50px;
@@ -141,6 +165,19 @@ Block related things
   min-width: 50px;
   color: white;
   border: none;
+}
+
+.preprocessor-model-holder{
+  min-width: 100px;
+  min-height: 40px;
+  align-items: center;
+  align-self: center;
+  align-content: center;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 0px;
+  background-color: #ededed;
 }
 
 
@@ -159,21 +196,29 @@ Block related things
 
 
 .block-orange {
-  /*Only runs recourse files thru the link below like. */
-  background-image : url('resource:///com/charlesbennington/scikitgrow/app/icon/48x48/apps/triangle_box.svg');
-  background-size: 90%; /* or contain, 100% 100%, etc. */
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #00000000;
-  border: none;
+  background-color : rgb(138, 88, 7);
   margin: 10px;
-  padding: 20px;
+  padding: 2px;
   margin-left: 50px;
   margin-right: 50px;
   border-radius: 10px;
   min-height: 20px;
   min-width: 50px;
-  color: black;
+  color: white;
+  border: none;
+}
+
+.block-validator {
+  /*Only runs recourse files thru the link below like. */
+  background-image : url('resource:///com/charlesbennington/scikitgrow/app/icon/48x48/apps/triangle_box.svg');
+  background-size: 100%; /* or contain, 100% 100%, etc. */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #00000000;
+  border: none;
+  padding: 20px;
+  min-height: 20px;
+  min-width: 50px;
 }
 
 

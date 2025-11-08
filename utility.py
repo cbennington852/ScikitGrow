@@ -22,3 +22,21 @@ def get_resource_path(rel_path):
     rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)
     abs_path_to_resource = os.path.abspath(rel_path_to_resource)
     return abs_path_to_resource
+
+def add_style( gui_thing, class_name):
+        gui_thing.get_style_context().add_class(class_name)
+
+def load_css_file():
+    css_file_path = "./styles.css"
+    with open(css_file_path) as f:
+        # Load CSS
+        css = f.read()
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_data(css)
+
+        # Apply CSS to display
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            css_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+        )

@@ -55,7 +55,6 @@ class Main_GUI(Gtk.Application):
             flags=Gio.ApplicationFlags.HANDLES_OPEN,
         )
         
-        self.css_file_path = "./styles.css"
         GLib.set_application_name("SciKitLearn GUI")
 
     def render_main_box_from_dataframe(self, ignore_pipeline=False):
@@ -116,7 +115,7 @@ class Main_GUI(Gtk.Application):
         # adding main box
         self.window.set_child(self.main_box)
         self.window.set_titlebar(self.render_top_bar())
-        self.load_css_file()
+        utility.load_css_file()
         self.window.present()
 
     def do_activate(self):
@@ -262,19 +261,7 @@ class Main_GUI(Gtk.Application):
         )
         sys.exit(1)
 
-    def load_css_file(self):
-        with open(self.css_file_path) as f:
-            # Load CSS
-            css = f.read()
-            css_provider = Gtk.CssProvider()
-            css_provider.load_from_data(css)
 
-            # Apply CSS to display
-            Gtk.StyleContext.add_provider_for_display(
-                Gdk.Display.get_default(),
-                css_provider,
-                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
-            )
 
     def add_style(self, gui_thing, class_name):
         gui_thing.get_style_context().add_class(class_name)
@@ -294,32 +281,21 @@ class Main_GUI(Gtk.Application):
             print(msg)
 
     def higher_order_wrapper_main_sklearn_pipeline(self, button):
-        try:
-            self.main_canvas.main_sklearn_pipe(
-                main_dataframe=self.main_dataframe,
-                curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
-                pipeline_x_values=self.pipeline_box.get_x_values(),
-                pipeline_y_value=self.pipeline_box.get_y_value(),
-                ptr_to_button=self.control_button
-            )
-        except Exception as e:
-            traceback.print_exc()
-            msg = str(e)
-            if len(msg) > 80:
-                msg = msg[:80]
-            dialog = Gtk.AlertDialog()
-            dialog.set_message(f"{type(e).__name__}")
-            dialog.set_detail(msg)
-            dialog.set_modal(True)
-            dialog.set_buttons(["OK"])
-            dialog.show()
+        self.main_canvas.main_sklearn_pipe(
+            main_dataframe=self.main_dataframe,
+            curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
+            pipeline_x_values=self.pipeline_box.get_x_values(),
+            pipeline_y_value=self.pipeline_box.get_y_value(),
+            ptr_to_button=self.control_button
+        )
+       
 
     def render_pipeline(self):
 
         # make top control buttons
         top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.control_button_box = Gtk.Box()
         self.control_button = Gtk.Button(label="Train Model")
-        
         self.control_button.connect(
             "clicked", self.higher_order_wrapper_main_sklearn_pipeline
         )
@@ -328,7 +304,9 @@ class Main_GUI(Gtk.Application):
         thing_box.append(Gtk.Label(label="Train Model"))
         self.control_button.set_child(thing_box)
         self.add_style(self.control_button, "control-button")
-        top_control_box.append(self.control_button)
+        self.control_button_box.append(self.control_button)
+        top_control_box.append(self.control_button_box)
+        utility.add_style(top_control_box , "trans-background")
 
         # create a standard box
         main_box = standard_box.StdBox(
