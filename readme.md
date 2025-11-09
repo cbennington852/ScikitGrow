@@ -28,20 +28,15 @@ This would allow students and novices to learn in a similar way to scratch, drag
 3. **Examples** This software should have example datasets, and later linked tutorials to facilitate learning. 
 4. **Compatibility** This software should allow for the exporting and saving of data, so students can save their projects and share them (presumably with proud parents)
 
-## Natrually AI Resitant
-With the rise of AI, I found that many of the students that I would tutor would be simply copying and pasting code from chatGPT, without actually understanding it. This outlines on of the strengths of drag and drop blocks, which are naturally resistant to forms of copy and paste, allowing for students to have a more natural way of learning through exploration, while also subtely disallowing the use of AI. 
-
 ## Exploratory Learning
 This project is supposed to encourage exploration and experimentation. The modular drag and drop system is part of this, allowing for users to swap out models on the fly, leading to them learning the differences between different models more in-depth, due to a tactile, hands on experience.
 
-## Current works
+## Current progress
 Currently, there is still a lot to work on for this application, most of the core application features have been implemented, but there is still a lot of software development left to do. 
 
-<img src="images/plan.png" alt="plan" width="300"/>
+![blocks v python](images/overall_proccess.svg "Optional title text")
 
 
-![blocks v python](images/full_app.png "Optional title text")
-*Pre-UI/UX redesign Fall 2025*
 ## Running the current GUI
 Warning; this is a work in progress, and bugs are a near guarantee. This has been tested on Linux, and nothing else. 
 To install dependencies
