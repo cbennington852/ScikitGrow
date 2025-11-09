@@ -333,7 +333,8 @@ class SklearnPipeline(Gtk.ScrolledWindow):
             unique_serialization_name='sklearn_model',
             style='data-pipeline',
             droppable_this_holds=block_libary.ModelBlock,
-            orientation=Gtk.Orientation.VERTICAL
+            orientation=Gtk.Orientation.VERTICAL,
+            only_one_entry=True
         )
         self.box_pipeline.append(self.pipeline)
 

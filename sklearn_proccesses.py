@@ -103,12 +103,14 @@ class SklearnPlotter(Gtk.Notebook):
                 msg = str(e)
                 if len(msg) > 80:
                     msg = msg[:80]
+                
                 dialog = Gtk.AlertDialog()
                 dialog.set_message(f"{type(e).__name__}")
                 dialog.set_detail(msg)
                 dialog.set_modal(True)
                 dialog.set_buttons(["OK"])
-                dialog.show()
+                GLib.idle_add(dialog.show)
+
             ptr_to_button.set_sensitive(True)
             self.spinner.stop()
             self.control_box_ptr.remove(self.spinner)
@@ -205,6 +207,8 @@ class SklearnPlotter(Gtk.Notebook):
 
     def validate_column_inputs(self, main_dataframe, pipeline_x_values , pipeline_y_value):
         lst_cols = main_dataframe.columns
+        if len(set(pipeline_x_values)) < len(pipeline_x_values):
+            raise ValueError("Duplicate columns on X-value")
         for x_col in pipeline_x_values:
             if x_col not in lst_cols:
                 raise ValueError(f"Error: {x_col} is not in the dataset")
