@@ -43,7 +43,7 @@ Currently, there is still a lot to work on for this application, most of the cor
 ![blocks v python](images/full_app.png "Optional title text")
 *Pre-UI/UX redesign Fall 2025*
 ## Running the current GUI
-Warning; this is a work in progress, and bugs are a near guarantee. 
+Warning; this is a work in progress, and bugs are a near guarantee. This has been tested on Linux, and nothing else. 
 To install dependencies
 ```
 ./install.sh
