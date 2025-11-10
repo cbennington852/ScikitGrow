@@ -134,13 +134,13 @@ class SklearnPlotter(Gtk.Notebook):
                 # get the x and y values 
                 self.x_cols = pipeline_x_values
                 self.y_cols = pipeline_y_value
-                result_validation = self.validate_column_inputs(main_dataframe ,curr_pipeline, pipeline_x_values , pipeline_y_value)
+                result_validation = self.validate_column_inputs(main_dataframe_copy ,curr_pipeline, pipeline_x_values , pipeline_y_value)
                 if result_validation:
                     self.plot_figure_canvas(result_validation , self.plotting_page)
                     thread_end_tasks()
                     return 
-                self.x = main_dataframe[self.x_cols]
-                self.y = main_dataframe[self.y_cols].iloc[:, 0]
+                self.x = main_dataframe_copy[self.x_cols]
+                self.y = main_dataframe_copy[self.y_cols].iloc[:, 0]
                 self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
                 figure = self.filter_pipeline()
                 accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
@@ -318,6 +318,8 @@ class SklearnPlotter(Gtk.Notebook):
             Tuple(trained_model)
         """
         # later here we will get and fit the training validation thing the user wants. 
+        print("X vals" , self.x)
+        print("Y Vals" , self.y)
         self.curr_pipeline.fit(self.x , self.y)
         if True:
             self.y_preds = SklearnPlotter.k_fold_general_threads(
@@ -370,7 +372,7 @@ class SklearnPlotter(Gtk.Notebook):
             if len(self.x.columns) == 1:
                 return self.plot_single_regression(self.x , self.y , self.y_preds , self.x_cols , self.y_cols)
             elif len(self.x.columns) == 2:
-                return self.plot_2d_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
+                return self.plot_3d_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
             else:
                 return self.plot_n_plus_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
                 
@@ -427,7 +429,7 @@ class SklearnPlotter(Gtk.Notebook):
                 horizontalalignment='center', verticalalignment='center',)
         return fig
 
-    def plot_2d_regressor(self , x , y , model ,  x_cols , y_cols):
+    def plot_3d_regressor(self , x , y , model ,  x_cols , y_cols):
         # Step 3: Create grid for plotting
         x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
         x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
@@ -468,49 +470,39 @@ class SklearnPlotter(Gtk.Notebook):
     def plot_classifier_n_plus(self, x , y, y_pred, clf, x_cols , y_cols ):
         pass
 
-    def plot_classifier_1d(self, x , y, y_pred, clf, x_cols , y_cols ):
-        raise ValueError("Not written yet")
-        x_min, x_max = x.min() - 1, x.max() + 1
-        X = x
+    def plot_classifier_1d(self, X , y, y_pred, clf, x_cols , y_cols ):
+        max_margin = 0.5
+        x_min, x_max = X.min() - max_margin, X.max() + max_margin
+        y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
+        x_plot = np.linspace(x_min, x_max, 1000).reshape(-1, 1)
+        y_preds = clf.predict(x_plot)
+        fig, ax = plt.subplots()
+        n_classes = len(np.unique(y_enc))
+        cmap = ListedColormap(self.get_clf_color_map().colors[:n_classes])
+        ax.scatter(X, y, c=y_enc, cmap=cmap,
+                    edgecolor='k', marker='o', s=50, label=f'')
 
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
+        # Plot the hard predicted class line (The step function)
+        ax.plot(x_plot[:, 0], y_preds, label='Hard Predicted Class (0 or 1)',
+                color='blue', linewidth=3)
 
-        fig, ax = plt.subplots(figsize=(8, 4))
+        switch_index = np.argmax(y_preds)
+        decision_boundary_x = x_plot[switch_index, 0]
 
-        # Generate test inputs
-        x_min, x_max = X.min() - 1, X.max() + 1
-        x_test = np.linspace(x_min, x_max, 400).reshape(-1, 1)
+        ax.axvline(x=decision_boundary_x, color='red', linestyle='--',
+                    label=f'Decision Boundary (x={decision_boundary_x:.2f})')
 
-        if hasattr(clf, "predict_proba"):
-            y_proba = clf.predict_proba(x_test)
-            n_classes = y_proba.shape[1]
-            for class_idx in range(n_classes):
-                ax.plot(x_test, y_proba[:, class_idx],
-                        label=f"P(class {class_idx})")
-            ax.set_ylabel("Probability")
-            ax.set_title(f"Classifier: {clf.__class__.__name__}")
-        elif hasattr(clf, "decision_function"):
-            decision = clf.decision_function(x_test)
-            if decision.ndim == 1:  # binary classification
-                ax.plot(x_test, decision, label="Decision function")
-            else:  # multiclass
-                for i in range(decision.shape[1]):
-                    ax.plot(x_test, decision[:, i], label=f"Score class {i}")
-            ax.set_ylabel("Decision score")
-            ax.set_title(f"Classifier: {clf.__class__.__name__}")
-        else:
-            raise ValueError("Classifier must implement predict_proba or decision_function")
-
-        # Plot training points
-        for class_val in np.unique(y):
-            ax.scatter(X[y == class_val], np.full_like(X[y == class_val], class_val),
-                    label=f"Class {class_val}", alpha=0.6)
-
+        # Set labels and title
+        classes = np.unique(self.og_mainframe[y_cols])
+        classes_color_encoding = np.unique(y_enc)
+        ax.set_title(f'Classifier for {y_cols[0]}')
+        ax.set_xlabel(f'{x_cols[0]}')
+        ax.set_ylabel(f'{y_cols[0]}')
+        ax.legend(loc='upper left')
+        ax.grid(True, axis='x', linestyle='--', alpha=0.6)
         return fig
 
     def plot_classifier_2d(self, x , y, y_pred, clf, x_cols , y_cols ):
-        raise ValueError("Not written yet")
         y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
         # Plot the decision boundary
         fig, ax = plt.subplots()
@@ -544,7 +536,6 @@ class SklearnPlotter(Gtk.Notebook):
         return fig
 
     def plot_single_regression(self, x , y , y_pred , x_cols, y_cols):
-        print("gooning ... x cols == 1 and regression")
         fig, ax = plt.subplots()
         color_cycle = self.get_color_map()
         ax.scatter(x , y , color=color_cycle[0], label=f"Dataset")
