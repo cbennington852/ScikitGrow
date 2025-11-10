@@ -74,6 +74,39 @@ class SklearnPlotter(Gtk.Notebook):
                 print(uniques)
                 main_dataframe[col] = codes
         return main_dataframe
+    
+    def plot_no_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+        # load x and y_values        
+        self.x = main_dataframe[self.x_cols]
+        self.y = main_dataframe[self.y_cols].iloc[:, 0]
+        if (len(pipeline_x_values) == 1 and len(pipeline_y_value) == 1):
+            # 2d scatterplot.
+            fig, ax = plt.subplots()
+            color_cycle = self.get_color_map()
+            ax.scatter(self.x , self.y , color=color_cycle[0], label=f"Dataset")
+            ax.set_title(f"{pipeline_x_values[0]} and {pipeline_y_value[0]}")
+            ax.set_xlabel(f"{pipeline_x_values[0]}")
+            ax.set_ylabel(f"{pipeline_y_value[0]}")
+            ax.legend(loc='upper left')
+            return fig
+        
+        elif (len(pipeline_x_values) == 2 and len(pipeline_y_value) == 1):
+            x = self.x
+            y = self.y
+            color_cycle = self.get_color_map()
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            cmap = self.get_clf_color_map()
+            ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[1], edgecolor='k')
+            ax.set_xlabel(f"{pipeline_x_values[0]}")
+            ax.set_ylabel(f"{pipeline_x_values[1]}")
+            ax.set_position([0.05, 0.05, 0.9, 0.9]) 
+            ax.set_zlabel(f"{pipeline_y_value[0]}")
+            ax.set_title(f"3D Surface for {pipeline_y_value[0]}")
+            return fig
+        else:
+            fig, ax = plt.subplots()
+            return fig
 
     def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , ptr_to_button):
         """Runs the main sklearn pipeline, filtering through the different options that
@@ -85,12 +118,29 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
-
+        def thread_end_tasks():
+            ptr_to_button.set_sensitive(True)
+            self.spinner.stop()
+            self.control_box_ptr.remove(self.spinner)
+            self.control_box_ptr.append(ptr_to_button)
         # on a separate thread?
         def sklearn_alternate_thread():
             try:
                 main_dataframe_copy = main_dataframe.copy(deep=True)
                 main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
+                # parse and get the untrained pipeline
+                self.curr_pipeline = curr_pipeline
+
+                # get the x and y values 
+                self.x_cols = pipeline_x_values
+                self.y_cols = pipeline_y_value
+                result_validation = self.validate_column_inputs(main_dataframe ,curr_pipeline, pipeline_x_values , pipeline_y_value)
+                if result_validation:
+                    self.plot_figure_canvas(result_validation , self.plotting_page)
+                    thread_end_tasks()
+                    return 
+                self.x = main_dataframe[self.x_cols]
+                self.y = main_dataframe[self.y_cols].iloc[:, 0]
                 self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
                 figure = self.filter_pipeline()
                 accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
@@ -110,11 +160,7 @@ class SklearnPlotter(Gtk.Notebook):
                 dialog.set_modal(True)
                 dialog.set_buttons(["OK"])
                 GLib.idle_add(dialog.show)
-
-            ptr_to_button.set_sensitive(True)
-            self.spinner.stop()
-            self.control_box_ptr.remove(self.spinner)
-            self.control_box_ptr.append(ptr_to_button)
+            thread_end_tasks()
 
         self.control_box_ptr = ptr_to_button.get_parent()
         self.spinner = Gtk.Spinner()
@@ -158,7 +204,8 @@ class SklearnPlotter(Gtk.Notebook):
         elif sklearn.base.is_regressor(last_step_model):
             return self.regressor_accuracy_plot(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
         else:
-            raise ValueError("The last step must be a regressor or a classifier ")
+            raise ValueError("Unexpected error ... Last model not regressor or classifier")
+        
     def add_style( gui_thing, class_name):
         gui_thing.get_style_context().add_class(class_name)
         
@@ -205,17 +252,30 @@ class SklearnPlotter(Gtk.Notebook):
         new_window.show()
 
 
-    def validate_column_inputs(self, main_dataframe, pipeline_x_values , pipeline_y_value):
+    def validate_column_inputs(self, main_dataframe, curr_pipeline, pipeline_x_values , pipeline_y_value):
         lst_cols = main_dataframe.columns
+        # If model empty do empty plot
+        if len(self.curr_pipeline.steps) == 0:
+            return self.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+
+        # If user added a pre-processor but not a model do an empty plot.
+        last_step_name , last_step_model = self.curr_pipeline.steps[-1]
+        if not (sklearn.base.is_classifier(last_step_model) or sklearn.base.is_regressor(last_step_model)):
+            return self.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        # if user has an duplicate column
         if len(set(pipeline_x_values)) < len(pipeline_x_values):
             pipeline_x_values = list(set(pipeline_x_values))
             self.x_cols = pipeline_x_values
+
+        # check to make sure cols are from this dataset.
         for x_col in pipeline_x_values:
             if x_col not in lst_cols:
                 raise ValueError(f"Error: {x_col} is not in the dataset")
         for y_col in pipeline_y_value:
             if y_col not in lst_cols:
                 raise ValueError(f"Error: {y_col} is not in the dataset")
+
+    
 
     def train_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         """
@@ -228,19 +288,17 @@ class SklearnPlotter(Gtk.Notebook):
             curr_pipeline (sklearn.pipeline): sklearn_pipeline object
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
-        """
-        # parse and get the untrained pipeline
-        self.curr_pipeline = curr_pipeline
 
-        # get the x and y values 
-        self.x_cols = pipeline_x_values
-        self.y_cols = pipeline_y_value
-        self.validate_column_inputs(main_dataframe , pipeline_x_values , pipeline_y_value)
-        self.x = main_dataframe[self.x_cols]
-        self.y = main_dataframe[self.y_cols].iloc[:, 0]
-        
+        Returns: 
+            Tuple(trained_model)
+        """
         # later here we will get and fit the training validation thing the user wants. 
-        self.curr_pipeline.fit(self.x , self.y)
+        # if True:
+        #     SklearnPlotter.k_fold_general_threads(
+
+        #     )
+        # else:
+        #     self.curr_pipeline.fit(self.x , self.y)
 
     def get_color_map(self):
         return plt.rcParams['axes.prop_cycle'].by_key()['color']

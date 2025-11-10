@@ -28,7 +28,6 @@
 28. ### Add a predict tab to the graph section 
 
 
-
 35. ### Create a way to export the model? 
     Brainstorming.
         - Export as a "pickle"? https://scikit-learn.org/stable/model_persistence.html
@@ -53,7 +52,5 @@
     - nessicary.
     - Oh also, maybe try to make multi-threaded 
 
-39. ### Fix having the same x_cols twice not working
-    - Temp fix. Throws an error.
 
 40. ### Have it plot blank scatter plots n'stuff.
