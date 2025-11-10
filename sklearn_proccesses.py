@@ -208,7 +208,8 @@ class SklearnPlotter(Gtk.Notebook):
     def validate_column_inputs(self, main_dataframe, pipeline_x_values , pipeline_y_value):
         lst_cols = main_dataframe.columns
         if len(set(pipeline_x_values)) < len(pipeline_x_values):
-            raise ValueError("Duplicate columns on X-value")
+            pipeline_x_values = list(set(pipeline_x_values))
+            self.x_cols = pipeline_x_values
         for x_col in pipeline_x_values:
             if x_col not in lst_cols:
                 raise ValueError(f"Error: {x_col} is not in the dataset")
