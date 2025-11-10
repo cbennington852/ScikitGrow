@@ -275,7 +275,32 @@ class SklearnPlotter(Gtk.Notebook):
             if y_col not in lst_cols:
                 raise ValueError(f"Error: {y_col} is not in the dataset")
 
-    
+    def k_fold_general_threads(model , kf , X , y):
+        def train_indexes(train_index , test_index):
+            """
+            The thing that we call each time in he k_fold
+            """
+            model_clone = sklearn.clone(model)
+            X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+            y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+            model_clone.fit(X_train , y_train)
+            curr_y_preds = model_clone.predict(X_test)
+            final_y[test_index] = curr_y_preds.flatten()
+
+        # the final array
+        final_y = np.empty(len(y))
+        # k fold thing 
+        threads = []
+        for fold, (train_index, test_index) in enumerate(kf.split(X, y)):
+            curr_thread = threading.Thread(target=train_indexes , kwargs={
+                "train_index" : train_index,
+                "test_index" : test_index
+            })
+            threads.append(curr_thread)
+            curr_thread.start()
+        for thread in threads:
+            thread.join()
+        return final_y 
 
     def train_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         """
@@ -293,12 +318,17 @@ class SklearnPlotter(Gtk.Notebook):
             Tuple(trained_model)
         """
         # later here we will get and fit the training validation thing the user wants. 
-        # if True:
-        #     SklearnPlotter.k_fold_general_threads(
-
-        #     )
-        # else:
-        #     self.curr_pipeline.fit(self.x , self.y)
+        self.curr_pipeline.fit(self.x , self.y)
+        if True:
+            self.y_preds = SklearnPlotter.k_fold_general_threads(
+                model=self.curr_pipeline,
+                kf=sklearn.model_selection.KFold(n_splits=3, shuffle=True),
+                X=self.x,
+                y=self.y
+            )
+        else:
+            self.curr_pipeline.fit(self.x , self.y)
+            self.y_preds = self.curr_pipeline.predict(self.x , self.y)
 
     def get_color_map(self):
         return plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -324,22 +354,21 @@ class SklearnPlotter(Gtk.Notebook):
         Returns:
             Figure: the figure containing the chart to be plotted. 
         """
-        y_pred = self.curr_pipeline.predict(self.x)
         last_step_name , last_step_model = self.curr_pipeline.steps[-1]
         # if is classifier 
         if sklearn.base.is_classifier(last_step_model):
             # render a classifier graph. 
             if len(self.x.columns) == 1:
-                return self.plot_classifier_1d(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+                return self.plot_classifier_1d(self.x , self.y , self.y_preds , self.curr_pipeline , self.x_cols , self.y_cols)
             elif len(self.x.columns) == 2:
-                return self.plot_classifier_2d(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+                return self.plot_classifier_2d(self.x , self.y , self.y_preds , self.curr_pipeline , self.x_cols , self.y_cols)
             else:
-                return self.plot_classifier_n_plus(self.x , self.y , y_pred , self.curr_pipeline , self.x_cols , self.y_cols)
+                return self.plot_classifier_n_plus(self.x , self.y , self.y_preds , self.curr_pipeline , self.x_cols , self.y_cols)
 
         elif sklearn.base.is_regressor(last_step_model):
             # render a regressor graph
             if len(self.x.columns) == 1:
-                return self.plot_single_regression(self.x , self.y , y_pred , self.x_cols , self.y_cols)
+                return self.plot_single_regression(self.x , self.y , self.y_preds , self.x_cols , self.y_cols)
             elif len(self.x.columns) == 2:
                 return self.plot_2d_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
             else:
@@ -355,9 +384,8 @@ class SklearnPlotter(Gtk.Notebook):
     #=============================================================
 
     def classifier_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
-        y_pred = curr_pipeline.predict(self.x)
         fig, ax = plt.subplots()
-        accuracy = sklearn.metrics.accuracy_score(self.y, y_pred)
+        accuracy = sklearn.metrics.accuracy_score(self.y, self.y_preds)
         ax.bar(['Accuracy'], [accuracy], color='skyblue')
 
         # Add text label and formatting
@@ -370,12 +398,11 @@ class SklearnPlotter(Gtk.Notebook):
         return fig
 
     def regressor_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
-        y_pred = curr_pipeline.predict(self.x)
 
-        rmse = sklearn.metrics.mean_squared_error(self.y, y_pred)
+        rmse = sklearn.metrics.mean_squared_error(self.y, self.y_preds)
 
         fig, ax = plt.subplots()
-        ax.scatter(self.y, y_pred, alpha=0.6, color='teal', edgecolor='k', label='Predicted Points')
+        ax.scatter(self.y, self.y_preds, alpha=0.6, color='teal', edgecolor='k', label='Predicted Points')
         ax.plot([self.y.min(), self.y.max()], [self.y.min(), self.y.max()], 'r--', lw=2, label='Ideal Fit (y = x)')
         ax.set_xlabel("Actual Values")
         ax.set_ylabel("Predicted Values")
@@ -385,8 +412,8 @@ class SklearnPlotter(Gtk.Notebook):
         textstr = (
             f"\nPredicted vs. Actual Values"
             f"\nRMSE                : {rmse}" + 
-            f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(self.y, y_pred):.2f}" + 
-            f"\nr2                  : {sklearn.metrics.r2_score(self.y, y_pred):.2f}"
+            f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(self.y, self.y_preds):.2f}" + 
+            f"\nr2                  : {sklearn.metrics.r2_score(self.y, self.y_preds):.2f}"
         )
         ax.set_title(textstr)
         print("accuracy")
@@ -407,7 +434,6 @@ class SklearnPlotter(Gtk.Notebook):
         x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
         color_cycle = self.get_color_map()
 
-
         # Create a DataFrame from the grid for prediction
         grid_df = pd.DataFrame({
             x_cols[0]: x1_grid.ravel(),
@@ -416,6 +442,9 @@ class SklearnPlotter(Gtk.Notebook):
 
         # Step 4: Predict y values over the grid
         y_pred = model.predict(grid_df).reshape(x1_grid.shape)
+
+        # Step 4: Predict y values over the grid
+        y_pred = y_pred.reshape(x1_grid.shape)
 
         # Step 5: Plotting
         fig = plt.figure()
@@ -440,6 +469,7 @@ class SklearnPlotter(Gtk.Notebook):
         pass
 
     def plot_classifier_1d(self, x , y, y_pred, clf, x_cols , y_cols ):
+        raise ValueError("Not written yet")
         x_min, x_max = x.min() - 1, x.max() + 1
         X = x
 
@@ -480,6 +510,7 @@ class SklearnPlotter(Gtk.Notebook):
         return fig
 
     def plot_classifier_2d(self, x , y, y_pred, clf, x_cols , y_cols ):
+        raise ValueError("Not written yet")
         y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
         # Plot the decision boundary
         fig, ax = plt.subplots()
