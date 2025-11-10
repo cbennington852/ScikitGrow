@@ -273,6 +273,7 @@ class Main_GUI(Gtk.Application):
                 curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
                 pipeline_x_values=self.pipeline_box.get_x_values(),
                 pipeline_y_value=self.pipeline_box.get_y_value(),
+                validator=self.pipeline_box.get_validator(),
                 ptr_to_button=self.control_button
             )
         except Exception as e:
@@ -286,6 +287,7 @@ class Main_GUI(Gtk.Application):
             curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
             pipeline_x_values=self.pipeline_box.get_x_values(),
             pipeline_y_value=self.pipeline_box.get_y_value(),
+            validator=self.pipeline_box.get_validator(),
             ptr_to_button=self.control_button
         )
        

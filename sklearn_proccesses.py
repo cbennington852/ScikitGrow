@@ -108,7 +108,7 @@ class SklearnPlotter(Gtk.Notebook):
             fig, ax = plt.subplots()
             return fig
 
-    def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , ptr_to_button):
+    def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , validator,  ptr_to_button):
         """Runs the main sklearn pipeline, filtering through the different options that
           the user could have inputted into this software. 
 
@@ -118,6 +118,7 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
+        print("Input valdiator" , validator)
         def thread_end_tasks():
             ptr_to_button.set_sensitive(True)
             self.spinner.stop()
@@ -130,6 +131,7 @@ class SklearnPlotter(Gtk.Notebook):
                 main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
                 # parse and get the untrained pipeline
                 self.curr_pipeline = curr_pipeline
+                self.validator = validator
 
                 # get the x and y values 
                 self.x_cols = pipeline_x_values
@@ -276,6 +278,7 @@ class SklearnPlotter(Gtk.Notebook):
                 raise ValueError(f"Error: {y_col} is not in the dataset")
 
     def k_fold_general_threads(model , kf , X , y):
+        print("Staring Validator training!!!")
         def train_indexes(train_index , test_index):
             """
             The thing that we call each time in he k_fold
@@ -320,11 +323,12 @@ class SklearnPlotter(Gtk.Notebook):
         # later here we will get and fit the training validation thing the user wants. 
         print("X vals" , self.x)
         print("Y Vals" , self.y)
+        print("Validator ...." , self.validator)
         self.curr_pipeline.fit(self.x , self.y)
-        if True:
+        if self.validator is not None:
             self.y_preds = SklearnPlotter.k_fold_general_threads(
                 model=self.curr_pipeline,
-                kf=sklearn.model_selection.KFold(n_splits=3, shuffle=True),
+                kf=self.validator[0][1],
                 X=self.x,
                 y=self.y
             )
