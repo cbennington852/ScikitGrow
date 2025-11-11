@@ -100,7 +100,7 @@ class BlockLibary(Gtk.ScrolledWindow):
                 skms.KFold,
                 skms.LeaveOneOut,
                 skms.StratifiedKFold,
-                No_Validator
+                NoValidator
             ],
             name_of_section= 'Validators' 
         )
