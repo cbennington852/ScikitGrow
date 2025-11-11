@@ -59,3 +59,32 @@
     https://pygobject.gnome.org/devguide/packagingguide.html
     pip install pyinstaller
     pyinstaller --noconfirm --noconsole main.py
+
+
+## Publication :: Brainstorming
+I should probably do a confrence rather than a journal. A journal would be a very long 
+and very winded 15-20 pages.
+
+Whereas a conference is a brisker 5 pages.
+- Journal of Statistics and Data Science Education (JSDSE)
+    https://www.tandfonline.com/journals/ujse21
+    REQUIRES empirical testing to be done!
+    Fees : ~0$ 
+    Acceptance rate : 20%
+
+- Educational Technology Research & Development (ETR&D)
+    https://link.springer.com/journal/11423
+    Focuses on R&D in equational development
+    Fees : ~3,000$ 
+    Acceptance rate : 20%
+
+- Journal of Open Source Software (JOSS)
+    https://joss.theoj.org/
+    Seeing some very similar projects on here
+    Fees : 0$
+    Acceptance rate : 60%
+    Only accepts my engine, probably not the
+    whole software. 
+
+- interactive learning environments
+    Fees : ~3,000$
