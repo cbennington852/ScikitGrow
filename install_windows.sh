@@ -4,6 +4,6 @@ pacman -S python --noconfirm
 pacman -S python-pip --noconfirm
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install sklearn numpy matplotlib
 glib-compile-resources reasources.xml --target=resources.gresource
 pacman -Su
