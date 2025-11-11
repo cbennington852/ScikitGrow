@@ -39,9 +39,17 @@ Currently, there is still a lot to work on for this application, most of the cor
 
 ## Running the current GUI
 Warning; this is a work in progress, and bugs are a near guarantee. This has been tested on Linux, and nothing else. 
-To install dependencies
+To install windows (Requires https://www.msys2.org/ and pacman):
 ```
-./install.sh
+./install_windows
+```
+To install for Linux
+```
+./install_linux
+```
+To install for Mac (requires https://brew.sh/ )
+```
+./install_mac
 ```
 
 To run the GUI
