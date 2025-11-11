@@ -57,4 +57,5 @@
 
 42. ### look into how to package this 
     https://pygobject.gnome.org/devguide/packagingguide.html
-    
+    pip install pyinstaller
+    pyinstaller --noconfirm --noconsole main.py
