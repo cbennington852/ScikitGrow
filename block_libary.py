@@ -23,6 +23,9 @@ def get_public_methods(library):
             res.append(getattr(library , function))
     return res
 
+class NoValidator():
+    def __init__(self):
+        return None
 
 STACKING_AMOUNT = 2
 class BlockLibary(Gtk.ScrolledWindow):
@@ -96,7 +99,8 @@ class BlockLibary(Gtk.ScrolledWindow):
             list_of_things=[
                 skms.KFold,
                 skms.LeaveOneOut,
-                skms.StratifiedKFold
+                skms.StratifiedKFold,
+                NoValidator
             ],
             name_of_section= 'Validators' 
         )

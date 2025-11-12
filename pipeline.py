@@ -359,6 +359,26 @@ class SklearnPipeline(Gtk.ScrolledWindow):
     def get_y_value(self):
         return self.y_values_entry.get_all_values()
 
+    def parse_sklearn_model_holder_list(pointer_to_list_model_holder , ptr_to_model_lst):
+        x = 0
+        for outer_child in pointer_to_list_model_holder:
+            # Get the current model if there is one here
+            if outer_child.model_block != None:
+                print("Parameter list" , outer_child.model_block.parameter_list)
+                list_of_parameters = outer_child.model_block.parameter_list
+                map_of_parameters = {}
+                
+                # looping thru out list oEf parameters.
+                for curr_pair in list_of_parameters:
+                    para_name = curr_pair.get_param_name()
+                    para_value = curr_pair.get_value()
+                    map_of_parameters[para_name] = para_value
+
+                # assembling the current model
+                new_entry_in_model_list = (f"{x}_{outer_child.model_block.__class__.__name__}_{outer_child.model_block.sklearn_model_function_call}")
+                assembled_model = outer_child.model_block.sklearn_model_function_call(**map_of_parameters)
+                ptr_to_model_lst.append((new_entry_in_model_list , assembled_model))
+            x += 1
 
     def get_sklearn_pipeline(self):
         """
@@ -368,29 +388,10 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         """
         # create a list of the models going into the pipeline
         model_list = []
-        def parse_sklearn_model_holder_list(pointer_to_list_model_holder):
-            x = 0
-            for outer_child in pointer_to_list_model_holder:
-                # Get the current model if there is one here
-                if outer_child.model_block != None:
-                    print("Parameter list" , outer_child.model_block.parameter_list)
-                    list_of_parameters = outer_child.model_block.parameter_list
-                    map_of_parameters = {}
-                    
-                    # looping thru out list oEf parameters.
-                    for curr_pair in list_of_parameters:
-                        para_name = curr_pair.get_param_name()
-                        para_value = curr_pair.get_value()
-                        map_of_parameters[para_name] = para_value
-
-                    # assembling the current model
-                    new_entry_in_model_list = (f"{x}_{outer_child.model_block.__class__.__name__}_{outer_child.model_block.sklearn_model_function_call}")
-                    assembled_model = outer_child.model_block.sklearn_model_function_call(**map_of_parameters)
-                    model_list.append((new_entry_in_model_list , assembled_model))
-                x += 1
+       
                 
-        parse_sklearn_model_holder_list(self.preprocessing)
-        parse_sklearn_model_holder_list(self.pipeline)
+        SklearnPipeline.parse_sklearn_model_holder_list(self.preprocessing , model_list)
+        SklearnPipeline.parse_sklearn_model_holder_list(self.pipeline , model_list)
 
         print("UNTRAINED PIEPLEINE")
         print(model_list)
@@ -423,6 +424,10 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         return assembled_model
     """
 
+    def get_validator(self):
+        ret_lst = []
+        SklearnPipeline.parse_sklearn_model_holder_list(self.validator , ret_lst)
+        return ret_lst
 
     def handle_parameter_input(input):
         """

@@ -13,7 +13,7 @@ from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 
 
 import standard_box
-import sklearn_proccesses
+import sklearn_engine
 import block_libary
 import pipeline
 import pandas as pd
@@ -273,6 +273,7 @@ class Main_GUI(Gtk.Application):
                 curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
                 pipeline_x_values=self.pipeline_box.get_x_values(),
                 pipeline_y_value=self.pipeline_box.get_y_value(),
+                validator=self.pipeline_box.get_validator(),
                 ptr_to_button=self.control_button
             )
         except Exception as e:
@@ -286,6 +287,7 @@ class Main_GUI(Gtk.Application):
             curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
             pipeline_x_values=self.pipeline_box.get_x_values(),
             pipeline_y_value=self.pipeline_box.get_y_value(),
+            validator=self.pipeline_box.get_validator(),
             ptr_to_button=self.control_button
         )
        
@@ -499,7 +501,7 @@ class Main_GUI(Gtk.Application):
                         grid_child.set_visible(False)
 
     def render_graph(self):
-        self.main_canvas = sklearn_proccesses.SklearnPlotter(self)
+        self.main_canvas = sklearn_engine.SklearnPlotter(self)
         self.main_canvas.set_size_request(500, 500)
         return self.main_canvas
 
