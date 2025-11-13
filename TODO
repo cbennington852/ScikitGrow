@@ -91,4 +91,17 @@ Whereas a conference is a brisker 5 pages.
 - interactive learning environments
     Fees : ~3,000$
 
+- TODO: Re-write to only include the engine
+    - Foucses : automatic scikit learn stuff.
+    - Oh also automatic K-fold validation multithreading.
+        - This should automatically calculate the cases where we use multithreading, and then 
+        make a decision for the user automatically before deciding weather or not to do multithreading on k-fold validation. 
+        - Also automatic encoding and serialization
+        - Maybe also some test cases.
+        - Also make the engine more separate, and less entangled. 
+        - Maybe we have a pool of threads and then each thread gets it's own "subsection" to run on. 
 
+## Maybe also conisder a re-write for this project in kotlin compose? 
+    It would mean I could deploy this to the web, which aligns much more with the project goals. 
+    
+         
