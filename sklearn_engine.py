@@ -7,6 +7,7 @@ import seaborn
 import threading
 from splash_screen import SplashScreen
 import utility
+import block_libary
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
@@ -325,7 +326,7 @@ class SklearnPlotter(Gtk.Notebook):
         print("Y Vals" , self.y)
         print("Validator ...." , self.validator)
         self.curr_pipeline.fit(self.x , self.y)
-        if self.validator is not None:
+        if (self.validator != []) and (not isinstance(self.validator[0][1] , block_libary.NoValidator)):
             self.y_preds = SklearnPlotter.k_fold_general_threads(
                 model=self.curr_pipeline,
                 kf=self.validator[0][1],
@@ -334,7 +335,7 @@ class SklearnPlotter(Gtk.Notebook):
             )
         else:
             self.curr_pipeline.fit(self.x , self.y)
-            self.y_preds = self.curr_pipeline.predict(self.x , self.y)
+            self.y_preds = self.curr_pipeline.predict(self.x)
 
     def get_color_map(self):
         return plt.rcParams['axes.prop_cycle'].by_key()['color']
