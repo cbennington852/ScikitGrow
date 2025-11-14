@@ -472,13 +472,13 @@ class Main_GUI(Gtk.Application):
 
     def render_block_library(self):
         # make a search bar
-        search_bar = Gtk.SearchEntry()
-        search_bar.set_placeholder_text("Search for blocks...")
+        #search_bar = Gtk.SearchEntry()
+        #search_bar.set_placeholder_text("Search for blocks...")
         self.block_library_var = block_libary.BlockLibary(self.main_dataframe.columns)
-        search_bar.connect("search-changed", self.searching_block_library)
+        #search_bar.connect("search-changed", self.searching_block_library)
 
         main_box = standard_box.StdBox(
-            header_box=search_bar, body_box=self.block_library_var
+            header_box=Gtk.Box(), body_box=self.block_library_var
         )
 
         return main_box

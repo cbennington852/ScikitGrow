@@ -50,7 +50,7 @@ class BlockLibary(Gtk.ScrolledWindow):
         )
         drop_controller.set_gtypes([ModelBlock , ColumnBlock])
         drop_controller.connect("drop", self.remove_block)
-        self.main_box.add_controller(drop_controller)
+        self.add_controller(drop_controller)
         #
         #
         #
@@ -114,9 +114,9 @@ class BlockLibary(Gtk.ScrolledWindow):
         )
 
         notebook.append_page(models , Gtk.Label(label="Models"))
-        notebook.append_page(pre_processors , Gtk.Label(label="Pre Processor"))
+        notebook.append_page(pre_processors , Gtk.Label(label="PreProcessors"))
         notebook.append_page(columns , Gtk.Label(label="Columns"))
-        notebook.append_page(validators , Gtk.Label(label="validators"))
+        notebook.append_page(validators , Gtk.Label(label="Validators"))
         # save as self
         self.set_child(notebook)
 
