@@ -35,6 +35,9 @@ class BlockLibary(Gtk.ScrolledWindow):
     def __init__(self, column_names , **kargs):
         super().__init__(**kargs)
 
+        notebook = Gtk.Notebook()
+        # use notebook.append_page(page , stuff in the tab)
+
         # adding styles
         self.column_names = column_names
         add_style(self , 'block-library')
@@ -55,45 +58,50 @@ class BlockLibary(Gtk.ScrolledWindow):
         self.main_box.set_vexpand(True)
         add_style(self.main_box , 'block-library')
 
-        self.add_submodule(
+        models = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        pre_processors = Gtk.Box()
+        validators = Gtk.Box()
+        columns = Gtk.Box()
+
+        columns = self.add_submodule(
             class_to_wrap=ColumnBlock , 
             color='green' ,
             list_of_things=self.column_names,
             name_of_section= 'Data Blocks' 
         )
-        self.add_submodule(
+        pre_processors = self.add_submodule(
             class_to_wrap=PreProcessingBlock, 
             color='purple' ,
             list_of_things=get_public_methods(sklearn.preprocessing),
             name_of_section= 'Data Preprocessing' 
         )
-        self.add_submodule(
+        models.append(self.add_submodule(
             class_to_wrap=ModelBlock , 
             color='green' ,
             list_of_things=get_public_methods(sklearn.linear_model),
             name_of_section= 'Linear Models' 
-        )
-        self.add_submodule(
+        ))
+        models.append(self.add_submodule(
             class_to_wrap=ModelBlock , 
             color='orange' ,
             list_of_things=get_public_methods(sklearn.neural_network),
             name_of_section= 'Deep Neural Networks' 
-        )
-        self.add_submodule(
+        ))
+        models.append(self.add_submodule(
             class_to_wrap=ModelBlock , 
             color='blue' ,
             list_of_things=get_public_methods(sklearn.tree),
             name_of_section= 'Decision Tree Models' 
-        )
+        ))
 
-        self.add_submodule(
+        models.append(self.add_submodule(
             class_to_wrap=ModelBlock , 
             color='pink' ,
             list_of_things=get_public_methods(sklearn.ensemble),
             name_of_section= 'Decision Tree Models' 
-        )
+        ))
 
-        self.add_submodule(
+        validators = self.add_submodule(
             class_to_wrap=ValidatorBlock , 
             color='validator' ,
             list_of_things=[
@@ -105,8 +113,12 @@ class BlockLibary(Gtk.ScrolledWindow):
             name_of_section= 'Validators' 
         )
 
+        notebook.append_page(models , Gtk.Label(label="Models"))
+        notebook.append_page(pre_processors , Gtk.Label(label="Pre Processor"))
+        notebook.append_page(columns , Gtk.Label(label="Columns"))
+        notebook.append_page(validators , Gtk.Label(label="validators"))
         # save as self
-        self.set_child(self.main_box)
+        self.set_child(notebook)
 
     def add_submodule(self, class_to_wrap , color , list_of_things, name_of_section , ):
         """Adds a sklearn submodule to the class. 
@@ -114,6 +126,9 @@ class BlockLibary(Gtk.ScrolledWindow):
         Args:
             submodule (sklearn.submodule): sklearn submodule to be parsed.
             color (str): string color that points to a css class in the css file.
+
+        Returns:
+            Tuple(ptr_to_label , ptr_to_box)
         """
         #setup grid
         main_box = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
@@ -135,8 +150,9 @@ class BlockLibary(Gtk.ScrolledWindow):
         # add label
         label_thing = Gtk.Label(label=name_of_section)
         add_style(label_thing , 'block-label')
-        self.main_box.append(label_thing)
-        self.main_box.append(main_box)
+        #self.main_box.append(label_thing)
+        #self.main_box.append(main_box)
+        return main_box
 
 
     def remove_block(self, _ctrl, value, _x, _y):

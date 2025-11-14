@@ -101,7 +101,7 @@ Whereas a conference is a brisker 5 pages.
         - Also make the engine more separate, and less entangled. 
         - Maybe we have a pool of threads and then each thread gets it's own "subsection" to run on. 
 
-## Maybe also conisder a re-write for this project in kotlin compose? 
-    It would mean I could deploy this to the web, which aligns much more with the project goals. 
+### 45. Make the library divided into specific sections selectable from icons! 
+    
     
          
