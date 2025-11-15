@@ -87,7 +87,7 @@ Block related things
   text-decoration: underline;
 }
 .block-library{
-  min-width: 100px;
+  min-width: 200px;
   min-height: 300px;
 }
 
