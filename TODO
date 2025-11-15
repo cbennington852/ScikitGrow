@@ -101,7 +101,7 @@ Whereas a conference is a brisker 5 pages.
         - Also make the engine more separate, and less entangled. 
         - Maybe we have a pool of threads and then each thread gets it's own "subsection" to run on. 
 
-### 45. Make the library divided into specific sections selectable from icons! 
-    
+### 46. Copy scratch color pallette!
+http://colorswall.com/palette/239085
     
          

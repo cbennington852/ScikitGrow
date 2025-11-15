@@ -27,8 +27,8 @@ class NoValidator():
     def __init__(self):
         return None
 
-STACKING_AMOUNT = 2
-class BlockLibary(Gtk.ScrolledWindow):
+STACKING_AMOUNT = 3
+class BlockLibary(Gtk.Box):
     """
     This is the "library" of available functions from sklearn that we can use in this package for this project. 
     """
@@ -36,6 +36,8 @@ class BlockLibary(Gtk.ScrolledWindow):
         super().__init__(**kargs)
 
         notebook = Gtk.Notebook()
+        notebook.set_hexpand(True)
+        notebook.set_vexpand(True)
         # use notebook.append_page(page , stuff in the tab)
 
         # adding styles
@@ -58,47 +60,80 @@ class BlockLibary(Gtk.ScrolledWindow):
         self.main_box.set_vexpand(True)
         add_style(self.main_box , 'block-library')
 
-        models = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        pre_processors = Gtk.Box()
-        validators = Gtk.Box()
-        columns = Gtk.Box()
+        classifiers = []
+        regressors = []
+        pre_processors = []
+        validators = []
+        columns = []
 
         columns = self.add_submodule(
             class_to_wrap=ColumnBlock , 
-            color='green' ,
+            color='' ,
             list_of_things=self.column_names,
             name_of_section= 'Data Blocks' 
         )
         pre_processors = self.add_submodule(
             class_to_wrap=PreProcessingBlock, 
-            color='purple' ,
+            color='turquoise' ,
             list_of_things=get_public_methods(sklearn.preprocessing),
             name_of_section= 'Data Preprocessing' 
         )
-        models.append(self.add_submodule(
+        # regressor 
+        regressors.extend(self.add_sklearn_model(
             class_to_wrap=ModelBlock , 
-            color='green' ,
+            color='purple' ,
             list_of_things=get_public_methods(sklearn.linear_model),
-            name_of_section= 'Linear Models' 
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_regressor
         ))
-        models.append(self.add_submodule(
+        classifiers.extend(self.add_sklearn_model(
             class_to_wrap=ModelBlock , 
-            color='orange' ,
-            list_of_things=get_public_methods(sklearn.neural_network),
-            name_of_section= 'Deep Neural Networks' 
+            color='purple' ,
+            list_of_things=get_public_methods(sklearn.linear_model),
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_classifier
         ))
-        models.append(self.add_submodule(
-            class_to_wrap=ModelBlock , 
-            color='blue' ,
-            list_of_things=get_public_methods(sklearn.tree),
-            name_of_section= 'Decision Tree Models' 
-        ))
-
-        models.append(self.add_submodule(
+        regressors.extend(self.add_sklearn_model(
             class_to_wrap=ModelBlock , 
             color='pink' ,
+            list_of_things=get_public_methods(sklearn.neural_network),
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_regressor
+        ))
+        classifiers.extend(self.add_sklearn_model(
+            class_to_wrap=ModelBlock , 
+            color='pink' ,
+            list_of_things=get_public_methods(sklearn.neural_network),
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_classifier
+        ))
+        regressors.extend(self.add_sklearn_model(
+            class_to_wrap=ModelBlock , 
+            color='orange' ,
+            list_of_things=get_public_methods(sklearn.tree),
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_regressor
+        ))
+        classifiers.extend(self.add_sklearn_model(
+            class_to_wrap=ModelBlock , 
+            color='orange' ,
+            list_of_things=get_public_methods(sklearn.tree),
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_classifier
+        ))
+        regressors.extend(self.add_sklearn_model(
+            class_to_wrap=ModelBlock , 
+            color='strawberry' ,
             list_of_things=get_public_methods(sklearn.ensemble),
-            name_of_section= 'Decision Tree Models' 
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_regressor
+        ))
+        classifiers.extend(self.add_sklearn_model(
+            class_to_wrap=ModelBlock , 
+            color='strawberry' ,
+            list_of_things=get_public_methods(sklearn.ensemble),
+            name_of_section= 'Linear Models' ,
+            model_type=sklearn.base.is_classifier
         ))
 
         validators = self.add_submodule(
@@ -113,14 +148,52 @@ class BlockLibary(Gtk.ScrolledWindow):
             name_of_section= 'Validators' 
         )
 
-        notebook.append_page(models , Gtk.Label(label="Models"))
-        notebook.append_page(pre_processors , Gtk.Label(label="PreProcessors"))
-        notebook.append_page(columns , Gtk.Label(label="Columns"))
-        notebook.append_page(validators , Gtk.Label(label="Validators"))
+        def get_list_as_flow_list(lst):
+            scroller = Gtk.ScrolledWindow()
+            main_lst = Gtk.FlowBox()
+            main_lst.set_valign(Gtk.Align.START)
+            main_lst.set_max_children_per_line(3)
+            main_lst.set_selection_mode(Gtk.SelectionMode.NONE)
+            for child in lst:
+                main_lst.append(child)
+            scroller.set_child(main_lst)
+            scroller.set_vexpand(True)
+            scroller.set_hexpand(True)
+            return scroller
+
+
+        notebook.append_page(get_list_as_flow_list(regressors) , Gtk.Label(label="Regressor Models"))
+        notebook.append_page(get_list_as_flow_list(classifiers) , Gtk.Label(label="Classifier Models"))
+        notebook.append_page(get_list_as_flow_list(pre_processors) , Gtk.Label(label="PreProcessors"))
+        notebook.append_page(get_list_as_flow_list(columns) , Gtk.Label(label="Columns"))
+        notebook.append_page(get_list_as_flow_list(validators) , Gtk.Label(label="Validators"))
         # save as self
-        self.set_child(notebook)
+        self.append(notebook)
 
     def add_submodule(self, class_to_wrap , color , list_of_things, name_of_section , ):
+        """Adds a sklearn submodule to the class. 
+
+        Args:
+            submodule (sklearn.submodule): sklearn submodule to be parsed.
+            color (str): string color that points to a css class in the css file.
+
+        Returns:
+            Tuple(ptr_to_label , ptr_to_box)
+        """
+        new_list_of_things = []
+        for potential_class in list_of_things:
+            if not inspect.isabstract(potential_class):
+                new_list_of_things.append(potential_class)
+        # adding the classes as model blocks
+        list_gtk_items = []
+        for k in range(0 , len(new_list_of_things)):
+            curr = class_to_wrap(new_list_of_things[k] , color)
+            list_gtk_items.append(curr)
+        label_thing = Gtk.Label(label=name_of_section)
+        add_style(label_thing , 'block-label')
+        return list_gtk_items
+    
+    def add_sklearn_model(self, class_to_wrap , color , list_of_things, name_of_section, model_type):
         """Adds a sklearn submodule to the class. 
 
         Args:
@@ -138,7 +211,7 @@ class BlockLibary(Gtk.ScrolledWindow):
         # remove the abstract classes
         new_list_of_things = []
         for potential_class in list_of_things:
-            if not inspect.isabstract(potential_class):
+            if (not inspect.isabstract(potential_class)) and model_type(potential_class):
                 new_list_of_things.append(potential_class)
         # adding the classes as model blocks
         for k in range(0 , len(new_list_of_things)):
@@ -148,10 +221,9 @@ class BlockLibary(Gtk.ScrolledWindow):
             # apply a style that is a certain color
             main_box.attach(curr , x , y , 1 , 1)
         # add label
+        # process and simplify label name? 
         label_thing = Gtk.Label(label=name_of_section)
         add_style(label_thing , 'block-label')
-        #self.main_box.append(label_thing)
-        #self.main_box.append(main_box)
         return main_box
 
 

@@ -25,7 +25,6 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pickle
-import joblib
 from splash_screen import SplashScreen
 from TopMenu import TopMenuButton
 
@@ -471,17 +470,7 @@ class Main_GUI(Gtk.Application):
         window_small.show()
 
     def render_block_library(self):
-        # make a search bar
-        #search_bar = Gtk.SearchEntry()
-        #search_bar.set_placeholder_text("Search for blocks...")
-        self.block_library_var = block_libary.BlockLibary(self.main_dataframe.columns)
-        #search_bar.connect("search-changed", self.searching_block_library)
-
-        main_box = standard_box.StdBox(
-            header_box=Gtk.Box(), body_box=self.block_library_var
-        )
-
-        return main_box
+        return  block_libary.BlockLibary(self.main_dataframe.columns)
 
     def searching_block_library(self, search_entry):
         search_entry = search_entry.get_text().lower()
