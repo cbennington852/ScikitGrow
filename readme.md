@@ -39,7 +39,7 @@ Currently, there is still a lot to work on for this application, most of the cor
 
 ## Running the current GUI
 Warning; this is a work in progress, and bugs are a near guarantee. This has been tested on Linux, and nothing else. 
-To install windows (Requires https://www.msys2.org/ and pacman):
+To install windows (Requires https://www.msys2.org/ and pacman): Run the following script from within the msys2 w64 terminal.
 ```
 ./install_windows
 ```
