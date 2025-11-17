@@ -42,20 +42,18 @@ Warning; this is a work in progress, and bugs are a near guarantee. This has bee
 To install windows (Requires https://www.msys2.org/ and pacman): Run the following script from within the msys2 w64 terminal.
 ```
 ./install_windows
+./windows_run
 ```
 To install for Linux
 ```
 ./install_linux
+./linux_run
 ```
-To install for Mac (requires https://brew.sh/ )
+Mac currently not supported.
 ```
 ./install_mac
 ```
 
-To run the GUI
-```
-./run.sh
-```
 There are several other example csv's I have included, They are viewable thru the "example_datasets" folder. 
 
 
