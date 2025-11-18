@@ -40,3 +40,10 @@ def load_css_file():
             css_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
         )
+
+def display_small_popup(parent , window_name, content, width=400 , height=300):
+    window_small = Gtk.ApplicationWindow(application=parent)
+    window_small.set_title(window_name)
+    window_small.set_default_size(width, height)
+    window_small.set_child(content)
+    window_small.show()

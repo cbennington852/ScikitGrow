@@ -7,7 +7,8 @@ import traceback
 import gi
 import threading
 import utility
-
+import warnings
+warnings.filterwarnings("ignore")
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 import standard_box

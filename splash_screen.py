@@ -13,6 +13,7 @@ import standard_box
 import sklearn_engine
 import block_libary
 import os
+import seaborn as sns
 import pipeline
 import pandas as pd
 import numpy as np
@@ -47,7 +48,7 @@ class SplashScreen():
 
         # load the icon
         self.parent = parent_application
-        self.window.set_title("Dataframe")
+        self.window.set_title("")
         self.window.set_default_size(1000, 800)
 
         # setting the child panel
@@ -55,15 +56,24 @@ class SplashScreen():
         self.window.set_child(self.get_splash_screen_panel())
         self.window.show()
 
-    def get_example_dataset_panel(self):
-        example_panel = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL)
-        self.start_example('diamonds')
-        return example_panel
     
     def start_example(self , example_name):
         example_dataset = sns.load_dataset(example_name)
         self.parent.create_window(example_dataset)
         self.window.destroy()
+
+    def render_example_datasets(self):
+        self.available_datasets = sns.get_dataset_names()
+        dataset_flow_box = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL)
+        for dataset in self.available_datasets:
+            print('dataset' , dataset)
+            curr_button = Gtk.Button(label=dataset)
+            dataset_flow_box.append(curr_button)
+            curr_button.connect('clicked' , lambda x: self.start_example(str(x.get_label())))
+        scroller = Gtk.ScrolledWindow()
+        scroller.set_child(dataset_flow_box)
+        return scroller
+    
 
 
     def get_splash_screen_panel(self):
@@ -80,7 +90,7 @@ class SplashScreen():
             vexpand=True
         )
         self.add_style(example_project_btn , 'buttons')
-        example_project_btn.connect('clicked' , lambda x: self.start_example('diamonds'))
+        example_project_btn.connect('clicked' , lambda x : self.show_examples_popup())
         example_project_btn.set_child(utility.load_image_from_file("Example_dataset.svg"))
         
         # loads an example dataset into existence.
