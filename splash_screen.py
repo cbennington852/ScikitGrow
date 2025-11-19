@@ -90,7 +90,9 @@ class SplashScreen():
             vexpand=True
         )
         self.add_style(example_project_btn , 'buttons')
-        example_project_btn.connect('clicked' , lambda x : self.show_examples_popup())
+        example_project_btn.connect('clicked' , lambda x : utility.display_small_popup(
+            self.parent , "Example Datasets" , self.render_example_datasets() ,
+        ))
         example_project_btn.set_child(utility.load_image_from_file("Example_dataset.svg"))
         
         # loads an example dataset into existence.

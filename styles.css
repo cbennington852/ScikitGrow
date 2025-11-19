@@ -51,6 +51,10 @@ switch:checked slider {
   min-height: 400px;
 }
 
+.pipeline-cols {
+  
+}
+
 .pipeline-model-holder{
   margin-left: 10px;
   margin-right: 10px;

@@ -4,10 +4,8 @@ import csv
 import gi
 import inspect
 import sklearn_parameter
-import utility
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
-
 import sklearn
 
 def load_image_from_file(file_name):

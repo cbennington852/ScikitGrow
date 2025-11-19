@@ -100,5 +100,6 @@ Whereas a conference is a brisker 5 pages.
 ### 46. Copy scratch color pallette!
 http://colorswall.com/palette/239085
     
-
+### 47. Test performance for diffrnet renders, maybe switch to NGL or vulcan. 
+     - Check the render for windows, and maybe switch to NGL, GL, or Vulcan (anything but cairo)
 

@@ -26,6 +26,11 @@ import matplotlib as mpl
 import pickle
 from splash_screen import SplashScreen
 from TopMenu import TopMenuButton
+major_version = Gtk.get_major_version()
+minor_version = Gtk.get_minor_version()
+micro_version = Gtk.get_micro_version()
+
+print(f"GTK version: {major_version}.{minor_version}.{micro_version}")
 
 
 class Main_GUI(Gtk.Application):
@@ -161,7 +166,7 @@ class Main_GUI(Gtk.Application):
 
         liststore = Gtk.ListStore(*column_types)
 
-        limit = 200
+        limit = 60
         for index, row in self.main_dataframe.iterrows():
             row = [str(point) for point in row]
             liststore.append(list(row))

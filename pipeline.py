@@ -311,6 +311,7 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         box_data.attach(self.x_values_entry, 1, 0, 1,1)
         box_data.attach(y_value_label , 0, 1,1,1)
         box_data.attach(self.y_values_entry , 1 ,1 ,1 , 1)
+        utility.add_style(box_data, 'pipeline-cols')
         
 
         #============================================
