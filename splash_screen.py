@@ -3,6 +3,7 @@ import sys
 import csv
 import traceback
 import gi
+import urllib
 import utility
 
 gi.require_version("Gtk", "4.0")
@@ -63,7 +64,17 @@ class SplashScreen():
         self.window.destroy()
 
     def render_example_datasets(self):
-        self.available_datasets = sns.get_dataset_names()
+        try:
+            self.available_datasets = sns.get_dataset_names()
+        except urllib.error.URLError:
+            error_label =  Gtk.Label(label="Could not connect to the seaborne servers, please check your internet connection.")
+            utility.display_small_popup(
+                parent=self.parent,
+                content=error_label,
+                width=200,
+                height=200,
+                window_name="Error"
+            )
         dataset_flow_box = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL)
         for dataset in self.available_datasets:
             print('dataset' , dataset)

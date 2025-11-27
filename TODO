@@ -12,13 +12,7 @@
         - We should use multi-threading for the k-fold and other validation. There is built in 
         functions to do this. Example `scores = cross_val_score(model, X, y, cv=5, n_jobs=-1)`
 
-17. ### Fix major UI/UX bug where library search is in all different places.
-    - WHY: This is happening because we are just hiding the blocks that do not fit the requirement.
-    - HOW FIX: after a certian num of character, just hide the whole libary, and append / render these into a smaller horizontally scaling grid / box, rather than a grid.
 
-26. ### splash screen example datasets. 
-    - On splash screen transition to a new "page" and then have said page have a back button,
-    and on that page have a list of example datasets from seaborne.
 
 27. ### popover modifications
     - Make some of the controls not fill in the blanks.
@@ -103,3 +97,6 @@ http://colorswall.com/palette/239085
 ### 47. Test performance for diffrnet renders, maybe switch to NGL or vulcan. 
      - Check the render for windows, and maybe switch to NGL, GL, or Vulcan (anything but cairo)
 
+### 48. Organize the folder structure + move the .svg's into something that compiles are a resource.
+
+### 49. Improve the example datasets splash screen, it currently looks funny

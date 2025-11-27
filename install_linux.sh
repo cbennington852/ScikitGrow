@@ -3,5 +3,4 @@ python -m venv .venv
 source .venv/bin/activate
 pip install scikit-learn matplotlib numpy 
 pip3 install pycairo
-pip3 install pycairo
 glib-compile-resources reasources.xml --target=resources.gresource
