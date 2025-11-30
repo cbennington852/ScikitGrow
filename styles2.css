@@ -1,0 +1,136 @@
+/*
+Part of the CSS re-build, below is the draggable blocks, and what they look like at the moment. 
+*/
+.data-block {
+  background-color : #0073ff; /*Scratch Motion*/
+  margin: 10px;
+  padding: 2px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+.block-purple {
+  background-color : #8e20ff; /*Scratch Looks*/
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  border-radius: 10px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+.block-pink {
+  background-color : #dd35f6; /*Scratch Sound*/
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  border-radius: 10px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+.block-orange{
+  background-color : #ff7425; /* Scratch Lists*/
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  border-radius: 10px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+
+.block-turquoise {
+  background-color : #42ce9d;
+  margin: 10px;
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 0px;
+  min-height: 20px;
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+.block-strawberry {
+  background-color : #fc6668;  /*Scratch My Blocks*/
+  padding: 2px;
+  margin-left: 50px;
+  margin-right: 50px;
+  min-height: 20px;
+  border-radius: 10px;
+
+  min-width: 50px;
+  color: white;
+  border: none;
+}
+
+.block-validator {
+  /*Only runs recourse files thru the link below like. */
+  background-image : url('resource:///com/charlesbennington/scikitgrow/app/icon/48x48/apps/triangle_box.svg');
+  background-size: 100%; /* or contain, 100% 100%, etc. */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #00000000;
+  border: none;
+  padding: 20px;
+  min-height: 20px;
+  min-width: 50px;
+}
+
+.pipeline-model-holder-validator {
+  background-image : url('resource:///com/charlesbennington/scikitgrow/app/icon/48x48/apps/triangle_box_grey.svg');
+  background-size: 90%; /* or contain, 100% 100%, etc. */
+  background-repeat: no-repeat;
+  background-position: center;
+  min-width: 100px;
+  min-height: 40px;
+}
+
+
+/*For the frames. Each "frame" is a section of the GUI*/
+/* .frame {
+    margin: 10px;
+} */
+
+
+/*
+For all of the draggable drop downs.
+*/
+.block-dropdown-button {
+  color: white;
+  background-color: none;
+  background-image : none;
+  border: none;
+}
+
+.block-dropdown-button button.toggle {
+  border: none;
+  background-color: none;
+  color: white;
+  background-image: none;
+  border: none;
+
+}
+.block-dropdown-button button.toggle :hover {
+  border: none;
+  background-color: none;
+  background-image: none;
+  border: none;
+
+}

@@ -112,14 +112,21 @@ Block related things
   align-content: center;
   background: none;
   border: none;
-  background-color: rgb(220, 220, 220);
+  background-color: rgb(231, 3, 3);
   background-image: none;
 }
 
 .data-pipeline-cols {
+  min-width: 100px;
+  min-height: 40px;
+  align-items: center;
+  align-self: center;
+  align-content: center;
   background-color: #ededed;
-  margin-left: 10px;
+
 }
+
+
 
 .trans-background {
   all: unset

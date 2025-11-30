@@ -25,7 +25,7 @@ def add_style( gui_thing, class_name):
         gui_thing.get_style_context().add_class(class_name)
 
 def load_css_file():
-    css_file_path = "./styles.css"
+    css_file_path = "./styles2.css"
     with open(css_file_path) as f:
         # Load CSS
         css = f.read()

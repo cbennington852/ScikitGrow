@@ -7,7 +7,7 @@ import utility
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 import sklearn.model_selection as skms
-
+import pipeline
 import sklearn
 
 def add_style(gui_thing , class_name):
@@ -228,12 +228,33 @@ class BlockLibary(Gtk.Box):
 
 
     def remove_block(self, _ctrl, value, _x, _y):
-        print("dropped into the library")
-        print(_ctrl)
+        """
+        The function called when a block is dragged into the block library, this typically removes the model holder.
+
+        Args:
+            _ctrl (_type_): Gtk drop target
+            value (_type_): Model block
+            _x (_type_): final X value on the screen?
+            _y (_type_): final Y value on the screen?
+        """
+
         model_holder = value.get_parent().get_parent()
-        print(model_holder)
         if model_holder.get_parent().get_only_one_entry() == False:
             model_holder.get_parent().remove(model_holder)
+        else:
+            # remove the old holder, cus GTK is sticky, and make a new one to add to the list
+            old_holder = model_holder
+            model_parent = model_holder.get_parent()
+            new_holder = pipeline.DroppableHolder(
+                style=old_holder.style,
+                thing_to_hold=old_holder.thing_to_hold,
+                parent=old_holder.parent
+            )
+            model_parent.remove(model_holder)
+            model_parent.append(new_holder)
+
+
+            
 
 class DraggableBlock(Gtk.Box):
     """

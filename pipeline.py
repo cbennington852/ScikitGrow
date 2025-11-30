@@ -289,14 +289,14 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         #============================================
         # data section box
         #============================================
-        box_data = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
         # add text fields for the data section, each one being a x-value or y-value
         x_value_label = Gtk.Label(label="X-values")
         # making a thing with autocompletion
         self.x_values_entry = ListDroppableHolder(
             unique_serialization_name='x_values',
             style='data-pipeline-cols',
-            droppable_this_holds=block_libary.ColumnBlock
+            droppable_this_holds=block_libary.ColumnBlock,
+             orientation=Gtk.Orientation.VERTICAL
         )
         # make a y_value, with completions
         y_value_label = Gtk.Label(label='Y-values')
@@ -304,14 +304,9 @@ class SklearnPipeline(Gtk.ScrolledWindow):
             unique_serialization_name='y_values',
             style='data-pipeline-cols',
             droppable_this_holds=block_libary.ColumnBlock,
-            only_one_entry=True
+            only_one_entry=True,
+             orientation=Gtk.Orientation.VERTICAL
         )
-        # build the data section
-        box_data.attach(x_value_label , 0 , 0 ,1 ,1)
-        box_data.attach(self.x_values_entry, 1, 0, 1,1)
-        box_data.attach(y_value_label , 0, 1,1,1)
-        box_data.attach(self.y_values_entry , 1 ,1 ,1 , 1)
-        utility.add_style(box_data, 'pipeline-cols')
         
 
         #============================================
@@ -349,8 +344,10 @@ class SklearnPipeline(Gtk.ScrolledWindow):
         )
         self.box_pipeline.append(self.validator)
         # append important stuff
-        self.main.append(Gtk.Label(label="X and Y axis"))
-        self.main.append(box_data)
+        self.main.append(x_value_label)
+        self.main.append(self.x_values_entry)
+        self.main.append(y_value_label)
+        self.main.append(self.y_values_entry)
         self.main.append(self.box_pipeline)
         self.set_child(self.main)
 
