@@ -19,22 +19,6 @@
     - make some of them into switches or sliders. 
 
 
-28. ### Add a predict tab to the graph section 
-
-
-35. ### Create a way to export the model? 
-    Brainstorming.
-        - Export as a "pickle"? https://scikit-learn.org/stable/model_persistence.html
-        - Maybe also export as a python script? 
-        - ^^^ This could allow for the user to perform predictions? 
-        - We could also export a "script" to use said model
-        - We could also have a way to "export as software"
-            - where a small GUI is made to predict values using the model that the user created!
-
-    Draft 1: 
-        We embed the sklearn model in the python file as a "pickle", and then 
-        allow the user to load said model and do prediction.
-    
 
 36. ### check out a python "compiler" to bytecode ... https://nuitka.net/
     - good for packaging? 
@@ -44,7 +28,6 @@
 
 41. ### make it plot 1d classifiers with the k_fold validation
 
-40. ### Have it plot blank scatter plots n'stuff.
 
 42. ### look into how to package this 
     https://pygobject.gnome.org/devguide/packagingguide.html
@@ -81,18 +64,7 @@ Whereas a conference is a brisker 5 pages.
 - interactive learning environments
     Fees : ~3,000$
 
-- TODO: Re-write to only include the engine
-    - Foucses : automatic scikit learn stuff.
-    - Oh also automatic K-fold validation multithreading.
-        - This should automatically calculate the cases where we use multithreading, and then 
-        make a decision for the user automatically before deciding weather or not to do multithreading on k-fold validation. 
-        - Also automatic encoding and serialization
-        - Maybe also some test cases.
-        - Also make the engine more separate, and less entangled. 
-        - Maybe we have a pool of threads and then each thread gets it's own "subsection" to run on. 
 
-### 46. Copy scratch color pallette!
-http://colorswall.com/palette/239085
     
 ### 47. Test performance for diffrnet renders, maybe switch to NGL or vulcan. 
      - Check the render for windows, and maybe switch to NGL, GL, or Vulcan (anything but cairo)
@@ -100,3 +72,17 @@ http://colorswall.com/palette/239085
 ### 48. Organize the folder structure + move the .svg's into something that compiles are a resource.
 
 ### 49. Improve the example datasets splash screen, it currently looks funny
+
+### 50. Predict Tab + Adding a sort of "export as python script."
+    - Ways to save and export the scikitlearn model.
+    - Brainstorming.
+        - Export as a "pickle"? https://scikit-learn.org/stable/model_persistence.html
+        - Maybe also export as a python script? 
+        - ^^^ This could allow for the user to perform predictions? 
+        - We could also export a "script" to use said model
+        - We could also have a way to "export as software"
+            - where a small GUI is made to predict values using the model that the user created!
+
+    Draft 1: 
+        We embed the sklearn model in the python file as a "pickle", and then 
+        allow the user to load said model and do prediction.
