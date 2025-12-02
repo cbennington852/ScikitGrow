@@ -93,25 +93,36 @@ Part of the CSS re-build, below is the draggable blocks, and what they look like
   min-width: 50px;
 }
 
+/*
 .pipeline-model-holder-validator {
   background-image : url('resource:///com/charlesbennington/scikitgrow/app/icon/48x48/apps/triangle_box_grey.svg');
-  background-size: 90%; /* or contain, 100% 100%, etc. */
+  background-size: 90%; 
   background-repeat: no-repeat;
   background-position: center;
   min-width: 100px;
   min-height: 40px;
 }
+*/
 
 
 /*For the frames. Each "frame" is a section of the GUI*/
-/* .frame {
-    margin: 10px;
-} */
+ .frame {
+  margin: 10px;
+  border-radius: 10px;
+} 
 
+paned {
+  border-color: #00000000;
+}
+
+paned > separator {
+  opacity: 0;
+}
 
 /*
 For all of the draggable drop downs.
 */
+
 .block-dropdown-button {
   color: white;
   background-color: none;

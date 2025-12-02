@@ -38,7 +38,8 @@ class Main_GUI(Gtk.Application):
 
         RESOURCE_FILE = "resources.gresource"
 
-        
+        settings = Gtk.Settings.get_default()
+        settings.set_property("gtk-application-prefer-dark-theme", True)
 
         def load_resources():
             try:
@@ -70,12 +71,15 @@ class Main_GUI(Gtk.Application):
         self.right_box = Gtk.Paned(
             orientation=Gtk.Orientation.VERTICAL,
         )
+        for child in self.right_box:
+            print("HEHHEHE" , child)
         self.add_style(self.right_box, "back-area")
 
         # The main box
         self.main_box = Gtk.Paned(
             orientation=Gtk.Orientation.HORIZONTAL,
         )
+        self.main_box
         self.add_style(self.main_box, "back-area")
 
         # chart stuff
@@ -443,6 +447,7 @@ class Main_GUI(Gtk.Application):
         dialog.save(self.window, None, save_image)
 
     def theme_selected(self, button, new_theme):
+        
         mpl.rcParams.update(mpl.rcParamsDefault)
         plt.style.use(new_theme)
         try:

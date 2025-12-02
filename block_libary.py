@@ -265,7 +265,11 @@ class DraggableBlock(Gtk.Box):
         super().__init__(**kargs)
         self.data_held = data_held
         self.color = color
+        self.set_valign(Gtk.Align.CENTER)
+
         add_style(self, 'data-block')
+        self.set_vexpand(False)
+        self.set_hexpand(False)
         self.append(Gtk.Label(label=display_name))
         drag_controller = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
         drag_controller.connect("prepare", self.on_drag_prepare)
@@ -336,40 +340,36 @@ class ColumnBlock(DraggableBlock):
 
 
 
-class ModelBlock(DraggableBlock):
+class ModelBlock(Gtk.MenuButton):
     """
     This represents one draggable "block" that we can drag and drop from one section of the GUI to 
     another section of the GUI. 
     """
     def __init__(self, sklearn_model_function_call , color,  **kargs):
-        super().__init__(
-            data_held=sklearn_model_function_call,
-            color=color,
-            display_name="",
-            **kargs
-        )
+        self.data_held = sklearn_model_function_call
+        self.color = color
+        self.display_name = ""
         self.sklearn_model_function_call = sklearn_model_function_call
+        sub_body = Gtk.Popover()
         
-        # getting all possible input metrics for this function and default values
-        # make a grid of possible ones
+        
+        # Process the parameters
         self.parameters_box = Gtk.Grid()
-
-        # also wrap this in a scrollable
+        self.process_args(sklearn_model_function_call)
         scrollable_view = Gtk.ScrolledWindow(hexpand=True)
         scrollable_view.set_min_content_height(250)
         scrollable_view.set_child(self.parameters_box)
 
-        # loop over the possible input arguments
-        
-        self.process_args(sklearn_model_function_call)
-        # assemble blocks
-        sub_body = Gtk.Popover()
+        # proccess the popover
         sub_body.set_child(scrollable_view)
         scrollable_view.set_size_request(400 , 200)
-        menu_button = Gtk.MenuButton(label=sklearn_model_function_call.__name__ , popover=sub_body)
-        menu_button.get_style_context().add_class("block-dropdown-button")
-        self.append(menu_button)
 
+
+
+        super().__init__(label=sklearn_model_function_call.__name__ , popover=sub_body , **kargs)
+
+        # resolve GTK things
+        self.get_style_context().add_class("block-dropdown-button")
         drag_controller = Gtk.DragSource(actions=Gdk.DragAction.MOVE)
         drag_controller.connect("prepare", self.on_drag_prepare)
         drag_controller.connect("drag-begin", self.on_drag_begin)
@@ -377,8 +377,27 @@ class ModelBlock(DraggableBlock):
         add_style(self , f"block-{color}")
         self.block_color = color
 
+        
+        
+
     def get_value(self):
         return self.sklearn_model_function_call.__name__
+    
+    def on_drag_prepare(self, _ctrl, _x, _y):
+        item = Gdk.ContentProvider.new_for_value(self)
+        string = Gdk.ContentProvider.new_for_value(self.data_held)
+        return Gdk.ContentProvider.new_union([item, string])
+
+    def on_drag_begin(self, ctrl, _drag):
+        icon = Gtk.WidgetPaintable.new(self)
+        ctrl.set_icon(icon, 0, 0)
+
+    def on_drag_end(self, drag_source, drag, success):
+        print('source: ',drag_source, ' drag:' , drag, ' success:' , success)
+        # Check if the move was successful and perform cleanup.
+        if success and drag.get_selected_action() == Gdk.DragAction.MOVE:
+            # The widget was successfully dropped, so we can remove it from its source.
+            self.source_box.remove(self.drag_widget)
     
     def process_args(self , sklearn_model_function_call ):
         """This here defines each specific "parameter_name" to "entry"
