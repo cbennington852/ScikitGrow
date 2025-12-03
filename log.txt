@@ -22,7 +22,7 @@ dataset seaice
 dataset taxis
 dataset tips
 dataset titanic
-HEHHEHE <__gi__.GtkPanedHandle object at 0x7cc5a6d27e40 (GtkPanedHandle at 0x2dae3260)>
+HEHHEHE <__gi__.GtkPanedHandle object at 0x725fa5ab0c40 (GtkPanedHandle at 0x217585f0)>
 odict_items([('threshold', <Parameter "threshold=0.0">), ('copy', <Parameter "copy=True">)])
 Thing :  <class 'inspect.Parameter'>
 New FACTORY <class 'float'>
@@ -1772,14 +1772,6 @@ New FACTORY <class 'bool'>
 Thing :  <class 'inspect.Parameter'>
 New FACTORY <class 'NoneType'>
 odict_items([])
-<GType gchararray (64)>
-<GType gchararray (64)>
-<GType gchararray (64)>
-<GType gchararray (64)>
-<GType gchararray (64)>
-<GType gchararray (64)>
-<GType gchararray (64)>
-<GType gchararray (64)>
 <GType gchararray (64)>
 <GType gchararray (64)>
 <GType gchararray (64)>

@@ -69,6 +69,8 @@ Part of the CSS re-build, below is the draggable blocks, and what they look like
 
 .block-strawberry {
   background-color : #fc6668;  /*Scratch My Blocks*/
+  margin: 10px;
+
   padding: 2px;
   margin-left: 50px;
   margin-right: 50px;
@@ -109,7 +111,14 @@ Part of the CSS re-build, below is the draggable blocks, and what they look like
  .frame {
   margin: 10px;
   border-radius: 10px;
+  background-color: rgb(45, 45, 45);
 } 
+
+.header-box {
+    background-color: rgb(27, 27, 27);
+    min-width: 400px;
+    padding: 10px;
+}
 
 paned {
   border-color: #00000000;

@@ -18,6 +18,7 @@ import pipeline
 import pandas as pd
 import numpy as np
 import sys
+import dataframe_viewer
 import sklearn
 from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCanvas
 from matplotlib.figure import Figure
@@ -147,55 +148,9 @@ class Main_GUI(Gtk.Application):
     def render_pandas_dataframe(
         self,
     ):
+        return dataframe_viewer.DataframeViewer(self.main_dataframe)
 
-        top_control_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_size_request(300, 300)
-        scrolled_window.set_hexpand(True)
-        scrolled_window.set_vexpand(True)
-
-        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        csv_viewer_box = Gtk.Box()
-        # read csv
-        # retrieve the pandas dataframe
-        # add the top header
-        # add all of the dataframe rows.
-        # may have to make a conversion map
-        column_types = []
-        for col in self.main_dataframe.columns:
-            tmp = GObject.type_from_name("gchararray")
-            print(tmp)
-            column_types.append(tmp)
-
-        liststore = Gtk.ListStore(*column_types)
-
-        limit = 60
-        for index, row in self.main_dataframe.iterrows():
-            row = [str(point) for point in row]
-            liststore.append(list(row))
-            limit -= 1
-            if limit <= 0:
-                break
-
-        # Create a TreeView and link it to the model
-        treeview = Gtk.TreeView(model=liststore)
-
-        # Create a column for each dataframe header
-        for i, col_name in enumerate(self.main_dataframe.columns):
-            renderer = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn(col_name, renderer, text=i)
-            treeview.append_column(column)
-
-        # Add the TreeView (not the ListStore!) to the container
-        csv_viewer_box.append(treeview)
-        scrolled_window.set_child(csv_viewer_box)
-        self.add_style(scrolled_window, "csv-reader ")
-
-        main_box = standard_box.StdBox(
-            header_box=top_control_box, body_box=scrolled_window
-        )
-        return main_box
+        
 
     def process_input_file(self, filepath):
         if (isinstance(filepath , pd.DataFrame)):
