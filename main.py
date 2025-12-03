@@ -40,7 +40,7 @@ class Main_GUI(Gtk.Application):
         RESOURCE_FILE = "resources.gresource"
 
         settings = Gtk.Settings.get_default()
-        settings.set_property("gtk-application-prefer-dark-theme", True)
+        #settings.set_property("gtk-application-prefer-dark-theme", True)
 
         def load_resources():
             try:

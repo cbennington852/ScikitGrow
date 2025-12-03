@@ -54,7 +54,7 @@ class DataframeViewer(Gtk.ScrolledWindow):
             column = Gtk.TreeViewColumn(col_name, renderer, text=i)
             treeview.append_column(column)
 
-        # Add the TreeView (not the ListStore!) to the container
+        # Add the TreeView to the container
         treeview.set_hexpand(True)
         csv_viewer_box.append(treeview)
         self.set_child(csv_viewer_box)

@@ -106,17 +106,17 @@ Part of the CSS re-build, below is the draggable blocks, and what they look like
 
 
 /*For the frames. Each "frame" is a section of the GUI*/
+
  .frame {
   margin: 10px;
   border-radius: 10px;
-  background-color: rgb(45, 45, 45);
 } 
 
 .header-box {
-    background-color: rgb(27, 27, 27);
     min-width: 400px;
     padding: 10px;
 }
+    
 
 paned {
   border-color: #00000000;
