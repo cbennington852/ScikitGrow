@@ -33,6 +33,9 @@
     pip install pyinstaller
     pyinstaller --noconfirm --noconsole main.py
 
+     - This ....https://pygobject.gnome.org/guide/deploy.html
+     - Also ....https://github.com/zevlee/hello-world-gtk
+        ^^^^ looks very promising, this could potentially be the one best / easiest option? 
 
 ## Publication :: Brainstorming
 I should probably do a confrence rather than a journal. A journal would be a very long 
