@@ -45,3 +45,4 @@ def display_small_popup(parent , window_name, content, width=400 , height=300):
     window_small.set_default_size(width, height)
     window_small.set_child(content)
     window_small.show()
+    return window_small

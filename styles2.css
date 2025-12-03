@@ -70,13 +70,11 @@ Part of the CSS re-build, below is the draggable blocks, and what they look like
 .block-strawberry {
   background-color : #fc6668;  /*Scratch My Blocks*/
   margin: 10px;
-
   padding: 2px;
   margin-left: 50px;
   margin-right: 50px;
   min-height: 20px;
   border-radius: 10px;
-
   min-width: 50px;
   color: white;
   border: none;
@@ -88,12 +86,12 @@ Part of the CSS re-build, below is the draggable blocks, and what they look like
   background-size: 100%; /* or contain, 100% 100%, etc. */
   background-repeat: no-repeat;
   background-position: center;
-  background-color: #00000000;
   border: none;
   padding: 20px;
   min-height: 20px;
   min-width: 50px;
 }
+
 
 /*
 .pipeline-model-holder-validator {

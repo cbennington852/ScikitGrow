@@ -62,6 +62,7 @@ class SplashScreen():
         example_dataset = sns.load_dataset(example_name)
         self.parent.create_window(example_dataset)
         self.window.destroy()
+        self.small_popup.destroy()
 
     def render_example_datasets(self):
         try:
@@ -75,17 +76,28 @@ class SplashScreen():
                 height=200,
                 window_name="Error"
             )
-        dataset_flow_box = Gtk.FlowBox(orientation=Gtk.Orientation.VERTICAL)
+        dataset_flow_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        disclaimer_label = Gtk.Label(label="""Below are free example datasets from seaborne, these are intended to be teaching examples.""")
+        disclaimer_label.set_wrap(True)
+        dataset_flow_box.append(disclaimer_label)
+        utility.add_style(dataset_flow_box , 'example_flowbox')
         for dataset in self.available_datasets:
             print('dataset' , dataset)
             curr_button = Gtk.Button(label=dataset)
+            curr_button.set_size_request(20 , -1)
+            curr_button.set_vexpand(False)
+            curr_button.set_hexpand(False)
             dataset_flow_box.append(curr_button)
+            utility.add_style(curr_button , 'example_button')
             curr_button.connect('clicked' , lambda x: self.start_example(str(x.get_label())))
         scroller = Gtk.ScrolledWindow()
         scroller.set_child(dataset_flow_box)
         return scroller
     
-
+    def display_small_popup(self , button):
+        self.small_popup = utility.display_small_popup(
+            self.parent , "Example Datasets" , self.render_example_datasets() ,
+        )
 
     def get_splash_screen_panel(self):
         main_panel = Gtk.Grid(
@@ -101,9 +113,7 @@ class SplashScreen():
             vexpand=True
         )
         self.add_style(example_project_btn , 'buttons')
-        example_project_btn.connect('clicked' , lambda x : utility.display_small_popup(
-            self.parent , "Example Datasets" , self.render_example_datasets() ,
-        ))
+        example_project_btn.connect('clicked' , self.display_small_popup)
         example_project_btn.set_child(utility.load_image_from_file("Example_dataset.svg"))
         
         # loads an example dataset into existence.
