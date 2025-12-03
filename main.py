@@ -148,7 +148,11 @@ class Main_GUI(Gtk.Application):
     def render_pandas_dataframe(
         self,
     ):
-        return dataframe_viewer.DataframeViewer(self.main_dataframe)
+        curr_frame = standard_box.StdBox(
+            header_box=Gtk.Box(),
+            body_box=dataframe_viewer.DataframeViewer(self.main_dataframe)
+        )
+        return curr_frame
 
         
 
