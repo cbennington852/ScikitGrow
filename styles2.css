@@ -126,6 +126,12 @@ paned > separator {
   opacity: 0;
 }
 
+switch slider {
+  background-color: rgb(255, 255, 255);
+  background-image: none;
+  border-radius: 15px;
+}
+
 /*
 For all of the draggable drop downs.
 */
