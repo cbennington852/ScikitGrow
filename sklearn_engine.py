@@ -17,8 +17,6 @@ from cycler import cycler
 import matplotlib
 import copy
 
-#matplotlib.use("GTK4Agg")  # Or 'GTK3Agg' for GTK3
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCanvas
