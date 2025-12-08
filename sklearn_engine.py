@@ -26,27 +26,7 @@ import pandas as pd
 import numpy as np
 
 
-class SklearnPlotter(Gtk.Notebook):
-    """A GTK notebook that contains all of the plotting info. 
-
-        self.main_sklearn_pipe() 
-        ^^^ calls the main plotting function
-
-    Args:
-        Gtk (_type_): _description_
-    """
-    def __init__(self , parent, **kargs):
-        super().__init__(**kargs)
-        # Create content for the first page
-        self.parent = parent
-        self.plotting_page = Gtk.Box()
-        plotting_page_label = Gtk.Label(label="Plot")
-        self.append_page(self.plotting_page, plotting_page_label)
-
-        # Create content for the second page
-        self.accuracy_page = Gtk.Box()
-        accuracy_page_label = Gtk.Label(label="Accuracy")
-        self.append_page(self.accuracy_page, accuracy_page_label)
+class SklearnEngine():
 
     def factorize_string_cols(self, main_dataframe , pipeline_x_values , pipeline_y_value):
         """Takes all of the string like columns and serializes them, with each unique 
@@ -57,17 +37,8 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
-        # returns as new main dataframe. 
-        print("Before making deepcopy")
-        self.og_mainframe = main_dataframe.copy(deep=True)
-        print("After making deepcopy!")
         cols = pipeline_x_values + pipeline_y_value
         for col in cols:
-            print(main_dataframe , main_dataframe.columns.tolist())
-            print(type(col))
-            # the columns are integers? or were serialized as ones.
-            #  
-            print("Type" , pd.api.types.is_string_dtype(main_dataframe[[str(col)]]))
             if pd.api.types.is_string_dtype(main_dataframe[col]):
                 codes, uniques = pd.factorize(main_dataframe[col])
                 print(codes)
@@ -108,7 +79,7 @@ class SklearnPlotter(Gtk.Notebook):
             fig, ax = plt.subplots()
             return fig
 
-    def main_sklearn_pipe(self , main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , validator,  ptr_to_button):
+    def main_sklearn_pipe(main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , validator):
         """Runs the main sklearn pipeline, filtering through the different options that
           the user could have inputted into this software. 
 
@@ -118,66 +89,29 @@ class SklearnPlotter(Gtk.Notebook):
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
-        print("Input valdiator" , validator)
-        def thread_end_tasks():
-            ptr_to_button.set_sensitive(True)
-            self.spinner.stop()
-            self.control_box_ptr.remove(self.spinner)
-            self.control_box_ptr.append(ptr_to_button)
-        # on a separate thread?
-        def sklearn_alternate_thread():
-            try:
-                main_dataframe_copy = main_dataframe.copy(deep=True)
-                main_dataframe_copy = self.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
-                # parse and get the untrained pipeline
-                self.curr_pipeline = curr_pipeline
-                self.validator = validator
+        raise ValueError("NOTE : Need to refactor this, decouple the sklearn stuff from the GUI stuff")        
 
-                # get the x and y values 
-                self.x_cols = pipeline_x_values
-                self.y_cols = pipeline_y_value
-                result_validation = self.validate_column_inputs(main_dataframe_copy ,curr_pipeline, pipeline_x_values , pipeline_y_value)
-                if result_validation:
-                    self.plot_figure_canvas(result_validation , self.plotting_page)
-                    thread_end_tasks()
-                    return 
-                self.x = main_dataframe_copy[self.x_cols]
-                self.y = main_dataframe_copy[self.y_cols].iloc[:, 0]
-                self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-                figure = self.filter_pipeline()
-                accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-                self.current_figure_plotted = figure
-                self.current_figure_accuracy = accuracy_plot
-                self.plot_figure_canvas(figure , self.plotting_page)
-                self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
-            except Exception as e:
-                traceback.print_exc()
-                msg = str(e)
-                if len(msg) > 80:
-                    msg = msg[:80]
-                
-                dialog = Gtk.AlertDialog()
-                dialog.set_message(f"{type(e).__name__}")
-                dialog.set_detail(msg)
-                dialog.set_modal(True)
-                dialog.set_buttons(["OK"])
-                GLib.idle_add(dialog.show)
-            thread_end_tasks()
+        # make a copy of the dataframe
+        main_dataframe_copy = main_dataframe.copy(deep=True)
+        # If user wants a string, try to factorize.
+        main_dataframe_copy = SklearnEngine.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
+        # Preform basic validation on the inputs
+        result_validation = SklearnEngine.validate_column_inputs(main_dataframe_copy ,curr_pipeline, pipeline_x_values , pipeline_y_value)
 
-        self.control_box_ptr = ptr_to_button.get_parent()
-        self.spinner = Gtk.Spinner()
-        utility.add_style(self.spinner , 'spinner')
-        self.spinner.start()
-        self.control_box_ptr.append(self.spinner)
-        ptr_to_button.set_sensitive(False)
-        sklearn_thread_1 = threading.Thread(target=sklearn_alternate_thread)
-        sklearn_thread_1.start()
-
-        # plotting stuff...
+        if result_validation:
+            return result_validation
         
 
+        self.x = main_dataframe_copy[self.x_cols]
+        self.y = main_dataframe_copy[self.y_cols].iloc[:, 0]
+        self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        figure = self.filter_pipeline()
+        accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        self.current_figure_plotted = figure
+        self.current_figure_accuracy = accuracy_plot
+        self.plot_figure_canvas(figure , self.plotting_page)
+        self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
 
-       
         
     def filter_accuracy_plotting(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         """
@@ -208,67 +142,24 @@ class SklearnPlotter(Gtk.Notebook):
         else:
             raise ValueError("Unexpected error ... Last model not regressor or classifier")
         
-    def add_style( gui_thing, class_name):
-        gui_thing.get_style_context().add_class(class_name)
-        
-    def plot_figure_canvas(self, fig , page):
-        """Small helper function to plot the output from matplotlib into GTK. 
 
-        Args:
-            fig (Figure): The matplotlib figure output
-            page (Gtk.Page): The pointer to the notebook page we want to plot to.
-        """
-        # remove prior plotting
-        for child in page:
-            page.remove(child)
-
-        
-
-        # creating overlay with the full screen button
-        overlay = Gtk.Overlay()
-        overlay.set_child(FigureCanvas(fig))
-        full_screen_button = Gtk.Button()
-        icon_path = utility.get_resource_path("full_screen.svg") 
-        image = Gtk.Image.new_from_file(icon_path)
-        SklearnPlotter.add_style(image , 'full_screen_button_image')
-        full_screen_button.set_child(image)
-        full_screen_button.set_size_request(30 , 30)
-        SklearnPlotter.add_style(full_screen_button , 'trans_button')
-        full_screen_button.set_halign(Gtk.Align.END)
-        full_screen_button.set_valign(Gtk.Align.START)
-        full_screen_button.set_margin_bottom(10)
-        full_screen_button.connect("clicked" , lambda x : self.create_window(fig))
-        overlay.add_overlay(full_screen_button)
-        page.append(overlay)  # a Gtk.DrawingArea
-        print("Done plotting ")
-
-    
-    
-    # helper to start a full screen thing
-    def create_window(self , fig):
-        new_fig = copy.deepcopy(fig)
-        new_window = Gtk.ApplicationWindow(application=self.parent)
-        new_window.set_title("")
-        new_window.set_default_size(1500, 1000)
-        new_window.set_child(FigureCanvas(new_fig))
-        new_window.show()
-
-
-    def validate_column_inputs(self, main_dataframe, curr_pipeline, pipeline_x_values , pipeline_y_value):
+    def validate_column_inputs(main_dataframe, curr_pipeline, pipeline_x_values , pipeline_y_value):
         lst_cols = main_dataframe.columns
         # If model empty do empty plot
-        if len(self.curr_pipeline.steps) == 0:
-            return self.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+        if len(curr_pipeline.steps) == 0:
+            return EngineResults(
+                visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value),
+                accuracy_plot=None
+            )
 
         # If user added a pre-processor but not a model do an empty plot.
-        last_step_name , last_step_model = self.curr_pipeline.steps[-1]
+        last_step_name , last_step_model = curr_pipeline.steps[-1]
         if not (sklearn.base.is_classifier(last_step_model) or sklearn.base.is_regressor(last_step_model)):
-            return self.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
-        # if user has an duplicate column
-        if len(set(pipeline_x_values)) < len(pipeline_x_values):
-            pipeline_x_values = list(set(pipeline_x_values))
-            self.x_cols = pipeline_x_values
-
+            return EngineResults(
+                visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value),
+                accuracy_plot=None
+            )
+       
         # check to make sure cols are from this dataset.
         for x_col in pipeline_x_values:
             if x_col not in lst_cols:
@@ -326,7 +217,7 @@ class SklearnPlotter(Gtk.Notebook):
         print("Validator ...." , self.validator)
         self.curr_pipeline.fit(self.x , self.y)
         if (self.validator != []) and (not isinstance(self.validator[0][1] , block_libary.NoValidator)):
-            self.y_preds = SklearnPlotter.k_fold_general_threads(
+            self.y_preds = SklearnEngine.k_fold_general_threads(
                 model=self.curr_pipeline,
                 kf=self.validator[0][1],
                 X=self.x,
@@ -549,3 +440,13 @@ class SklearnPlotter(Gtk.Notebook):
         ax.set_ylabel(f"{y_cols[0]}")
         ax.legend(loc='upper left')
         return fig
+
+
+class EngineResults():
+    """
+    Small class to hold the results from the engine.
+    """
+    def __init__(self, visual_plot , accuracy_plot):
+        self.visual_plot = visual_plot
+        self.accuracy_plot = accuracy_plot
+        

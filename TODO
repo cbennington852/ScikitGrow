@@ -88,3 +88,8 @@ Whereas a conference is a brisker 5 pages.
     Draft 1: 
         We embed the sklearn model in the python file as a "pickle", and then 
         allow the user to load said model and do prediction.
+
+
+### 51. Make pretty mac theme permanent
+
+### 
