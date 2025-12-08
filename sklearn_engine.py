@@ -8,23 +8,35 @@ import threading
 from splash_screen import SplashScreen
 import utility
 import block_libary
-
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 from cycler import cycler
-
-
 import matplotlib
 import copy
-
 import matplotlib.pyplot as plt
-
 from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCanvas
 from matplotlib.figure import Figure
 import sklearn
 import pandas as pd
 import numpy as np
+from abc import ABC , abstractmethod
 
+class ModelTrainingResults():
+    """
+    Small class to hold the results from training the model.
+    """
+    def __init__(self , y_predictions , trained_model):
+        self.y_predictions = y_predictions
+        self.trained_model = trained_model
+
+class EngineResults():
+    """
+    Small class to hold the results from the engine.
+    """
+    def __init__(self, visual_plot , accuracy_plot):
+        self.visual_plot = visual_plot
+        self.accuracy_plot = accuracy_plot
+        
 
 class SklearnEngine():
 
@@ -46,15 +58,15 @@ class SklearnEngine():
                 main_dataframe[col] = codes
         return main_dataframe
     
-    def plot_no_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+    def plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
         # load x and y_values        
-        self.x = main_dataframe[self.x_cols]
-        self.y = main_dataframe[self.y_cols].iloc[:, 0]
+        x = main_dataframe[pipeline_x_values]
+        y = main_dataframe[pipeline_y_value].iloc[:, 0]
         if (len(pipeline_x_values) == 1 and len(pipeline_y_value) == 1):
             # 2d scatterplot.
             fig, ax = plt.subplots()
-            color_cycle = self.get_color_map()
-            ax.scatter(self.x , self.y , color=color_cycle[0], label=f"Dataset")
+            color_cycle = SklearnEngine.get_color_map()
+            ax.scatter(x , y , color=color_cycle[0], label=f"Dataset")
             ax.set_title(f"{pipeline_x_values[0]} and {pipeline_y_value[0]}")
             ax.set_xlabel(f"{pipeline_x_values[0]}")
             ax.set_ylabel(f"{pipeline_y_value[0]}")
@@ -62,12 +74,10 @@ class SklearnEngine():
             return fig
         
         elif (len(pipeline_x_values) == 2 and len(pipeline_y_value) == 1):
-            x = self.x
-            y = self.y
-            color_cycle = self.get_color_map()
+            color_cycle = SklearnEngine.get_color_map()
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            cmap = self.get_clf_color_map()
+            cmap = SklearnEngine.get_clf_color_map()
             ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[1], edgecolor='k')
             ax.set_xlabel(f"{pipeline_x_values[0]}")
             ax.set_ylabel(f"{pipeline_x_values[1]}")
@@ -79,7 +89,7 @@ class SklearnEngine():
             fig, ax = plt.subplots()
             return fig
 
-    def main_sklearn_pipe(main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , validator):
+    def main_sklearn_pipe(main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , validator) -> EngineResults:
         """Runs the main sklearn pipeline, filtering through the different options that
           the user could have inputted into this software. 
 
@@ -89,7 +99,7 @@ class SklearnEngine():
             pipeline_x_values ([str]): _description_
             pipeline_y_value ([str]): _description_
         """
-        raise ValueError("NOTE : Need to refactor this, decouple the sklearn stuff from the GUI stuff")        
+        #raise ValueError("NOTE : Need to refactor this, decouple the sklearn stuff from the GUI stuff")        
 
         # make a copy of the dataframe
         main_dataframe_copy = main_dataframe.copy(deep=True)
@@ -101,46 +111,45 @@ class SklearnEngine():
         if result_validation:
             return result_validation
         
+        # Gather the x and y data
+        x = main_dataframe_copy[pipeline_x_values]
+        y = main_dataframe_copy[pipeline_y_value].iloc[:, 0]
 
-        self.x = main_dataframe_copy[self.x_cols]
-        self.y = main_dataframe_copy[self.y_cols].iloc[:, 0]
-        self.train_model(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-        figure = self.filter_pipeline()
-        accuracy_plot = self.filter_accuracy_plotting(main_dataframe_copy , curr_pipeline , pipeline_x_values , pipeline_y_value)
-        self.current_figure_plotted = figure
-        self.current_figure_accuracy = accuracy_plot
-        self.plot_figure_canvas(figure , self.plotting_page)
-        self.plot_figure_canvas(accuracy_plot , self.accuracy_page)
+        # Train the model
+        model_training_results = SklearnEngine.train_model(
+            main_dataframe=main_dataframe_copy, 
+            curr_pipeline=curr_pipeline, 
+            x=x,
+            y=y,
+            validator=validator
+        )
 
-        
-    def filter_accuracy_plotting(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
-        """
-        ACCURACY ONLY 
-        Filters the dataset based on the pipeline, trying to see specifically what type
-        of input the user wants to get back out at them. 
-
-        Args:
-            main_dataframe (pd.Dataframe): main inputted dataframe
-            curr_pipeline (sklearn.pipeline): sklearn_pipeline object
-            pipeline_x_values ([str]): _description_
-            pipeline_y_value ([str]): _description_
-
-        Raises:
-            ValueError: Not a regressor or classifier
-
-        Returns:
-            Figure: the figure containing the chart to be plotted. 
-        """
-        print(curr_pipeline , "sfdsd")
-        
         last_step_name , last_step_model = curr_pipeline.steps[-1]
-        # if is classifier 
+
         if sklearn.base.is_classifier(last_step_model):
-            return self.classifier_accuracy_plot(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+            return SklearnEngine.ClassificationPlotterFilter.main_filter(
+                main_dataframe ,
+                curr_pipeline , 
+                pipeline_x_values , 
+                pipeline_y_value ,
+                x , 
+                y , 
+                model_training_results.trained_model,
+                model_training_results.y_predictions
+            )
         elif sklearn.base.is_regressor(last_step_model):
-            return self.regressor_accuracy_plot(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value)
+            return SklearnEngine.RegressionPlotterFilter.main_filter(
+                main_dataframe ,
+                curr_pipeline , 
+                pipeline_x_values , 
+                pipeline_y_value ,
+                x , 
+                y , 
+                model_training_results.trained_model,
+                model_training_results.y_predictions
+            )
         else:
-            raise ValueError("Unexpected error ... Last model not regressor or classifier")
+            raise ValueError("Sci-kit Engine Internal Error ... Not a recognized model type.")
         
 
     def validate_column_inputs(main_dataframe, curr_pipeline, pipeline_x_values , pipeline_y_value):
@@ -196,7 +205,7 @@ class SklearnEngine():
             thread.join()
         return final_y 
 
-    def train_model(self , main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+    def train_model( main_dataframe , curr_pipeline , x , y , validator) -> ModelTrainingResults:
         """
         Trains the model using the main dataframe and pipeline_x_values. This is also
         where we will see what type of test train split the user has implemented into 
@@ -209,112 +218,302 @@ class SklearnEngine():
             pipeline_y_value ([str]): _description_
 
         Returns: 
-            Tuple(trained_model)
+            Trained Model
         """
-        # later here we will get and fit the training validation thing the user wants. 
-        print("X vals" , self.x)
-        print("Y Vals" , self.y)
-        print("Validator ...." , self.validator)
-        self.curr_pipeline.fit(self.x , self.y)
-        if (self.validator != []) and (not isinstance(self.validator[0][1] , block_libary.NoValidator)):
-            self.y_preds = SklearnEngine.k_fold_general_threads(
-                model=self.curr_pipeline,
-                kf=self.validator[0][1],
-                X=self.x,
-                y=self.y
+        # Train the mode        
+        curr_pipeline.fit(x , y)
+        # Apply the user specified validator
+        if (validator != []) and (not isinstance(validator[0][1] , block_libary.NoValidator)):
+            y_preds = SklearnEngine.k_fold_general_threads(
+                model=curr_pipeline,
+                kf=validator[0][1],
+                X=x,
+                y=y
             )
         else:
-            self.curr_pipeline.fit(self.x , self.y)
-            self.y_preds = self.curr_pipeline.predict(self.x)
+            y_preds = curr_pipeline.predict(x)
 
-    def get_color_map(self):
+        # Return 
+        return ModelTrainingResults(
+            y_predictions=y_preds,
+            trained_model=curr_pipeline
+        )
+    
+    def get_color_map():
         return plt.rcParams['axes.prop_cycle'].by_key()['color']
     
-    def get_clf_color_map(self):
-        return matplotlib.colors.ListedColormap(self.get_color_map())
+    def get_clf_color_map():
+        return matplotlib.colors.ListedColormap(SklearnEngine.get_color_map())
+    
+    # We have two classes, one for classifier and the other for plotting.
+    # Plotter Filter
+    # Classifier Plotter Filter
+    # Regression Plotter Filter
 
-    def filter_pipeline(self):
+    def get_scatter_alpha_value(number_data_points , minimum_alpha_value=0.1 , factor=3000):
+        """Calculates the alpha value based on the number of data points in a dataset
         """
-        PLOTTING ONLY 
-        Filters the dataset based on the pipeline, trying to see specifically what type
-        of input the user wants to get back out at them. 
+        first_part = (-1 * ((number_data_points ** 2) / factor)) + 100
+        return max(first_part / 100 , minimum_alpha_value)
 
-        Args:
-            main_dataframe (pd.Dataframe): main inputted dataframe
-            curr_pipeline (sklearn.pipeline): sklearn_pipeline object
-            pipeline_x_values ([str]): _description_
-            pipeline_y_value ([str]): _description_
+    class PlotterFilter(ABC):
+        @abstractmethod
+        def main_filter(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ) -> EngineResults:
+            pass
 
-        Raises:
-            ValueError: Not a regressor or classifier
 
-        Returns:
-            Figure: the figure containing the chart to be plotted. 
-        """
-        last_step_name , last_step_model = self.curr_pipeline.steps[-1]
-        # if is classifier 
-        if sklearn.base.is_classifier(last_step_model):
-            # render a classifier graph. 
-            if len(self.x.columns) == 1:
-                return self.plot_classifier_1d(self.x , self.y , self.y_preds , self.curr_pipeline , self.x_cols , self.y_cols)
-            elif len(self.x.columns) == 2:
-                return self.plot_classifier_2d(self.x , self.y , self.y_preds , self.curr_pipeline , self.x_cols , self.y_cols)
+    class ClassificationPlotterFilter(PlotterFilter):
+        def main_filter(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ) -> EngineResults:
+            visual_plot = None
+            accuracy_plot = SklearnEngine.ClassificationPlotterFilter.accuracy_plot(
+                main_dataframe ,
+                curr_pipeline , 
+                pipeline_x_values , 
+                pipeline_y_value ,
+                x , 
+                y , 
+                trained_model,
+                y_predictions
+            )
+            if len(x.columns) == 1:
+                visual_plot = SklearnEngine.ClassificationPlotterFilter.plot_1d(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
+            elif len(x.columns) == 2:
+                visual_plot = SklearnEngine.ClassificationPlotterFilter.plot_2d(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
+            elif len(x.columns) == 3:
+                visual_plot =  SklearnEngine.ClassificationPlotterFilter.plot_3(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
             else:
-                return self.plot_classifier_n_plus(self.x , self.y , self.y_preds , self.curr_pipeline , self.x_cols , self.y_cols)
+                visual_plot =  SklearnEngine.ClassificationPlotterFilter.plot_3_plus(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
+            return EngineResults(
+                visual_plot=visual_plot,
+                accuracy_plot=accuracy_plot
+            )
+            
+        def accuracy_plot(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ):
+            fig, ax = plt.subplots()
+            accuracy = sklearn.metrics.accuracy_score(y, y_predictions)
+            ax.bar(['Accuracy'], [accuracy])
+            ax.set_ylim(0, 1)
+            ax.set_ylabel('Accuracy')
+            ax.set_title('Model Accuracy')
+            ax.text(0, accuracy / 2, f"{accuracy:.2%}", ha='center', va='center', fontsize=12)
+            return fig
+            
+        def plot_1d(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                ):
+            max_margin = 0.5
+            x_min, x_max = x.min() - max_margin, x.max() + max_margin
+            y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
+            x_plot = np.linspace(x_min, x_max, 1000).reshape(-1, 1)
+            y_preds = trained_model.predict(x_plot)
+            fig, ax = plt.subplots()
+            n_classes = len(np.unique(y_enc))
+            cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
+            ax.scatter(X, y, c=y_enc, cmap=cmap,
+                        edgecolor='k', marker='o', s=50, label=f'')
+            ax.plot(x_plot[:, 0], y_preds, label='Hard Predicted Class (0 or 1)',
+                    color='blue', linewidth=3)
+            switch_index = np.argmax(y_preds)
+            decision_boundary_x = x_plot[switch_index, 0]
+            ax.axvline(x=decision_boundary_x, color='red', linestyle='--',
+                        label=f'Decision Boundary (x={decision_boundary_x:.2f})')
+            ax.set_title(f'Classifier for {pipeline_y_value[0]}')
+            ax.set_xlabel(f'{pipeline_y_value[0]}')
+            ax.set_ylabel(f'{pipeline_y_value[0]}')
+            ax.legend(loc='upper left')
+            ax.grid(True, axis='x', linestyle='--', alpha=0.6)
+            return fig
+        
+        def plot_2d(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                ):
+            y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
+            # Plot the decision boundary
+            fig, ax = plt.subplots()
+            n_classes = len(np.unique(y_enc))
+            #cmap = self.get_clf_color_map()
+            cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
+            sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
+                trained_model,
+                x,
+                response_method="predict",
+                cmap=cmap,
+                ax=ax
+            )
 
-        elif sklearn.base.is_regressor(last_step_model):
-            # render a regressor graph
-            if len(self.x.columns) == 1:
-                return self.plot_single_regression(self.x , self.y , self.y_preds , self.x_cols , self.y_cols)
-            elif len(self.x.columns) == 2:
-                return self.plot_3d_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
-            else:
-                return self.plot_n_plus_regressor(self.x , self.y, self.curr_pipeline, self.x_cols , self.y_cols)
-                
-        else:
-            raise ValueError("Ending result is neither a classifier or regressor. ")
-        # making the graph / chart
+            # Plot the data points
+            ax.scatter(x.iloc[:, 0], x.iloc[:, 1], cmap=cmap,  c=y_enc, edgecolors='k')
+            ax.set_title(f"Classifier for {pipeline_y_value[0]}")
+            ax.set_xlabel(f"{pipeline_x_values[0]}")
+            ax.set_ylabel(f"{pipeline_x_values[1]}")
+            handles = []
+            classes = np.unique(main_dataframe[pipeline_y_value])
+            classes_color_encoding = np.unique(y_enc)
+            for x in range(0 , len(classes)):
+                class_val = classes_color_encoding[x]
+                handles.append(
+                    ax.plot([], [], marker='o', linestyle='', color=cmap(class_val),
+                            label=f'Class {classes[x]}', markeredgecolor='k')
+                )
+            ax.legend(loc='upper left')
+            return fig
+        
+        def plot_3(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                ):
+            pass
+        #https://www.researchgate.net/figure/3-Dimensional-surface-plot-of-classification-accuracy-against-spread-and-pattern-numbers_fig1_273402360
+        # shows how to do this.
+
+        def plot_4_plus(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                ):
+            pass
+        # Not really possible, but we could have it return a blank plot.
 
 
-    #=============================================================
-    # sections of graphing
-    #=============================================================
 
-    def classifier_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
-        fig, ax = plt.subplots()
-        accuracy = sklearn.metrics.accuracy_score(self.y, self.y_preds)
-        ax.bar(['Accuracy'], [accuracy], color='skyblue')
+    class RegressionPlotterFilter(PlotterFilter):
+        def main_filter(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ) -> EngineResults:
+            accuracy = SklearnEngine.RegressionPlotterFilter.accuracy(main_dataframe ,
+                curr_pipeline , 
+                pipeline_x_values , 
+                pipeline_y_value ,
+                x , 
+                y , 
+                trained_model,
+                y_predictions
+            )
 
-        # Add text label and formatting
-        ax.set_ylim(0, 1)
-        ax.set_ylabel('Accuracy')
-        ax.set_title('Model Accuracy')
-        ax.text(0, accuracy / 2, f"{accuracy:.2%}", ha='center', va='center', fontsize=12, color='black')
 
-        # Return the figure
-        return fig
+        def accuracy(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ):
+            fig, ax = plt.subplots()
+            ax.scatter(y, y_predictions, alpha=SklearnEngine.get_scatter_alpha_value(len(x)), edgecolor='k', label='Predicted Points')
+            ax.plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2, label='Prefect Prediction')
+            ax.set_xlabel("Actual Values")
+            ax.set_ylabel("Predicted Values")
+            ax.legend()
+            ax.grid(True)
+            textstr = (
+                f"\nPredicted vs. Actual Values"
+                f"\nRMSE                : {sklearn.metrics.mean_squared_error(y, y_predictions):.2f}" + 
+                f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(y, y_predictions):.2f}" + 
+                f"\nr2                  : {sklearn.metrics.r2_score(y, y_predictions):.2f}"
+            )
+            ax.set_title(textstr)
+            return fig
+    
 
-    def regressor_accuracy_plot(self, main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
-
-        rmse = sklearn.metrics.mean_squared_error(self.y, self.y_preds)
-
-        fig, ax = plt.subplots()
-        ax.scatter(self.y, self.y_preds, alpha=0.6, color='teal', edgecolor='k', label='Predicted Points')
-        ax.plot([self.y.min(), self.y.max()], [self.y.min(), self.y.max()], 'r--', lw=2, label='Ideal Fit (y = x)')
-        ax.set_xlabel("Actual Values")
-        ax.set_ylabel("Predicted Values")
-        ax.legend()
-        ax.grid(True)
-        # adding other stuff
-        textstr = (
-            f"\nPredicted vs. Actual Values"
-            f"\nRMSE                : {rmse}" + 
-            f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(self.y, self.y_preds):.2f}" + 
-            f"\nr2                  : {sklearn.metrics.r2_score(self.y, self.y_preds):.2f}"
-        )
-        ax.set_title(textstr)
-        print("accuracy")
-        return fig
+       
     
     def plot_n_plus_regressor(self , x , y , model ,  x_cols , y_cols):
         fig, ax = plt.subplots()
@@ -365,70 +564,7 @@ class SklearnEngine():
     def plot_classifier_n_plus(self, x , y, y_pred, clf, x_cols , y_cols ):
         pass
 
-    def plot_classifier_1d(self, X , y, y_pred, clf, x_cols , y_cols ):
-        max_margin = 0.5
-        x_min, x_max = X.min() - max_margin, X.max() + max_margin
-        y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
-        x_plot = np.linspace(x_min, x_max, 1000).reshape(-1, 1)
-        y_preds = clf.predict(x_plot)
-        fig, ax = plt.subplots()
-        n_classes = len(np.unique(y_enc))
-        cmap = ListedColormap(self.get_clf_color_map().colors[:n_classes])
-        ax.scatter(X, y, c=y_enc, cmap=cmap,
-                    edgecolor='k', marker='o', s=50, label=f'')
-
-        # Plot the hard predicted class line (The step function)
-        ax.plot(x_plot[:, 0], y_preds, label='Hard Predicted Class (0 or 1)',
-                color='blue', linewidth=3)
-
-        switch_index = np.argmax(y_preds)
-        decision_boundary_x = x_plot[switch_index, 0]
-
-        ax.axvline(x=decision_boundary_x, color='red', linestyle='--',
-                    label=f'Decision Boundary (x={decision_boundary_x:.2f})')
-
-        # Set labels and title
-        classes = np.unique(self.og_mainframe[y_cols])
-        classes_color_encoding = np.unique(y_enc)
-        ax.set_title(f'Classifier for {y_cols[0]}')
-        ax.set_xlabel(f'{x_cols[0]}')
-        ax.set_ylabel(f'{y_cols[0]}')
-        ax.legend(loc='upper left')
-        ax.grid(True, axis='x', linestyle='--', alpha=0.6)
-        return fig
-
-    def plot_classifier_2d(self, x , y, y_pred, clf, x_cols , y_cols ):
-        y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
-        # Plot the decision boundary
-        fig, ax = plt.subplots()
-        n_classes = len(np.unique(y_enc))
-        #cmap = self.get_clf_color_map()
-        cmap = ListedColormap(self.get_clf_color_map().colors[:n_classes])
-        sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
-            clf,
-            x,
-            response_method="predict",
-            cmap=cmap,
-            ax=ax
-        )
-
-        # Plot the data points
-        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], cmap=cmap,  c=y_enc, edgecolors='k')
-        ax.set_title(f"Classifier for {y_cols[0]}")
-        ax.set_xlabel(f"{x_cols[0]}")
-        ax.set_ylabel(f"{x_cols[1]}")
-        handles = []
-        classes = np.unique(self.og_mainframe[y_cols])
-        classes_color_encoding = np.unique(y_enc)
-        print(self.og_mainframe[y_cols])
-        for x in range(0 , len(classes)):
-            class_val = classes_color_encoding[x]
-            handles.append(
-                ax.plot([], [], marker='o', linestyle='', color=cmap(class_val),
-                        label=f'Class {classes[x]}', markeredgecolor='k')
-            )
-        ax.legend(loc='upper left')
-        return fig
+    
 
     def plot_single_regression(self, x , y , y_pred , x_cols, y_cols):
         fig, ax = plt.subplots()
@@ -442,11 +578,5 @@ class SklearnEngine():
         return fig
 
 
-class EngineResults():
-    """
-    Small class to hold the results from the engine.
-    """
-    def __init__(self, visual_plot , accuracy_plot):
-        self.visual_plot = visual_plot
-        self.accuracy_plot = accuracy_plot
-        
+
+
