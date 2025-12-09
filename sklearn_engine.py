@@ -36,11 +36,14 @@ class EngineResults():
     def __init__(self, visual_plot , accuracy_plot):
         self.visual_plot = visual_plot
         self.accuracy_plot = accuracy_plot
+
+
+MESH_ALPHA=0.7
         
 
 class SklearnEngine():
 
-    def factorize_string_cols(self, main_dataframe , pipeline_x_values , pipeline_y_value):
+    def factorize_string_cols(main_dataframe , pipeline_x_values , pipeline_y_value):
         """Takes all of the string like columns and serializes them, with each unique 
         value getting a new serial number
 
@@ -408,7 +411,6 @@ class SklearnEngine():
             # Plot the decision boundary
             fig, ax = plt.subplots()
             n_classes = len(np.unique(y_enc))
-            #cmap = self.get_clf_color_map()
             cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
             sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
                 trained_model,
@@ -445,7 +447,7 @@ class SklearnEngine():
                     trained_model,
                     y_predictions
                 ):
-            pass
+            raise ValueError("TODO : Write a 3 dimensional classification visualization")
         #https://www.researchgate.net/figure/3-Dimensional-surface-plot-of-classification-accuracy-against-spread-and-pattern-numbers_fig1_273402360
         # shows how to do this.
 
@@ -459,8 +461,8 @@ class SklearnEngine():
                     trained_model,
                     y_predictions
                 ):
-            pass
-        # Not really possible, but we could have it return a blank plot.
+           fig, ax = plt.subplots()
+           return fig
 
 
 
@@ -475,7 +477,7 @@ class SklearnEngine():
             trained_model,
             y_predictions
         ) -> EngineResults:
-            accuracy = SklearnEngine.RegressionPlotterFilter.accuracy(main_dataframe ,
+            accuracy_plot = SklearnEngine.RegressionPlotterFilter.accuracy(main_dataframe ,
                 curr_pipeline , 
                 pipeline_x_values , 
                 pipeline_y_value ,
@@ -484,6 +486,150 @@ class SklearnEngine():
                 trained_model,
                 y_predictions
             )
+            visual_plot = None
+            if len(x.columns) == 1:
+                visual_plot = SklearnEngine.RegressionPlotterFilter.plot_1d(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
+            elif len(x.columns) == 2:
+                visual_plot = SklearnEngine.RegressionPlotterFilter.plot_2d(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
+            elif len(x.columns) == 3:
+                visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_3d(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
+            else:
+                visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_4_plus(
+                    main_dataframe ,
+                    curr_pipeline , 
+                    pipeline_x_values , 
+                    pipeline_y_value ,
+                    x , 
+                    y , 
+                    trained_model,
+                    y_predictions
+                )
+            return EngineResults(
+                visual_plot=visual_plot,
+                accuracy_plot=accuracy_plot
+            )
+
+
+        def plot_1d(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ):
+            fig, ax = plt.subplots()
+            color_cycle = SklearnEngine.get_color_map()
+            ax.scatter(x , y , color=color_cycle[0], label=f"Dataset", alpha=SklearnEngine.get_scatter_alpha_value(len(x)))
+            ax.plot(x , y_predictions ,  color=color_cycle[1] , label='Model predictions')
+            ax.set_title(f"{pipeline_x_values[0]} and {pipeline_y_value[0]}")
+            ax.set_xlabel(f"{pipeline_x_values[0]}")
+            ax.set_ylabel(f"{pipeline_y_value[0]}")
+            ax.legend(loc='upper left')
+            return fig
+        
+        def plot_2d(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ):
+            # Step 3: Create grid for plotting
+            x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
+            x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
+            x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
+            color_cycle = SklearnEngine.get_color_map()
+
+            # Create a DataFrame from the grid for prediction
+            grid_df = pd.DataFrame({
+                pipeline_x_values[0]: x1_grid.ravel(),
+                pipeline_x_values[1]: x2_grid.ravel()
+            })
+
+            # Step 4: Predict y values over the grid
+            y_pred = trained_model.predict(grid_df).reshape(x1_grid.shape)
+
+
+            # Step 5: Plotting
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+
+            # Plot surface
+            cmap = SklearnEngine.get_clf_color_map()
+            ax.plot_surface(x1_grid, x2_grid, y_pred,  alpha=MESH_ALPHA)
+
+            # Plot actual data points
+            ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[1], edgecolor='k')
+
+            # Labels
+            ax.set_xlabel(f"{pipeline_x_values[0]}")
+            ax.set_ylabel(f"{pipeline_x_values[1]}")
+            #ax.set_position([0.05, 0.05, 0.9, 0.9]) 
+            ax.set_zlabel(f"{pipeline_y_value[0]}")
+            ax.set_title(f"3D Surface for {pipeline_y_value[0]}")
+            return fig
+            
+        def plot_3d(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ):
+            raise ValueError("Not implemented")
+
+
+
+        
+        def plot_4d_plus(
+            main_dataframe ,
+            curr_pipeline , 
+            pipeline_x_values , 
+            pipeline_y_value ,
+            x , 
+            y , 
+            trained_model,
+            y_predictions
+        ):
+            fig, ax = plt.subplots()
+            return fig
+
 
 
         def accuracy(
@@ -512,70 +658,9 @@ class SklearnEngine():
             ax.set_title(textstr)
             return fig
     
-
        
     
-    def plot_n_plus_regressor(self , x , y , model ,  x_cols , y_cols):
-        fig, ax = plt.subplots()
-
-        ax.text(x=0.5 , y=0.5, s="Your plot is in the 4th dimension, the accuracy graph still works, " \
-                "however, the \"plot\"graph will onl show the first three dimensions", transform=ax[0].transAxes,
-                horizontalalignment='center', verticalalignment='center',)
-        return fig
-
-    def plot_3d_regressor(self , x , y , model ,  x_cols , y_cols):
-        # Step 3: Create grid for plotting
-        x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
-        x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
-        x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
-        color_cycle = self.get_color_map()
-
-        # Create a DataFrame from the grid for prediction
-        grid_df = pd.DataFrame({
-            x_cols[0]: x1_grid.ravel(),
-            x_cols[1]: x2_grid.ravel()
-        })
-
-        # Step 4: Predict y values over the grid
-        y_pred = model.predict(grid_df).reshape(x1_grid.shape)
-
-        # Step 4: Predict y values over the grid
-        y_pred = y_pred.reshape(x1_grid.shape)
-
-        # Step 5: Plotting
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-
-        # Plot surface
-        cmap = self.get_clf_color_map()
-        ax.plot_surface(x1_grid, x2_grid, y_pred,  alpha=0.7)
-
-        # Plot actual data points
-        ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[1], edgecolor='k')
-
-        # Labels
-        ax.set_xlabel(f"{x_cols[0]}")
-        ax.set_ylabel(f"{x_cols[1]}")
-        ax.set_position([0.05, 0.05, 0.9, 0.9]) 
-        ax.set_zlabel(f"{y_cols[0]}")
-        ax.set_title(f"3D Surface for {y_cols[0]}")
-        return fig
-
-    def plot_classifier_n_plus(self, x , y, y_pred, clf, x_cols , y_cols ):
-        pass
-
-    
-
-    def plot_single_regression(self, x , y , y_pred , x_cols, y_cols):
-        fig, ax = plt.subplots()
-        color_cycle = self.get_color_map()
-        ax.scatter(x , y , color=color_cycle[0], label=f"Dataset")
-        ax.plot(x , y_pred ,  color=color_cycle[1] , label='AI predictions')
-        ax.set_title(f"{x_cols[0]} and {y_cols[0]}")
-        ax.set_xlabel(f"{x_cols[0]}")
-        ax.set_ylabel(f"{y_cols[0]}")
-        ax.legend(loc='upper left')
-        return fig
+  
 
 
 

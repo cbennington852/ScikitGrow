@@ -18,6 +18,7 @@ import pipeline
 import pandas as pd
 import numpy as np
 import sys
+import sklearn_plotter
 import dataframe_viewer
 import sklearn
 from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCanvas
@@ -234,7 +235,7 @@ class Main_GUI(Gtk.Application):
 
     def higher_order_wrapper_main_sklearn_pipeline_no_error(self, _):
         try:
-            self.main_canvas.main_sklearn_pipe(
+            self.main_canvas.run_engine(
                 main_dataframe=self.main_dataframe,
                 curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
                 pipeline_x_values=self.pipeline_box.get_x_values(),
@@ -248,7 +249,7 @@ class Main_GUI(Gtk.Application):
             print(msg)
 
     def higher_order_wrapper_main_sklearn_pipeline(self, button):
-        self.main_canvas.main_sklearn_pipe(
+        self.main_canvas.run_engine(
             main_dataframe=self.main_dataframe,
             curr_pipeline=self.pipeline_box.get_sklearn_pipeline(),
             pipeline_x_values=self.pipeline_box.get_x_values(),
@@ -458,7 +459,7 @@ class Main_GUI(Gtk.Application):
                         grid_child.set_visible(False)
 
     def render_graph(self):
-        self.main_canvas = sklearn_engine.SklearnPlotter(self)
+        self.main_canvas = sklearn_plotter.SklearnPlotter(self)
         self.main_canvas.set_size_request(500, 500)
         return self.main_canvas
 

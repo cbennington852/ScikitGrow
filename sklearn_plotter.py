@@ -35,10 +35,11 @@ class SklearnPlotter(Gtk.Notebook):
     Args:
         Gtk (_type_): _description_
     """
-    def __init__(self , parent, ptr_to_button, **kargs):
+    def __init__(self , parent, **kargs):
         super().__init__(**kargs)
         # Create content for the plotting page
         self.parent = parent
+        self.thread_in_use = False
         self.plotting_page = Gtk.Box()
         plotting_page_label = Gtk.Label(label="Plot")
         self.append_page(self.plotting_page, plotting_page_label)
@@ -53,7 +54,6 @@ class SklearnPlotter(Gtk.Notebook):
         prediction_label = Gtk.Label(label="Predict")
         self.append_page(self.prediction_page, prediction_label)
 
-        self.ptr_to_button = ptr_to_button
 
      # helper to start a full screen thing
     def create_window(self , fig):
@@ -64,7 +64,11 @@ class SklearnPlotter(Gtk.Notebook):
         new_window.set_child(FigureCanvas(new_fig))
         new_window.show()
 
-    def run_engine(self , main_dataframe , pipeline_x_values , pipeline_y_value , curr_pipeline , validator ):
+    def run_engine(self , main_dataframe , pipeline_x_values , pipeline_y_value , curr_pipeline , validator, ptr_to_button ):
+        # kills this if the thread is occupied
+        self.ptr_to_button = ptr_to_button
+        if self.thread_in_use:
+            return 
         def internal_run_engine():
             try:
                 sklearn_results = sklearn_engine.SklearnEngine.main_sklearn_pipe(
@@ -74,18 +78,16 @@ class SklearnPlotter(Gtk.Notebook):
                     curr_pipeline=curr_pipeline,
                     validator=validator
                 )
+                self.plot_figure_canvas(
+                    sklearn_results.visual_plot,
+                    self.plotting_page
+                )
+                self.plot_figure_canvas(
+                    sklearn_results.accuracy_plot,
+                    self.accuracy_page
+                )
             except Exception as e:
-                traceback.print_exc()
-                msg = str(e)
-                if len(msg) > 80:
-                    msg = msg[:80]
-                
-                dialog = Gtk.AlertDialog()
-                dialog.set_message(f"{type(e).__name__}")
-                dialog.set_detail(msg)
-                dialog.set_modal(True)
-                dialog.set_buttons(["OK"])
-                GLib.idle_add(dialog.show)
+                utility.display_error_popup(e)
             self.thread_end_tasks()
 
         self.control_box_ptr = self.ptr_to_button.get_parent()
@@ -95,15 +97,15 @@ class SklearnPlotter(Gtk.Notebook):
         self.control_box_ptr.append(self.spinner)
         self.ptr_to_button.set_sensitive(False)
         sklearn_thread_1 = threading.Thread(target=internal_run_engine)
+        self.thread_in_use = True
         sklearn_thread_1.start()
 
-        raise ValueError("Not working yet")
-    
     def thread_end_tasks(self):
-            self.ptr_to_button.set_sensitive(True)
-            self.spinner.stop()
-            self.control_box_ptr.remove(self.spinner)
-            self.control_box_ptr.append(self.ptr_to_button)
+        self.ptr_to_button.set_sensitive(True)
+        self.spinner.stop()
+        self.control_box_ptr.remove(self.spinner)
+        self.control_box_ptr.append(self.ptr_to_button)
+        self.thread_in_use = False
 
     def plot_figure_canvas(self, fig , page):
         """Small helper function to plot the output from matplotlib into GTK. 

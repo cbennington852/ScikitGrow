@@ -7,6 +7,7 @@ import sklearn_parameter
 gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, Gio, Gdk, GObject
 import sklearn
+import traceback
 
 def load_image_from_file(file_name):
         """
@@ -20,6 +21,18 @@ def get_resource_path(rel_path):
     rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)
     abs_path_to_resource = os.path.abspath(rel_path_to_resource)
     return abs_path_to_resource
+
+def display_error_popup(e):
+    traceback.print_exc()
+    msg = str(e)
+    if len(msg) > 200:
+        msg = msg[:200]
+    dialog = Gtk.AlertDialog()
+    dialog.set_message(f"{type(e).__name__}")
+    dialog.set_detail(msg)
+    dialog.set_modal(True)
+    dialog.set_buttons(["OK"])
+    GLib.idle_add(dialog.show)
 
 def add_style( gui_thing, class_name):
         gui_thing.get_style_context().add_class(class_name)

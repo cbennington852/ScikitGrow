@@ -92,7 +92,13 @@ Whereas a conference is a brisker 5 pages.
 
 ### 51. Make pretty mac theme permanent
 
-### 52 . Re-do engine
 
 ### 53. Alpha for dots determined using 
     - https://dl.acm.org/doi/10.1145/3613904.3642127#:~:text=Our%20aims%20are%20to%20test,caused%20by%20high%20point%20density.
+
+
+### 54. Have the sci-kit docs accessible thru a web window
+
+### 55. 4d meshgrid for the funny regresison
+
+https://stackoverflow.com/questions/14995610/how-to-make-a-4d-plot-with-matplotlib-using-arbitrary-data
