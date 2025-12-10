@@ -1,61 +1,60 @@
-import json
+from PyQt5.QtWidgets import QTableView, QApplication
+from PyQt5 import QAbstractTableModel, Qt, QModelIndex
 import sys
-import csv
-import traceback
-import gi
-import inspect
-import utility
-
-gi.require_version("Gtk", "4.0")
-import block_libary
-from gi.repository import GLib, Gtk, Gio, Gdk, GObject
-import sklearn
+import pandas as pd
 
 
+class PandasModel(QAbstractTableModel):
+    """A model to interface a Qt view with pandas dataframe """
 
-class DataframeViewer(Gtk.ScrolledWindow):
+    def __init__(self, dataframe: pd.DataFrame, parent=None):
+        QAbstractTableModel.__init__(self, parent)
+        self._dataframe = dataframe
 
-    def __init__(self , main_dataframe , **kargs):
-        super().__init__(**kargs)
-        self.set_size_request(300, 300)
-        self.set_hexpand(True)
-        self.set_vexpand(True)
-        self.main_dataframe = main_dataframe
+    def rowCount(self, parent=QModelIndex()) -> int:
+        """ Override method from QAbstractTableModel
 
-        self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        csv_viewer_box = Gtk.Box()
-        # read csv
-        # retrieve the pandas dataframe
-        # add the top header
-        # add all of the dataframe rows.
-        # may have to make a conversion map
-        column_types = []
-        for col in self.main_dataframe.columns:
-            tmp = GObject.type_from_name("gchararray")
-            print(tmp)
-            column_types.append(tmp)
+        Return row count of the pandas DataFrame
+        """
+        if parent == QModelIndex():
+            return len(self._dataframe)
 
-        liststore = Gtk.ListStore(*column_types)
+        return 0
 
-        limit = 60
-        for index, row in self.main_dataframe.iterrows():
-            row = [str(point) for point in row]
-            liststore.append(list(row))
-            limit -= 1
-            if limit <= 0:
-                break
+    def columnCount(self, parent=QModelIndex()) -> int:
+        """Override method from QAbstractTableModel
 
-        # Create a TreeView and link it to the model
-        treeview = Gtk.TreeView(model=liststore)
+        Return column count of the pandas DataFrame
+        """
+        if parent == QModelIndex():
+            return len(self._dataframe.columns)
+        return 0
 
-        # Create a column for each dataframe header
-        for i, col_name in enumerate(self.main_dataframe.columns):
-            renderer = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn(col_name, renderer, text=i)
-            treeview.append_column(column)
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole):
+        """Override method from QAbstractTableModel
 
-        # Add the TreeView to the container
-        treeview.set_hexpand(True)
-        csv_viewer_box.append(treeview)
-        self.set_child(csv_viewer_box)
-        utility.add_style(self, "csv-reader ")
+        Return data cell from the pandas DataFrame
+        """
+        if not index.isValid():
+            return None
+
+        if role == Qt.ItemDataRole.DisplayRole:
+            return str(self._dataframe.iloc[index.row(), index.column()])
+
+        return None
+
+    def headerData(
+        self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole
+    ):
+        """Override method from QAbstractTableModel
+
+        Return dataframe index as vertical header data and columns as horizontal header data.
+        """
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
+                return str(self._dataframe.columns[section])
+
+            if orientation == Qt.Vertical:
+                return str(self._dataframe.index[section])
+
+        return None

@@ -1,0 +1,3 @@
+scikit-learn
+PyQt5
+matplotlib

@@ -588,11 +588,10 @@ class SklearnEngine():
             ax = fig.add_subplot(111, projection='3d')
 
             # Plot surface
-            cmap = SklearnEngine.get_clf_color_map()
-            ax.plot_surface(x1_grid, x2_grid, y_pred,  alpha=MESH_ALPHA)
+            ax.plot_surface(x1_grid, x2_grid, y_pred, alpha=MESH_ALPHA)
 
             # Plot actual data points
-            ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[1], edgecolor='k')
+            ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=y, edgecolor='k')
 
             # Labels
             ax.set_xlabel(f"{pipeline_x_values[0]}")
@@ -612,7 +611,8 @@ class SklearnEngine():
             trained_model,
             y_predictions
         ):
-            raise ValueError("Not implemented")
+            fig, ax = plt.subplots()
+            return fig
 
 
 
