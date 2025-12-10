@@ -14,7 +14,7 @@ class SplashScreen(QWidget):
         self.label = Qt.QLabel("Scikit Grow")
         pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
         self.label.setPixmap(pixmap)
-        self.setWindowIcon(QIcon(":/images/Mini_Logo_Lilac_Learn_2.svg"))
+        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
         layout.addWidget(self.label)
         self.example_datasets = QPushButton("Example Datasets")
         self.import_dataset = QPushButton("Import Dataset from file")
