@@ -38,22 +38,18 @@ Currently, there is still a lot to work on for this application, most of the cor
 
 
 ## Running the current GUI
-Warning; this is a work in progress, and bugs are a near guarantee. 
-To install windows (Requires https://www.msys2.org/ and pacman): Run the following script from within the msys2 w64 terminal.
+
+Works on Linux , Windows , Mac
+Install dependencies
 ```
-./install_windows
-./windows_run
+python -m venv myenv
+pip install -r requirements.txt
 ```
-To install for Linux
+Running the GUI
 ```
-./install_linux
-./linux_run
-```
-Mac currently not supported.
-```
-./install_mac
+echo "Then activate your venv, this varies slightly from platform to platform."
+python main.py
 ```
 
-There are several other example csv's I have included, They are viewable thru the "example_datasets" folder. 
 
 

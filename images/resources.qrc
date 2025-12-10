@@ -1,0 +1,14 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/images">
+        <file>base_scratch_block_pink.svg</file>
+        <file>Full_logo_SciKit_Grow.svg</file>
+        <file>green_arrow.svg</file>
+        <file>Mini_Logo_SciKit_Grow.svg</file>
+        <file>Mini_Logo_Alantis_Learn.svg</file>
+        <file>Mini_Logo_Lilac_Learn_2.svg</file>
+        <file>triangle_box_grey.svg</file>
+        <file>triangle_box.svg</file>
+
+    </qresource>
+</RCC>

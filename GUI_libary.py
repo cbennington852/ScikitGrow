@@ -69,7 +69,7 @@ class ParameterPopup(Qt.QDialog):
             curr = None
             try:
                 curr = (parameter_name , eval(q_line_edit.text()))
-            except e:
+            except:
                 curr = (parameter_name , eval(f'\'{q_line_edit.text()}\''))
             new_parameters.append(curr)
         self.my_parent.parameters = new_parameters

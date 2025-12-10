@@ -1,7 +1,20 @@
 from PyQt5.QtWidgets import QTableView, QApplication
-from PyQt5 import QAbstractTableModel, Qt, QModelIndex
+from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex
 import sys
 import pandas as pd
+import PyQt5.QtWidgets as QtW
+
+class DataframeViewer(QtW.QTableView):
+    def __init__(self, df, **kwargs):
+        super().__init__(**kwargs)
+        self.resize(800, 500)
+        self.horizontalHeader().setStretchLastSection(True)
+        self.setAlternatingRowColors(True)
+        self.setSelectionBehavior(QTableView.SelectRows)
+        model = PandasModel(df)
+        self.setModel(model)
+        self.show()
+
 
 
 class PandasModel(QAbstractTableModel):

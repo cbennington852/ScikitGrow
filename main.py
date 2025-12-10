@@ -1,11 +1,14 @@
 import sys
 import PyQt5.QtWidgets as Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout
-import sys
 from layout_colorwidget import Color
 from GUI_libary import GUILibarySubmodule
 from sklearn_libary import SubLibary 
+from dataframe_viewer import DataframeViewer
+from GUI_splash_screen import SplashScreen
 import sklearn
+import seaborn as sns
+
 
 class MainWindow(QMainWindow):
 
@@ -14,28 +17,36 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("My App")
 
+        self.dataframe = sns.load_dataset("iris")
 
         layout = QVBoxLayout()
-
-        layout.addWidget(Color('red'))
-        layout.addWidget(Color('green'))
-        layout.addWidget(Color('blue'))
-        layout.addWidget(GUILibarySubmodule(
-            SubLibary.get_public_methods(sklearn.linear_model)
-        ))
-
-        widget = QWidget()
-        widget.setLayout(layout)
         box = Qt.QGroupBox()
         box.setLayout(layout)
+
+
+        libary = GUILibarySubmodule(
+            SubLibary.get_public_methods(sklearn.linear_model)
+        )
+        dataframeV = DataframeViewer(
+            self.dataframe
+        )
+        
+
         scroll = Qt.QScrollArea()
-        scroll.setWidget(box)
+        scroll.setWidget(libary)
         scroll.setWidgetResizable(True)
         scroll.setFixedHeight(200)
-        self.setCentralWidget(scroll)
+
+        layout.addWidget(scroll)
+        layout.addWidget(dataframeV)
+
+        
+        self.setCentralWidget(box)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
-    window = MainWindow() # Create an instance of our custom window
-    window.show() # Display the window
+    splash = SplashScreen()
+    splash.show()
+    #window = MainWindow() # Create an instance of our custom window
+    #window.show() # Display the window
     sys.exit(app.exec_()) # Start the application's event loop
