@@ -3,37 +3,46 @@ from sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag
-
-class GUILibarySubmodule(QWidget):
-    def __init__(self , sublibary : SubLibary , **kwargs):
-        super().__init__(**kwargs) 
-        self.layout = QVBoxLayout(self)
-        self.sublibary = sublibary
-        self.layout.addWidget(QLabel(self.sublibary.library_name))
-        for sklearn in self.sublibary.function_calls:
-            self.layout.addWidget(Draggable(
-                str(sklearn.__name__),
-                sklearn
-            ))
-
+from PyQt5.QtGui import QDrag , QPixmap
+import PyQt5.QtCore as QCore 
 
 
 # these are the draggable buttons
 class Draggable(QPushButton):
     def __init__(self , name, sklearn_function , **kwargs):
         super().__init__(**kwargs) 
+        self.kwargs = kwargs
+        self.name = name
         self.sklearn_function = sklearn_function
         self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
         self.setText(name)
         self.clicked.connect(self.on_button_clicked)
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drag_start_position = event.pos()
+
     def mouseMoveEvent(self, e):
         if e.buttons() == Qt.LeftButton:
             drag = QDrag(self)
             mime = QMimeData()
+            # Render this while dragging
+            pixmap = QPixmap(self.size())
+            # Tell the button to drag in the center.
+            drag.setHotSpot(self.drag_start_position) 
+            #drag.setHotSpot(center)
+            self.render(pixmap)
+            drag.setPixmap(pixmap)
+
             drag.setMimeData(mime)
             drag.exec_(Qt.MoveAction)
+
+    def copy_self(self):
+        return Draggable(
+            name=self.name,
+            sklearn_function=self.sklearn_function,
+            **self.kwargs
+        )
     
     def on_button_clicked(self):
         popover = ParameterPopup(

@@ -2,14 +2,13 @@ import sys
 import PyQt5.QtWidgets as Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout
 from layout_colorwidget import Color
-from GUI_libary import GUILibarySubmodule
+from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline
 from sklearn_libary import SubLibary 
 from dataframe_viewer import DataframeViewer
 import sklearn
 import seaborn as sns
 import image_resources
 from PyQt5.QtGui import QIcon , QPixmap
-from pipeline import Pipeline
 
 
 """
@@ -48,6 +47,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("My App")
         self.resize(800 , 600)
         self.dataframe = sns.load_dataset("iris")
+        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
 
         layout = QVBoxLayout()
