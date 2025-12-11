@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel
 from sklearn_libary import SubLibary
-import PyQt5.QtWidgets as Qt
+import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
+from PyQt5.QtCore import Qt, QMimeData
+from PyQt5.QtGui import QDrag
 
 class GUILibarySubmodule(QWidget):
     def __init__(self , sublibary : SubLibary , **kwargs):
@@ -17,6 +19,7 @@ class GUILibarySubmodule(QWidget):
 
 
 
+# these are the draggable buttons
 class Draggable(QPushButton):
     def __init__(self , name, sklearn_function , **kwargs):
         super().__init__(**kwargs) 
@@ -24,6 +27,13 @@ class Draggable(QPushButton):
         self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
         self.setText(name)
         self.clicked.connect(self.on_button_clicked)
+
+    def mouseMoveEvent(self, e):
+        if e.buttons() == Qt.LeftButton:
+            drag = QDrag(self)
+            mime = QMimeData()
+            drag.setMimeData(mime)
+            drag.exec_(Qt.MoveAction)
     
     def on_button_clicked(self):
         popover = ParameterPopup(
@@ -36,7 +46,7 @@ class Draggable(QPushButton):
 
 
 
-class ParameterPopup(Qt.QDialog):
+class ParameterPopup(QtW.QDialog):
     def __init__(self , sklearn_function , parameters, parent : Draggable,  **kwargs):
         super().__init__(**kwargs) 
         self.my_parent = parent
@@ -44,12 +54,12 @@ class ParameterPopup(Qt.QDialog):
         self.setGeometry(100, 100, 200, 100)  # x, y, width, height
         self.all_widgets = []
 
-        layout = Qt.QFormLayout()
+        layout = QtW.QFormLayout()
         label = QLabel("This is a small dialog window.")
         layout.addWidget(label)
 
         for parameter_name , default_value in parameters:
-            curr = Qt.QLineEdit()
+            curr = QtW.QLineEdit()
             curr.setText(str(default_value))
             layout.addRow(
                 parameter_name,

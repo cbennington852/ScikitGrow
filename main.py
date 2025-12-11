@@ -5,19 +5,50 @@ from layout_colorwidget import Color
 from GUI_libary import GUILibarySubmodule
 from sklearn_libary import SubLibary 
 from dataframe_viewer import DataframeViewer
-from GUI_splash_screen import SplashScreen
 import sklearn
 import seaborn as sns
+import image_resources
+from PyQt5.QtGui import QIcon , QPixmap
+from pipeline import Pipeline
+
+
+"""
+class SplashScreen(QWidget):
+    def __init__(self):
+        super().__init__()
+        
+        layout = QVBoxLayout()
+        self.setFixedSize(800 , 600)
+        self.label = Qt.QLabel("Scikit Grow")
+        pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
+        self.label.setPixmap(pixmap)
+        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
+        layout.addWidget(self.label)
+        self.example_datasets = QPushButton("Example Datasets")
+        self.import_dataset = QPushButton("Import Dataset from file")
+        layout.addWidget(self.example_datasets)
+        layout.addWidget(self.import_dataset)
+        self.setLayout(layout)
+        self.example_datasets.clicked.connect(SplashScreen.open_application_with_dataframe)
+
+    def open_application_with_dataframe(dataframe):
+        print(dataframe)
+        dataframe = sns.load_dataset("iris")
+        window = MainWindow(dataframe) # Create an instance of our custom window
+        window.show() # Display the window
+"""
+
 
 
 class MainWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self ):
         super().__init__()
 
         self.setWindowTitle("My App")
-
+        self.resize(800 , 600)
         self.dataframe = sns.load_dataset("iris")
+
 
         layout = QVBoxLayout()
         box = Qt.QGroupBox()
@@ -39,14 +70,15 @@ class MainWindow(QMainWindow):
 
         layout.addWidget(scroll)
         layout.addWidget(dataframeV)
+        layout.addWidget(Pipeline())
 
         
         self.setCentralWidget(box)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
-    splash = SplashScreen()
-    splash.show()
-    #window = MainWindow() # Create an instance of our custom window
-    #window.show() # Display the window
+    #splash = SplashScreen()
+    #splash.show()
+    window = MainWindow() # Create an instance of our custom window
+    window.show() # Display the window
     sys.exit(app.exec_()) # Start the application's event loop
