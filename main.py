@@ -2,7 +2,7 @@ import sys
 import PyQt5.QtWidgets as Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout
 from layout_colorwidget import Color
-from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline
+from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline , PipelineMother
 from sklearn_libary import SubLibary 
 from dataframe_viewer import DataframeViewer
 import sklearn
@@ -43,7 +43,6 @@ class MainWindow(QMainWindow):
 
     def __init__(self ):
         super().__init__()
-
         self.setWindowTitle("My App")
         self.resize(800 , 600)
         self.dataframe = sns.load_dataset("iris")
@@ -70,8 +69,8 @@ class MainWindow(QMainWindow):
 
         layout.addWidget(scroll)
         layout.addWidget(dataframeV)
-        layout.addWidget(Pipeline())
-
+        #layout.addWidget(Pipeline())
+        layout.addWidget(PipelineMother())
         
         self.setCentralWidget(box)
 
