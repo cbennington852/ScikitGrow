@@ -10,8 +10,7 @@ class SubLibary():
         res = []
         for function in dir(library):
             if function[0] != '_' and function[0].isupper():
-                print("Function" , function)
-                if filter_function(function):
+                if filter_function(getattr(library , function)):
                     res.append(getattr(library , function))
         return SubLibary(
             res,

@@ -4,7 +4,7 @@ import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QDrag
-import PyQt5.QtCore as QCore 
+import PyQt5.QtCore as QtCore 
 from draggable import Draggable
 from sklearn.base import is_regressor, is_classifier
 import sklearn
@@ -131,14 +131,14 @@ class PipelineSection(QtW.QGroupBox):
         elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , PipelineSection):
             e.accept()
 
-class Pipeline(QtW.QDockWidget):
-    def __init__(self, my_parent, **kwargs):
-        super().__init__("Pipeline"  , **kwargs)
-        main_box = QtW.QWidget()
+class Pipeline(QtW.QGroupBox):
+    def __init__(self, my_parent, GUI_parent ,  **kwargs):
+        super().__init__(GUI_parent, **kwargs)
         my_layout = QVBoxLayout()
         self.my_parent = my_parent
-        main_box.setLayout(my_layout)
-        self.setAllowedAreas(Qt.DockWidgetArea.NoDockWidgetArea)
+        self.setLayout(my_layout)
+        self.setStyleSheet("background-color: white;")
+        self.setFixedSize(300 , 300)
         self.preproccessor_pipe = PipelineSection(
             title="Preproccessors",
             accepting_function=lambda x : x.__module__.startswith("preprocessing")
@@ -149,36 +149,62 @@ class Pipeline(QtW.QDockWidget):
             accepting_function=lambda x : is_classifier(x) or is_regressor(x),
             max_num_models=1
         )
+        self.close_pipeline_button = QtW.QPushButton("Close pipeline")
+        self.close_pipeline_button.clicked.connect(self.remove_pipeline)
+        my_layout.addWidget(self.close_pipeline_button)
         my_layout.addWidget(self.preproccessor_pipe)
         my_layout.addWidget(self.model_pipe)
-        self.setWidget(main_box)
+
+    def remove_pipeline(self):
+        for x in range(0 , len(PipelineMother.pipelines)):
+            if PipelineMother.pipelines[x] == self:
+                del PipelineMother.pipelines[x]
+        self.deleteLater()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.offset = event.pos()
+            # Bring the dragged widget to the front of its siblings
+            self.raise_() 
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() == Qt.MouseButton.LeftButton:
+            # Calculate the new position relative to the parent widget
+            # global position of mouse - global position of parent + the offset recorded in mousePressEvent
+            # OR simpler: use mapToParent() with the current event position and subtract the initial offset
+            self.move(self.mapToParent(event.pos() - self.offset))
+
+    def mouseReleaseEvent(self, event):
+        self.offset = QPoint()
+
 
     def moveEvent(self, moveEvent):
         geo = self.my_parent.geometry()
-        print(f"Pipeline Window : {moveEvent.pos()}")
-        print(f"Pos : {self.my_parent.pos()} , Left : {self.my_parent.width()} , Right : {self.my_parent.height()}")
+        #print(f"Pipeline Window : {moveEvent.pos()}")
+        #print(f"Pos : {self.my_parent.pos()} , Left : {self.my_parent.width()} , Right : {self.my_parent.height()}")
         return super().moveEvent(moveEvent)
 
 
 class PipelineMother(QtW.QMainWindow):
+    pipelines = []
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.resize(600 , 600)
         toolbar = QtW.QToolBar()
+        self.main_thing = QtW.QWidget()
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
         self.add_pipeline_button.clicked.connect(self.add_pipeline)
         toolbar.addWidget(self.add_pipeline_button)
+        self.setCentralWidget(self.main_thing)
         self.addToolBar(toolbar)
         self.add_pipeline()
 
+
     def add_pipeline(self):
-        new_pipeline = Pipeline(self)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea,  new_pipeline)
-        new_pipeline.setFloating(True)
-        new_pipeline.resize(300 , 300)
+        new_pipeline = Pipeline(self , self.main_thing)
+        new_pipeline.move(30 , 30)
+        new_pipeline.show()
+        self.pipelines.append(new_pipeline)
         print(f"Mother Pos : ({self.pos().x()},{self.pos().y()})")
-        new_pipeline.move(
-            self.pos().x(),
-            self.pos().y()
-        )
+        print(f"Pipeline Pos : ({new_pipeline.pos().x()},{new_pipeline.pos().y()})")
