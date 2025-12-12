@@ -2,7 +2,7 @@ import sys
 import PyQt5.QtWidgets as Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout
 from layout_colorwidget import Color
-from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline , PipelineMother
+from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline , PipelineMother , GUILibary
 from sklearn_libary import SubLibary 
 from dataframe_viewer import DataframeViewer
 import sklearn
@@ -54,9 +54,10 @@ class MainWindow(QMainWindow):
         box.setLayout(layout)
 
 
-        libary = GUILibarySubmodule(
-            SubLibary.get_public_methods(sklearn.linear_model)
-        )
+        # libary = GUILibarySubmodule(
+        #     SubLibary.get_public_methods(sklearn.linear_model)
+        # )
+        libary = GUILibary()
         dataframeV = DataframeViewer(
             self.dataframe
         )

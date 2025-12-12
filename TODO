@@ -1,42 +1,4 @@
 
-37. ### Adding K-fold validation.
-    - **Considerations** 
-        - This could be added a a pre-processing block, something that the user could drag and drop in.
-        - This could also be added as another section to pipeline as drag and drop? 
-        (perhaps a validation section?)
-        - will this make the software too complicated?
-            - likely not?
-        - We will also need a "special" model block to tell the model to not do cross validation.
-        This would likely be several work hours of work. 
-    - **Extra Notes**
-        - We should use multi-threading for the k-fold and other validation. There is built in 
-        functions to do this. Example `scores = cross_val_score(model, X, y, cv=5, n_jobs=-1)`
-
-
-
-27. ### popover modifications
-    - Make some of the controls not fill in the blanks.
-    - make some of them into switches or sliders. 
-
-
-36. ### check out a python "compiler" to bytecode ... https://nuitka.net/
-    - good for packaging? 
-
-37. ### 1_n_regression, on a large dataset, make the dots transparent?
-    - Makes chart more readable?
-
-41. ### make it plot 1d classifiers with the k_fold validation
-
-
-42. ### look into how to package this 
-    https://pygobject.gnome.org/devguide/packagingguide.html
-    pip install pyinstaller
-    pyinstaller --noconfirm --noconsole main.py
-
-     - This ....https://pygobject.gnome.org/guide/deploy.html
-     - Also ....https://github.com/zevlee/hello-world-gtk
-        ^^^^ looks very promising, this could potentially be the one best / easiest option? 
-
 ## Publication :: Brainstorming
 I should probably do a confrence rather than a journal. A journal would be a very long 
 and very winded 15-20 pages.
@@ -67,37 +29,4 @@ Whereas a conference is a brisker 5 pages.
     Fees : ~3,000$
 
 
-    
-### 47. Test performance for diffrnet renders, maybe switch to NGL or vulcan. 
-     - Check the render for windows, and maybe switch to NGL, GL, or Vulcan (anything but cairo)
-
-### 48. Organize the folder structure + move the .svg's into something that compiles are a resource.
-
-### 49. Improve the example datasets splash screen, it currently looks funny
-
-### 50. Predict Tab + Adding a sort of "export as python script."
-    - Ways to save and export the scikitlearn model.
-    - Brainstorming.
-        - Export as a "pickle"? https://scikit-learn.org/stable/model_persistence.html
-        - Maybe also export as a python script? 
-        - ^^^ This could allow for the user to perform predictions? 
-        - We could also export a "script" to use said model
-        - We could also have a way to "export as software"
-            - where a small GUI is made to predict values using the model that the user created!
-
-    Draft 1: 
-        We embed the sklearn model in the python file as a "pickle", and then 
-        allow the user to load said model and do prediction.
-
-
-### 51. Make pretty mac theme permanent
-
-
-### 53. Alpha for dots determined using 
-    - https://dl.acm.org/doi/10.1145/3613904.3642127#:~:text=Our%20aims%20are%20to%20test,caused%20by%20high%20point%20density.
-
-
-### 54. Have the sci-kit docs accessible thru a web window
-
-
-### 56. Switch to PyQt5 soon?
+### Making the pipeline part work better.

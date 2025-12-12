@@ -6,11 +6,13 @@ class SubLibary():
         self.function_calls = function_calls
         self.library_name = library_name
 
-    def get_public_methods(library):
+    def get_public_methods(library , filter_function = lambda x : True):
         res = []
         for function in dir(library):
             if function[0] != '_' and function[0].isupper():
-                res.append(getattr(library , function))
+                print("Function" , function)
+                if filter_function(function):
+                    res.append(getattr(library , function))
         return SubLibary(
             res,
             library_name=str(library.__name__)
