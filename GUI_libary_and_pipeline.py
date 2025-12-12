@@ -105,8 +105,15 @@ class PipelineSection(QtW.QGroupBox):
         pos = e.pos()
         widget = e.source()
         if (self.get_num_models() == self.max_num_models):
-            e.ignore()
-            return
+            print("Hello, max limit hit")
+            # Remove one the children from this
+            for child in self.findChildren(QtW.QWidget):
+                if isinstance(child , Draggable) and child != widget:
+                    print("Times called" , child , widget)
+                    e.accept()
+                    self.my_layout.addWidget(widget)
+                    child.deleteLater()
+                    return
         # we can see the previous parent
         from_parent = widget.parentWidget()
         to_parent = self
