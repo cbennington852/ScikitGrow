@@ -1,5 +1,5 @@
 import sys
-import PyQt5.QtWidgets as Qt
+import PyQt5.QtWidgets as QtW
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout
 from layout_colorwidget import Color
 from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline , PipelineMother , GUILibary
@@ -9,6 +9,9 @@ import sklearn
 import seaborn as sns
 import image_resources
 from PyQt5.QtGui import QIcon , QPixmap
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from plotter import Plotter
 
 
 """
@@ -48,32 +51,39 @@ class MainWindow(QMainWindow):
         self.dataframe = sns.load_dataset("iris")
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
-
-        layout = QVBoxLayout()
-        box = Qt.QGroupBox()
-        box.setLayout(layout)
-
-
-        # libary = GUILibarySubmodule(
-        #     SubLibary.get_public_methods(sklearn.linear_model)
-        # )
-        libary = GUILibary()
-        dataframeV = DataframeViewer(
+        libary = GUILibary(
             self.dataframe
         )
-        
+        dataframeViewer = DataframeViewer(
+            self.dataframe
+        )
+        pipeline_mommy = PipelineMother()
+        plotter = Plotter()
 
-        scroll = Qt.QScrollArea()
-        scroll.setWidget(libary)
-        scroll.setWidgetResizable(True)
-        scroll.setFixedHeight(200)
 
-        layout.addWidget(scroll)
-        layout.addWidget(dataframeV)
-        #layout.addWidget(Pipeline())
-        layout.addWidget(PipelineMother())
-        
-        self.setCentralWidget(box)
+        dock_libary = QtW.QDockWidget(
+            "Libary",
+            self
+        )
+        dock_dataframe = QtW.QDockWidget(
+            "Dataframe",
+            self
+        )
+        dock_plot = QtW.QDockWidget(
+            "Plots",
+            self
+        )
+
+        dock_libary.setWidget(libary)
+        dock_dataframe.setWidget(dataframeViewer)
+        dock_plot.setWidget(plotter)
+
+        self.addDockWidget(Qt.RightDockWidgetArea , dock_libary)
+        self.addDockWidget(Qt.LeftDockWidgetArea , dock_dataframe)
+        self.addDockWidget(Qt.LeftDockWidgetArea , dock_plot)
+
+
+        self.setCentralWidget(pipeline_mommy)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance

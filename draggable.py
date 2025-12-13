@@ -7,6 +7,45 @@ from PyQt5.QtGui import QDrag , QPixmap
 import PyQt5.QtCore as QCore 
 
 
+
+class DraggableColumn(QPushButton):
+    def __init__(self, name, **kwargs):
+        super().__init__(**kwargs) 
+        self.kwargs = kwargs
+        self.name = name
+        self.setText(self.name)
+
+    def copy_self(self):
+        return DraggableColumn(
+            name=self.name,
+            **self.kwargs
+        )
+
+    #
+    # Below just makes it draggable, and renders whatever this looks like
+    #
+    def mouseMoveEvent(self, e):
+        # Makes it draggable
+        if e.buttons() == Qt.LeftButton:
+            drag = QDrag(self)
+            mime = QMimeData()
+            # Render this while dragging
+            pixmap = QPixmap(self.size())
+            # Tell the button to drag in the center.
+            drag.setHotSpot(self.drag_start_position) 
+            #drag.setHotSpot(center)
+            self.render(pixmap)
+            drag.setPixmap(pixmap)
+
+            drag.setMimeData(mime)
+            drag.exec_(Qt.MoveAction)
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drag_start_position = event.pos()
+        super(DraggableColumn, self).mousePressEvent(event)
+
+
+
 # these are the draggable buttons
 class Draggable(QPushButton):
     def __init__(self , name, sklearn_function , **kwargs):
