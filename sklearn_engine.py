@@ -316,68 +316,56 @@ class SklearnEngine():
     class ClassificationPlotterFilter(PlotterFilter):
         def main_filter(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines : list[Pipeline], 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ) -> EngineResults:
             visual_plot = None
             accuracy_plot = SklearnEngine.ClassificationPlotterFilter.accuracy_plot(
                 main_dataframe ,
-                curr_pipeline , 
+                curr_pipelines , 
                 pipeline_x_values , 
                 pipeline_y_value ,
                 x , 
                 y , 
-                trained_model,
-                y_predictions
             )
             if len(x.columns) == 1:
                 visual_plot = SklearnEngine.ClassificationPlotterFilter.plot_1d(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 )
             elif len(x.columns) == 2:
                 visual_plot = SklearnEngine.ClassificationPlotterFilter.plot_2d(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 )
             elif len(x.columns) == 3:
                 visual_plot =  SklearnEngine.ClassificationPlotterFilter.plot_3(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 )
             else:
                 visual_plot =  SklearnEngine.ClassificationPlotterFilter.plot_3_plus(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 )
             return EngineResults(
                 visual_plot=visual_plot,
@@ -393,10 +381,15 @@ class SklearnEngine():
             y , 
         ):
             fig, ax = plt.subplots()
+            results = []
+            categories = []
             for i in range(0 , len(curr_pipelines)):
                 y_predictions = curr_pipelines[i].model_results.y_predictions
                 accuracy = sklearn.metrics.accuracy_score(y, y_predictions)
-                ax.bar(['Accuracy'], [accuracy])
+                results.append(accuracy)
+                categories.append(curr_pipelines[i].name)
+            bar_container = ax.bar(categories , results)
+            ax.bar_label(bar_container)
             ax.set_ylim(0, 1)
             ax.set_ylabel('Accuracy')
             ax.set_title('Model Accuracy')

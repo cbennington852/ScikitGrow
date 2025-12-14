@@ -1,10 +1,13 @@
 import sklearn_engine
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import sklearn
 from sklearn_engine import Pipeline
 
 dataframe = pd.read_csv("example_datasets/test.csv")
+dataframe_classifier = sns.load_dataset("iris")
+print(dataframe_classifier.columns)
 
 linear_pipe = sklearn.pipeline.Pipeline([
     ("Linear_m" , sklearn.linear_model.LinearRegression())
@@ -19,19 +22,43 @@ tree_pipe_1 =  sklearn.pipeline.Pipeline([
         max_depth=100
     ))
 ])
+classifier_1 =  sklearn.pipeline.Pipeline([
+    ("asfafas" , sklearn.linear_model.RidgeClassifier(
+    ))
+])
 
+classifier_2 =  sklearn.pipeline.Pipeline([
+    ("asfafas" , sklearn.tree.DecisionTreeClassifier(
+    ))
+])
+
+# res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+#     main_dataframe=dataframe,
+#     pipeline_x_values=['Example Chemical 2'  ],
+#     pipeline_y_value=['Example Chemical 1'],
+#     curr_pipelines=[
+#         Pipeline(
+#             sklearn_pipeline=linear_pipe,
+#             validator=None
+#         ),
+#         Pipeline(
+#             sklearn_pipeline=tree_pipe_1,
+#             validator=None
+#         )
+#     ]
+# )
 
 res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
-    main_dataframe=dataframe,
-    pipeline_x_values=['Example Chemical 2'  ],
-    pipeline_y_value=['Example Chemical 1'],
+    main_dataframe=dataframe_classifier,
+    pipeline_x_values=['petal_width'  ],
+    pipeline_y_value=['species'],
     curr_pipelines=[
         Pipeline(
-            sklearn_pipeline=linear_pipe,
+            sklearn_pipeline=classifier_1,
             validator=None
         ),
         Pipeline(
-            sklearn_pipeline=tree_pipe_1,
+            sklearn_pipeline=classifier_2,
             validator=None
         )
     ]
