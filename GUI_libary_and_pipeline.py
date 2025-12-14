@@ -67,7 +67,7 @@ class ColumnsSubmodule(QtW.QWidget):
         print(f"Prev Parent : {from_parent} , To Parent : {to_parent}")
         if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSubmodule):
             e.accept()
-        elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , ColumnsSubmodule):
+        elif isinstance(from_parent , ColumnsSection) and isinstance(to_parent , ColumnsSubmodule):
             e.accept()
             from_parent.layout().removeWidget(widget)
             widget.deleteLater()
@@ -107,7 +107,7 @@ class ColumnsSection(QtW.QGroupBox):
         super().__init__( **kwargs)
         self.my_title = title
         self.max_num_cols = max_num_cols
-        self.setFixedSize(200 , 90)
+        self.resize(200 , 90)
         self.setAcceptDrops(True)
         self.my_layout = QVBoxLayout()
         self.setLayout(self.my_layout)
@@ -166,7 +166,6 @@ class PipelineSection(QtW.QGroupBox):
         self.setAcceptDrops(True)
         self.my_layout = QVBoxLayout()
         self.setLayout(self.my_layout)
-        self.my_layout.addWidget(QtW.QLabel("drag here"))
 
     def get_pipeline_objects(self):
         resulting_models = []

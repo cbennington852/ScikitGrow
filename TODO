@@ -29,7 +29,6 @@ Whereas a conference is a brisker 5 pages.
     Fees : ~3,000$
 
 
-### 1. Modify the sklearn engine to take multiple "pipelines"
 
 ### 2. Saving and loading from file.
 
@@ -37,3 +36,5 @@ Whereas a conference is a brisker 5 pages.
     - SubWindow Pipeline
     - Draggables as scratch-like blocks.
     - Color Redesign and CSS
+
+### 4. Bug with removing col values from their holder.
