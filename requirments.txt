@@ -1,4 +1,5 @@
 scikit-learn
 PyQt5
 matplotlib
-seabrone
+seaborn
+wonderwords

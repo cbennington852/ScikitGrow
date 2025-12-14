@@ -1,25 +1,46 @@
-import sys
-import csv
-import gi
-import traceback
-from matplotlib.colors import ListedColormap
+import matplotlib
 import seaborn
 import threading
-from splash_screen import SplashScreen
-import utility
-import block_libary
-gi.require_version("Gtk", "4.0")
-from gi.repository import GLib, Gtk, Gio, Gdk, GObject
-from cycler import cycler
-import matplotlib
-import copy
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_gtk4agg import FigureCanvasGTK4Agg as FigureCanvas
-from matplotlib.figure import Figure
 import sklearn
+import random
 import pandas as pd
 import numpy as np
 from abc import ABC , abstractmethod
+from matplotlib.colors import ListedColormap
+
+
+# Feature expansion plan ... multiple pipelines
+    # SklearnEngine takes in multiple "Pipelines"
+    # Each Pipeline gets a thread for training.
+
+    # Each plotting endpoint needs to modified, and receives a list of Pipelines
+
+class Pipeline():
+    rand_adj = [
+        "awesome", "beautiful", "charming", "delightful", "energetic", 
+        "fantastic", "gorgeous", "happy", "intelligent", "joyful"
+    ]
+    rand_nouns = ['Mountain', 'Spoon', 'Wisdom', 'Truck', 'Silence', 'Pillow', 'Algorithm', 'Jacket', 'Curiosity', 'Shadow', 'Library', 'Breeze', 'Chocolate', 'Justice', 'Keyboard', 'Oven', 'Melody', 'River', 'Happiness', 'Telescope']
+
+    """
+    A small class to hold a sklearn pipeline and optionally a validator.
+    """
+    def __init__(self , sklearn_pipeline : sklearn.pipeline.Pipeline , name = None , validator = None ):
+        self.sklearn_pipeline = sklearn_pipeline
+        self.validator = validator
+        self.name = name
+        self.model_results : ModelTrainingResults = None
+        if self.name is None:
+            self.name = random.choice(Pipeline.rand_adj) + " " + random.choice(Pipeline.rand_nouns)
+        last_step_name , last_step_model = self.sklearn_pipeline.steps[-1]
+        if sklearn.base.is_classifier(last_step_model):
+            self.supervised_learning_type = SklearnEngine.CLASSIFICATION
+        elif sklearn.base.is_regressor(last_step_model):
+            self.supervised_learning_type = SklearnEngine.REGRESSION
+        else:
+            raise ValueError(f"Pipeline {name} has neither a regressor or classifier. Crashing")
+            
 
 class ModelTrainingResults():
     """
@@ -42,6 +63,76 @@ MESH_ALPHA=0.7
         
 
 class SklearnEngine():
+
+    REGRESSION = "regression"
+    CLASSIFICATION = "classification"
+
+    def check_all_same_supervised_learning_type(curr_pipelines : list[Pipeline]):
+        first = curr_pipelines[0]
+        for i in range(1 , len(curr_pipelines)):
+            if curr_pipelines[i].supervised_learning_type != first.supervised_learning_type:
+                raise ValueError(
+                    f"{first.name} Has a different supervised learning type than {curr_pipelines[i].name}"
+                )
+        return first.supervised_learning_type
+    def main_sklearn_pipe(main_dataframe,  curr_pipelines : list[Pipeline] , pipeline_x_values  , pipeline_y_value ) -> EngineResults:
+        """Runs the main sklearn pipeline, filtering through the different options that
+          the user could have inputted into this software. 
+
+        Args:
+            main_dataframe (pd.Dataframe): main inputted dataframe
+            curr_pipeline lst[SklearnEngine.Pipeline]: list of pipelines
+            pipeline_x_values ([str]): _description_
+            pipeline_y_value ([str]): _description_
+        """
+
+        # make a copy of the dataframe
+        main_dataframe_copy = main_dataframe.copy(deep=True)
+        # verify that the pipelines are 
+        supervised_learning_type = SklearnEngine.check_all_same_supervised_learning_type(curr_pipelines)
+        # If user wants a string, try to factorize.
+        main_dataframe_copy = SklearnEngine.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
+        # Preform basic validation on the inputs
+        result_validation = SklearnEngine.validate_column_inputs(main_dataframe_copy , curr_pipelines, pipeline_x_values , pipeline_y_value)
+
+        if result_validation:
+            return result_validation
+        
+        # Gather the x and y data
+        x = main_dataframe_copy[pipeline_x_values]
+        y = main_dataframe_copy[pipeline_y_value].iloc[:, 0]
+
+        # Train the model
+        SklearnEngine.train_model(
+            main_dataframe=main_dataframe_copy, 
+            curr_pipeline=curr_pipelines, 
+            x=x,
+            y=y,
+        )
+        for pipe in curr_pipelines:
+            print(pipe.model_results)
+
+
+        if supervised_learning_type == SklearnEngine.CLASSIFICATION:
+            return SklearnEngine.ClassificationPlotterFilter.main_filter(
+                main_dataframe ,
+                curr_pipelines , 
+                pipeline_x_values , 
+                pipeline_y_value ,
+                x , 
+                y , 
+            )
+        elif supervised_learning_type == SklearnEngine.REGRESSION:
+            return SklearnEngine.RegressionPlotterFilter.main_filter(
+                main_dataframe ,
+                curr_pipelines , 
+                pipeline_x_values , 
+                pipeline_y_value ,
+                x , 
+                y , 
+            )
+        else:
+            raise ValueError("Internal Engine Error : Not Regression or classification")
 
     def factorize_string_cols(main_dataframe , pipeline_x_values , pipeline_y_value):
         """Takes all of the string like columns and serializes them, with each unique 
@@ -92,86 +183,18 @@ class SklearnEngine():
             fig, ax = plt.subplots()
             return fig
 
-    def main_sklearn_pipe(main_dataframe,  curr_pipeline , pipeline_x_values  , pipeline_y_value , validator) -> EngineResults:
-        """Runs the main sklearn pipeline, filtering through the different options that
-          the user could have inputted into this software. 
-
-        Args:
-            main_dataframe (pd.Dataframe): main inputted dataframe
-            curr_pipeline (sklearn.pipeline): sklearn_pipeline object
-            pipeline_x_values ([str]): _description_
-            pipeline_y_value ([str]): _description_
-        """
-        #raise ValueError("NOTE : Need to refactor this, decouple the sklearn stuff from the GUI stuff")        
-
-        # make a copy of the dataframe
-        main_dataframe_copy = main_dataframe.copy(deep=True)
-        # If user wants a string, try to factorize.
-        main_dataframe_copy = SklearnEngine.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
-        # Preform basic validation on the inputs
-        result_validation = SklearnEngine.validate_column_inputs(main_dataframe_copy ,curr_pipeline, pipeline_x_values , pipeline_y_value)
-
-        if result_validation:
-            return result_validation
-        
-        # Gather the x and y data
-        x = main_dataframe_copy[pipeline_x_values]
-        y = main_dataframe_copy[pipeline_y_value].iloc[:, 0]
-
-        # Train the model
-        model_training_results = SklearnEngine.train_model(
-            main_dataframe=main_dataframe_copy, 
-            curr_pipeline=curr_pipeline, 
-            x=x,
-            y=y,
-            validator=validator
-        )
-
-        last_step_name , last_step_model = curr_pipeline.steps[-1]
-
-        if sklearn.base.is_classifier(last_step_model):
-            return SklearnEngine.ClassificationPlotterFilter.main_filter(
-                main_dataframe ,
-                curr_pipeline , 
-                pipeline_x_values , 
-                pipeline_y_value ,
-                x , 
-                y , 
-                model_training_results.trained_model,
-                model_training_results.y_predictions
-            )
-        elif sklearn.base.is_regressor(last_step_model):
-            return SklearnEngine.RegressionPlotterFilter.main_filter(
-                main_dataframe ,
-                curr_pipeline , 
-                pipeline_x_values , 
-                pipeline_y_value ,
-                x , 
-                y , 
-                model_training_results.trained_model,
-                model_training_results.y_predictions
-            )
-        else:
-            raise ValueError("Sci-kit Engine Internal Error ... Not a recognized model type.")
+   
         
 
-    def validate_column_inputs(main_dataframe, curr_pipeline, pipeline_x_values , pipeline_y_value):
+    def validate_column_inputs(main_dataframe, curr_pipelines, pipeline_x_values , pipeline_y_value):
         lst_cols = main_dataframe.columns
         # If model empty do empty plot
-        if len(curr_pipeline.steps) == 0:
+        if len(curr_pipelines) == 0:
             return EngineResults(
-                visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value),
+                visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipelines , pipeline_x_values , pipeline_y_value),
                 accuracy_plot=None
             )
 
-        # If user added a pre-processor but not a model do an empty plot.
-        last_step_name , last_step_model = curr_pipeline.steps[-1]
-        if not (sklearn.base.is_classifier(last_step_model) or sklearn.base.is_regressor(last_step_model)):
-            return EngineResults(
-                visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value),
-                accuracy_plot=None
-            )
-       
         # check to make sure cols are from this dataset.
         for x_col in pipeline_x_values:
             if x_col not in lst_cols:
@@ -207,8 +230,9 @@ class SklearnEngine():
         for thread in threads:
             thread.join()
         return final_y 
+    
 
-    def train_model( main_dataframe , curr_pipeline , x , y , validator) -> ModelTrainingResults:
+    def train_model( main_dataframe , curr_pipeline : list[Pipeline] , x , y ) -> list[ModelTrainingResults]:
         """
         Trains the model using the main dataframe and pipeline_x_values. This is also
         where we will see what type of test train split the user has implemented into 
@@ -223,24 +247,40 @@ class SklearnEngine():
         Returns: 
             Trained Model
         """
-        # Train the mode        
-        curr_pipeline.fit(x , y)
-        # Apply the user specified validator
-        if (validator != []) and (not isinstance(validator[0][1] , block_libary.NoValidator)):
-            y_preds = SklearnEngine.k_fold_general_threads(
-                model=curr_pipeline,
-                kf=validator[0][1],
-                X=x,
-                y=y
+        results = {}
+        def train_single_model(curr : Pipeline):
+            curr.sklearn_pipeline.fit(x , y)
+            # Apply the user specified validator
+            if (curr.validator is not None):
+                y_preds = SklearnEngine.k_fold_general_threads(
+                    model=curr_pipeline,
+                    kf=curr.validator,
+                    X=x,
+                    y=y
+                )
+            else:
+                y_preds = curr.sklearn_pipeline.predict(x)
+            results[curr] = (
+                ModelTrainingResults(
+                    y_predictions=y_preds,
+                    trained_model=curr.sklearn_pipeline
+                )
             )
-        else:
-            y_preds = curr_pipeline.predict(x)
+        threads = []
+        # Train each pipeline on an individual thread.
+        for pipeline in curr_pipeline:
+            curr_thread = threading.Thread(target=train_single_model , kwargs={"curr" : pipeline})
+            threads.append(curr_thread)
+            curr_thread.start()
+        # Wait for each thread to finish
+        for thread in threads:
+            thread.join()
+        # Attach the results to each pipeline
+        print(results)
+        for ptr_to_pipeline , model_results in results.items():
+            ptr_to_pipeline.model_results = model_results
 
-        # Return 
-        return ModelTrainingResults(
-            y_predictions=y_preds,
-            trained_model=curr_pipeline
-        )
+        
     
     def get_color_map():
         return plt.rcParams['axes.prop_cycle'].by_key()['color']
