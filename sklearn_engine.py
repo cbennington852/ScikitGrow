@@ -110,8 +110,6 @@ class SklearnEngine():
             x=x,
             y=y,
         )
-        for pipe in curr_pipelines:
-            print(pipe.model_results)
 
 
         if supervised_learning_type == SklearnEngine.CLASSIFICATION:
@@ -148,8 +146,6 @@ class SklearnEngine():
         for col in cols:
             if pd.api.types.is_string_dtype(main_dataframe[col]):
                 codes, uniques = pd.factorize(main_dataframe[col])
-                print(codes)
-                print(uniques)
                 main_dataframe[col] = codes
         return main_dataframe
     
@@ -205,7 +201,6 @@ class SklearnEngine():
                 raise ValueError(f"Error: {y_col} is not in the dataset")
 
     def k_fold_general_threads(model , kf , X , y):
-        print("Staring Validator training!!!")
         def train_indexes(train_index , test_index):
             """
             The thing that we call each time in he k_fold
@@ -277,7 +272,6 @@ class SklearnEngine():
         for thread in threads:
             thread.join()
         # Attach the results to each pipeline
-        print(results)
         for ptr_to_pipeline , model_results in results.items():
             ptr_to_pipeline.model_results = model_results
 
@@ -404,14 +398,14 @@ class SklearnEngine():
                     y , 
                 ):
             max_margin = 0.5
+            fig, ax = plt.subplots()
+            x_min, x_max = x.min() - max_margin, x.max() + max_margin
+            y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
+            x_plot = np.linspace(x_min, x_max, 1000).reshape(-1, 1)
+            n_classes = len(np.unique(y_enc))
+            cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
             for i in range(0 , len(curr_pipelines)):
-                x_min, x_max = x.min() - max_margin, x.max() + max_margin
-                y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
-                x_plot = np.linspace(x_min, x_max, 1000).reshape(-1, 1)
                 y_preds = curr_pipelines[i].model_results.trained_model.predict(x_plot)
-                fig, ax = plt.subplots()
-                n_classes = len(np.unique(y_enc))
-                cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
                 ax.plot(x_plot[:, 0], y_preds, label=f'Hard Predicted Class (0 or 1) {curr_pipelines[i].name}', linewidth=3)
                 switch_index = np.argmax(y_preds)
                 decision_boundary_x = x_plot[switch_index, 0]
@@ -421,48 +415,50 @@ class SklearnEngine():
             ax.scatter(x, y, c=y_enc, cmap=cmap, edgecolor='k', marker='o', s=50, label=f'')
             ax.set_xlabel(f'{pipeline_y_value[0]}')
             ax.set_ylabel(f'{pipeline_y_value[0]}')
-            ax.legend(loc='upper left')
+            fig.legend(loc='outside upper right')
             ax.grid(True, axis='x', linestyle='--', alpha=0.6)
             return fig
         
         def plot_2d(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines :list[Pipeline] , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 ):
+            fig, axs = plt.subplots( 1 , len(curr_pipelines) )
             y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
             # Plot the decision boundary
-            fig, ax = plt.subplots()
             n_classes = len(np.unique(y_enc))
             cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
-            sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
-                trained_model,
-                x,
-                response_method="predict",
-                cmap=cmap,
-                ax=ax
-            )
-
-            # Plot the data points
-            ax.scatter(x.iloc[:, 0], x.iloc[:, 1], cmap=cmap,  c=y_enc, edgecolors='k')
-            ax.set_title(f"Classifier for {pipeline_y_value[0]}")
-            ax.set_xlabel(f"{pipeline_x_values[0]}")
-            ax.set_ylabel(f"{pipeline_x_values[1]}")
-            handles = []
             classes = np.unique(main_dataframe[pipeline_y_value])
             classes_color_encoding = np.unique(y_enc)
-            for x in range(0 , len(classes)):
-                class_val = classes_color_encoding[x]
-                handles.append(
-                    ax.plot([], [], marker='o', linestyle='', color=cmap(class_val),
-                            label=f'Class {classes[x]}', markeredgecolor='k')
+            for i in range(0 , len(curr_pipelines)):
+                print("Current axes" ,  axs)
+                print('burger' , curr_pipelines[i].model_results.trained_model)
+                print(" X thing" , x)
+                current_ax = axs[i]
+                sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
+                    curr_pipelines[i].model_results.trained_model,
+                    x,
+                    response_method="predict",
+                    cmap=cmap,
+                    ax=current_ax
                 )
-            ax.legend(loc='upper left')
+                # Plot the data points
+                axs[i].scatter(x.iloc[:, 0], x.iloc[:, 1], cmap=cmap,  c=y_enc, edgecolors='k')
+                axs[i].set_title(f"Classifier for {pipeline_y_value[0]} : {curr_pipelines[i].name}")
+                axs[i].set_xlabel(f"{pipeline_x_values[0]}")
+                axs[i].set_ylabel(f"{pipeline_x_values[1]}")
+                handles = []
+                for k in range(0 , len(classes)):
+                    class_val = classes_color_encoding[k]
+                    handles.append(
+                        axs[i].plot([], [], marker='o', linestyle='', color=cmap(class_val),
+                                label=f'Class {classes[k]}', markeredgecolor='k')
+                    )
+                axs[i].legend(loc='upper left')
             return fig
         
         def plot_3(

@@ -50,7 +50,7 @@ classifier_2 =  sklearn.pipeline.Pipeline([
 
 res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
     main_dataframe=dataframe_classifier,
-    pipeline_x_values=['petal_width'  ],
+    pipeline_x_values=['petal_width' , 'sepal_length' ],
     pipeline_y_value=['species'],
     curr_pipelines=[
         Pipeline(
