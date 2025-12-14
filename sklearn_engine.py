@@ -18,10 +18,9 @@ from matplotlib.colors import ListedColormap
 
 class Pipeline():
     rand_adj = [
-        "awesome", "beautiful", "charming", "delightful", "energetic", 
-        "fantastic", "gorgeous", "happy", "intelligent", "joyful"
+        "Awesome", "Beautiful", "Charming", "Delightful", "Energetic", 
+        "Fantastic", "Gorgeous", "Happy", "Intelligent", "Joyful"
     ]
-    rand_nouns = ['Mountain', 'Spoon', 'Wisdom', 'Truck', 'Silence', 'Pillow', 'Algorithm', 'Jacket', 'Curiosity', 'Shadow', 'Library', 'Breeze', 'Chocolate', 'Justice', 'Keyboard', 'Oven', 'Melody', 'River', 'Happiness', 'Telescope']
 
     """
     A small class to hold a sklearn pipeline and optionally a validator.
@@ -31,9 +30,9 @@ class Pipeline():
         self.validator = validator
         self.name = name
         self.model_results : ModelTrainingResults = None
-        if self.name is None:
-            self.name = random.choice(Pipeline.rand_adj) + " " + random.choice(Pipeline.rand_nouns)
         last_step_name , last_step_model = self.sklearn_pipeline.steps[-1]
+        if self.name is None:
+            self.name = random.choice(Pipeline.rand_adj) + " " + last_step_model.__class__.__name__
         if sklearn.base.is_classifier(last_step_model):
             self.supervised_learning_type = SklearnEngine.CLASSIFICATION
         elif sklearn.base.is_regressor(last_step_model):
@@ -303,13 +302,11 @@ class SklearnEngine():
         @abstractmethod
         def main_filter(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines , 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ) -> EngineResults:
             pass
 
@@ -509,67 +506,56 @@ class SklearnEngine():
     class RegressionPlotterFilter(PlotterFilter):
         def main_filter(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines , 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ) -> EngineResults:
-            accuracy_plot = SklearnEngine.RegressionPlotterFilter.accuracy(main_dataframe ,
-                curr_pipeline , 
+            accuracy_plot = SklearnEngine.RegressionPlotterFilter.accuracy(
+                main_dataframe ,
+                curr_pipelines , 
                 pipeline_x_values , 
                 pipeline_y_value ,
                 x , 
                 y , 
-                trained_model,
-                y_predictions
             )
             visual_plot = None
             if len(x.columns) == 1:
                 visual_plot = SklearnEngine.RegressionPlotterFilter.plot_1d(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 )
             elif len(x.columns) == 2:
                 visual_plot = SklearnEngine.RegressionPlotterFilter.plot_2d(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
-                    y , 
-                    trained_model,
-                    y_predictions
+                    y ,
                 )
             elif len(x.columns) == 3:
                 visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_3d(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
-                    y , 
-                    trained_model,
-                    y_predictions
+                    y ,
                 )
             else:
                 visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_4_plus(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
-                    y , 
-                    trained_model,
-                    y_predictions
+                    y ,
                 )
             return EngineResults(
                 visual_plot=visual_plot,
@@ -579,39 +565,37 @@ class SklearnEngine():
 
         def plot_1d(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines : list[Pipeline], 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ):
             fig, ax = plt.subplots()
             color_cycle = SklearnEngine.get_color_map()
             ax.scatter(x , y , color=color_cycle[0], label=f"Dataset", alpha=SklearnEngine.get_scatter_alpha_value(len(x)))
-            ax.plot(x , y_predictions ,  color=color_cycle[1] , label='Model predictions')
+            for i in range(0 , len(curr_pipelines)):
+                curr = curr_pipelines[i].model_results.y_predictions
+                ax.plot(x , curr ,  color=color_cycle[i+1] , label=f'{curr_pipelines[i].name} predictions')
             ax.set_title(f"{pipeline_x_values[0]} and {pipeline_y_value[0]}")
             ax.set_xlabel(f"{pipeline_x_values[0]}")
             ax.set_ylabel(f"{pipeline_y_value[0]}")
-            ax.legend(loc='upper left')
+            ax.legend()
             return fig
         
         def plot_2d(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines : list[Pipeline], 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ):
             # Step 3: Create grid for plotting
             x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
             x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
             x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
-            color_cycle = SklearnEngine.get_color_map()
+            lst_cmaps = plt.colormaps()
 
             # Create a DataFrame from the grid for prediction
             grid_df = pd.DataFrame({
@@ -619,16 +603,17 @@ class SklearnEngine():
                 pipeline_x_values[1]: x2_grid.ravel()
             })
 
-            # Step 4: Predict y values over the grid
-            y_pred = trained_model.predict(grid_df).reshape(x1_grid.shape)
-
-
-            # Step 5: Plotting
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
 
-            # Plot surface
-            ax.plot_surface(x1_grid, x2_grid, y_pred, alpha=MESH_ALPHA)
+            for i  in range(0 , len(curr_pipelines)):
+                pipeline = curr_pipelines[i]
+                y_pred = pipeline.sklearn_pipeline.predict(grid_df).reshape(x1_grid.shape)
+                cmap_index = 0
+                if i < len(lst_cmaps):
+                    cmap_index = i
+
+                ax.plot_surface(x1_grid, x2_grid, y_pred, alpha=MESH_ALPHA , cmap=lst_cmaps[cmap_index])
 
             # Plot actual data points
             ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=y, edgecolor='k')
@@ -674,28 +659,29 @@ class SklearnEngine():
 
         def accuracy(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines : list[Pipeline], 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ):
-            fig, ax = plt.subplots()
-            ax.scatter(y, y_predictions, alpha=SklearnEngine.get_scatter_alpha_value(len(x)), edgecolor='k', label='Predicted Points')
-            ax.plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2, label='Prefect Prediction')
-            ax.set_xlabel("Actual Values")
-            ax.set_ylabel("Predicted Values")
-            ax.legend()
-            ax.grid(True)
-            textstr = (
-                f"\nPredicted vs. Actual Values"
-                f"\nRMSE                : {sklearn.metrics.mean_squared_error(y, y_predictions):.2f}" + 
-                f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(y, y_predictions):.2f}" + 
-                f"\nr2                  : {sklearn.metrics.r2_score(y, y_predictions):.2f}"
-            )
-            ax.set_title(textstr)
+            fig, axs = plt.subplots( 1 , len(curr_pipelines) )
+            for i in range(0 , len(curr_pipelines)):
+                y_predictions = curr_pipelines[i].model_results.y_predictions
+                axs[i].scatter(y, y_predictions, alpha=SklearnEngine.get_scatter_alpha_value(len(x)), edgecolor='k', label='Predicted Points')
+                axs[i].plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2, label='Prefect Prediction')
+                axs[i].set_xlabel("Actual Values")
+                axs[i].set_ylabel(f"")
+                axs[i].legend()
+                axs[i].grid(True)
+                textstr = (
+                    f"\n{curr_pipelines[i].name}"
+                    f"\nPredicted vs. Actual Values"
+                    f"\nRMSE                : {sklearn.metrics.mean_squared_error(y, y_predictions):.2f}" + 
+                    f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(y, y_predictions):.2f}" + 
+                    f"\nr2                  : {sklearn.metrics.r2_score(y, y_predictions):.2f}"
+                )
+                axs[i].set_title(textstr)
             return fig
     
        

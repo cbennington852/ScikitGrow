@@ -14,9 +14,16 @@ linear_pipe_2 = sklearn.pipeline.Pipeline([
     ("Linear_m" , sklearn.linear_model.Lasso())
 ])
 
+tree_pipe_1 =  sklearn.pipeline.Pipeline([
+    ("tree_m" , sklearn.tree.DecisionTreeRegressor(
+        max_depth=10
+    ))
+])
+
+
 res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
     main_dataframe=dataframe,
-    pipeline_x_values=['Example Chemical 2' , 'Example Chemical 3' ],
+    pipeline_x_values=['Example Chemical 2'  , 'Example Chemical 3'],
     pipeline_y_value=['Example Chemical 1'],
     curr_pipelines=[
         Pipeline(
@@ -24,7 +31,7 @@ res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
             validator=None
         ),
         Pipeline(
-            sklearn_pipeline=linear_pipe_2,
+            sklearn_pipeline=tree_pipe_1,
             validator=None
         )
     ]

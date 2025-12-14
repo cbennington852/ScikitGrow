@@ -51,13 +51,11 @@ class MainWindow(QMainWindow):
         self.dataframe = sns.load_dataset("iris")
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
-        libary = GUILibary(
-            self.dataframe
-        )
-        dataframeViewer = DataframeViewer(
-            self.dataframe
-        )
+        libary = GUILibary(self.dataframe)
+        dataframeViewer = DataframeViewer(self.dataframe)
+        
         pipeline_mommy = PipelineMother()
+
         plotter = Plotter()
 
 
