@@ -87,6 +87,8 @@ class SklearnEngine():
 
         # make a copy of the dataframe
         main_dataframe_copy = main_dataframe.copy(deep=True)
+        #Sort the dataframe to make plots better.
+        main_dataframe_copy.sort_values(by=pipeline_x_values, inplace=True)
         # verify that the pipelines are 
         supervised_learning_type = SklearnEngine.check_all_same_supervised_learning_type(curr_pipelines)
         # If user wants a string, try to factorize.
@@ -384,50 +386,46 @@ class SklearnEngine():
             
         def accuracy_plot(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines :list[Pipeline] , 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ):
             fig, ax = plt.subplots()
-            accuracy = sklearn.metrics.accuracy_score(y, y_predictions)
-            ax.bar(['Accuracy'], [accuracy])
+            for i in range(0 , len(curr_pipelines)):
+                y_predictions = curr_pipelines[i].model_results.y_predictions
+                accuracy = sklearn.metrics.accuracy_score(y, y_predictions)
+                ax.bar(['Accuracy'], [accuracy])
             ax.set_ylim(0, 1)
             ax.set_ylabel('Accuracy')
             ax.set_title('Model Accuracy')
-            ax.text(0, accuracy / 2, f"{accuracy:.2%}", ha='center', va='center', fontsize=12)
             return fig
             
         def plot_1d(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines :list[Pipeline] , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 ):
             max_margin = 0.5
-            x_min, x_max = x.min() - max_margin, x.max() + max_margin
-            y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
-            x_plot = np.linspace(x_min, x_max, 1000).reshape(-1, 1)
-            y_preds = trained_model.predict(x_plot)
-            fig, ax = plt.subplots()
-            n_classes = len(np.unique(y_enc))
-            cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
-            ax.scatter(X, y, c=y_enc, cmap=cmap,
-                        edgecolor='k', marker='o', s=50, label=f'')
-            ax.plot(x_plot[:, 0], y_preds, label='Hard Predicted Class (0 or 1)',
-                    color='blue', linewidth=3)
-            switch_index = np.argmax(y_preds)
-            decision_boundary_x = x_plot[switch_index, 0]
-            ax.axvline(x=decision_boundary_x, color='red', linestyle='--',
-                        label=f'Decision Boundary (x={decision_boundary_x:.2f})')
+            for i in range(0 , len(curr_pipelines)):
+                x_min, x_max = x.min() - max_margin, x.max() + max_margin
+                y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
+                x_plot = np.linspace(x_min, x_max, 1000).reshape(-1, 1)
+                y_preds = curr_pipelines[i].model_results.trained_model.predict(x_plot)
+                fig, ax = plt.subplots()
+                n_classes = len(np.unique(y_enc))
+                cmap = ListedColormap(SklearnEngine.get_clf_color_map().colors[:n_classes])
+                ax.plot(x_plot[:, 0], y_preds, label=f'Hard Predicted Class (0 or 1) {curr_pipelines[i].name}', linewidth=3)
+                switch_index = np.argmax(y_preds)
+                decision_boundary_x = x_plot[switch_index, 0]
+                ax.axvline(x=decision_boundary_x, linestyle='--',
+                            label=f'Decision Boundary (x={decision_boundary_x:.2f})')
             ax.set_title(f'Classifier for {pipeline_y_value[0]}')
+            ax.scatter(x, y, c=y_enc, cmap=cmap, edgecolor='k', marker='o', s=50, label=f'')
             ax.set_xlabel(f'{pipeline_y_value[0]}')
             ax.set_ylabel(f'{pipeline_y_value[0]}')
             ax.legend(loc='upper left')

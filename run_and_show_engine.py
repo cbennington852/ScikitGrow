@@ -16,14 +16,14 @@ linear_pipe_2 = sklearn.pipeline.Pipeline([
 
 tree_pipe_1 =  sklearn.pipeline.Pipeline([
     ("tree_m" , sklearn.tree.DecisionTreeRegressor(
-        max_depth=10
+        max_depth=100
     ))
 ])
 
 
 res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
     main_dataframe=dataframe,
-    pipeline_x_values=['Example Chemical 2'  , 'Example Chemical 3'],
+    pipeline_x_values=['Example Chemical 2'  ],
     pipeline_y_value=['Example Chemical 1'],
     curr_pipelines=[
         Pipeline(
