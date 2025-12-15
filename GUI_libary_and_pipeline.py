@@ -127,6 +127,13 @@ class ColumnsSection(QtW.QGroupBox):
             if isinstance(child , DraggableColumn):
                 num += 1
         return num
+    
+    def get_cols(self) -> list[DraggableColumn]:
+        res_cols = []
+        for child in self.findChildren(QtW.QWidget):
+            if isinstance(child , DraggableColumn):
+                res_cols.append(child)
+        return res_cols
 
     def dropEvent(self, e):
         pos = e.pos()
@@ -190,6 +197,13 @@ class PipelineSection(QtW.QGroupBox):
             if isinstance(child , Draggable):
                 num += 1
         return num
+    
+    def get_models(self) -> list[Draggable]:
+        res_models = []
+        for child in self.findChildren(QtW.QWidget):
+            if isinstance(child , Draggable):
+                res_models.append(child)
+        return res_models
 
     def dropEvent(self, e):
         pos = e.pos()
@@ -229,6 +243,8 @@ class PipelineSection(QtW.QGroupBox):
             e.accept()
 
 class Pipeline(QtW.QGroupBox):
+    all_pipelines = []
+
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)
         my_layout = QVBoxLayout()
@@ -236,6 +252,8 @@ class Pipeline(QtW.QGroupBox):
         self.setLayout(my_layout)
         self.setStyleSheet("background-color: white;")
         self.setFixedSize(300 , 300)
+        self.name_pipeline = QtW.QLineEdit()
+        self.name_pipeline.setPlaceholderText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
             title="Preproccessors",
             accepting_function=lambda x : x.__module__.startswith("preprocessing")
@@ -246,17 +264,29 @@ class Pipeline(QtW.QGroupBox):
             accepting_function=lambda x : is_classifier(x) or is_regressor(x),
             max_num_models=1
         )
+        self.validators = PipelineSection(
+            title="Validator",
+            # Makes sure this is a validator by checking if it has a 'split' function which is required.
+            accepting_function=lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None)),
+            max_num_models=1
+        )
         self.close_pipeline_button = QtW.QPushButton("Close pipeline")
         self.close_pipeline_button.clicked.connect(self.remove_pipeline)
         my_layout.addWidget(self.close_pipeline_button)
+        my_layout.addWidget(self.name_pipeline)
         my_layout.addWidget(self.preproccessor_pipe)
         my_layout.addWidget(self.model_pipe)
+        my_layout.addWidget(self.validators)
+
+    def get_name_pipeline(self) -> str:
+        return self.name_pipeline.text
 
     def remove_pipeline(self):
-        for x in range(0 , len(PipelineMother.pipelines)):
-            if PipelineMother.pipelines[x] == self:
-                del PipelineMother.pipelines[x]
-        self.deleteLater()
+        for x in range(0 , len(self.my_parent.pipelines)):
+            if self.my_parent.pipelines[x] == self:
+                del self.my_parent.pipelines[x]
+                self.deleteLater()
+                return
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -268,8 +298,11 @@ class Pipeline(QtW.QGroupBox):
         if event.buttons() == Qt.MouseButton.LeftButton:
             # Calculate the new position relative to the parent widget
             # global position of mouse - global position of parent + the offset recorded in mousePressEvent
-            # OR simpler: use mapToParent() with the current event position and subtract the initial offset
-            self.move(self.mapToParent(event.pos() - self.offset))
+            # overides in event of weird error I can't recreate right now.
+            try:
+                self.move(self.mapToParent(event.pos() - self.offset))
+            except:
+                pass
 
     def mouseReleaseEvent(self, event):
         self.offset = QPoint()
@@ -283,11 +316,11 @@ class Pipeline(QtW.QGroupBox):
 
 
 class PipelineMother(QtW.QMainWindow):
-    pipelines = []
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.resize(600 , 600)
+        self.pipelines = []
         toolbar = QtW.QToolBar()
         self.main_thing = QtW.QWidget()
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
@@ -306,7 +339,6 @@ class PipelineMother(QtW.QMainWindow):
         self.train_models = QtW.QPushButton(
             "Train Models"
         )
-        self.train_models.clicked.connect(self.train_models_pressed)
 
         toolbar.addWidget(self.add_pipeline_button)
         toolbar.addWidget(self.train_models)
@@ -317,8 +349,6 @@ class PipelineMother(QtW.QMainWindow):
         self.addToolBar(toolbar)
         self.add_pipeline()
 
-    def train_models_pressed(self):
-        pass
 
 
     def add_pipeline(self):

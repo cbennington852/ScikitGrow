@@ -56,8 +56,8 @@ class MainWindow(QMainWindow):
         
         pipeline_mommy = PipelineMother()
 
-        plotter = Plotter()
-
+        plotter = Plotter(pipeline_mommy)
+        pipeline_mommy.train_models.clicked.connect(plotter.plot_pipeline)
 
         dock_libary = QtW.QDockWidget(
             "Libary",
