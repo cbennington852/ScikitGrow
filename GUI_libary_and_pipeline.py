@@ -10,31 +10,53 @@ from sklearn.base import is_regressor, is_classifier
 import sklearn
 
 class GUILibary(QtW.QTabWidget):
+
+    ###############################################
+    # List of Filter / Accepting Functions
+    ###############################################
+    PREPROCESSOR_FILTER = lambda x : hasattr(x, 'fit') and hasattr(x, 'transform')
+    MODEL_FILTER = lambda x : is_classifier(x) or is_regressor(x)
+    VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
+    REGRESSOR_FILTER = lambda x : is_regressor(x)
+    CLASSIFIER_FILTER = lambda x : is_classifier(x)
+
+
     def __init__(self , dataframe,  **kwargs):
         super().__init__(**kwargs)
         self.dataframe = dataframe
         sklearn_models = [
             sklearn.linear_model,
             sklearn.ensemble,
+            sklearn.preprocessing,
+            sklearn.tree
         ]
 
-        # Adding regressors.
-        regressor_box = QtW.QWidget()
-        regressor_layout = QtW.QVBoxLayout()
-        
-        regressor_box.setLayout(regressor_layout)
-        for subsection in sklearn_models:
-            curr = GUILibarySubmodule(
-                    SubLibary.get_public_methods(
-                        library=subsection,
-                        filter_function=lambda x : is_regressor(x)
+        def addModule(name , filter):    
+            regressor_box = QtW.QWidget()
+            regressor_layout = QtW.QVBoxLayout()
+            regressor_box.setLayout(regressor_layout)
+            for subsection in sklearn_models:
+                curr = GUILibarySubmodule(
+                        SubLibary.get_public_methods(
+                            library=subsection,
+                            filter_function=filter
+                        )
                     )
-                )
-            regressor_layout.addWidget(curr)
-        scroll_regressor = QtW.QScrollArea()
-        scroll_regressor.setWidget(regressor_box)
-        scroll_regressor.setWidgetResizable(True)
-        self.addTab(scroll_regressor , "Regressors")
+                regressor_layout.addWidget(curr)
+            scroll_regressor = QtW.QScrollArea()
+            scroll_regressor.setWidget(regressor_box)
+            scroll_regressor.setWidgetResizable(True)
+            self.addTab(scroll_regressor , name)
+
+
+
+        addModule("Regressors" , GUILibary.REGRESSOR_FILTER)
+        addModule("Classifiers" , GUILibary.CLASSIFIER_FILTER)
+        addModule("Pre-processors" , GUILibary.PREPROCESSOR_FILTER)
+        addModule("Validators" , GUILibary.VALIDATOR_FILTER)
+
+
+
         self.addTab(self.cols_tab() , "Columns")
 
     def cols_tab(self):
@@ -79,11 +101,14 @@ class GUILibarySubmodule(QtW.QGroupBox):
         self.setAcceptDrops(True)
         self.sublibary = sublibary
         self.setTitle(self.sublibary.library_name)
+        if len(self.sublibary.function_calls) == 0:
+            self.deleteLater()
         for sklearn in self.sublibary.function_calls:
             self.layout.addWidget(Draggable(
                 str(sklearn.__name__),
                 sklearn
             ))
+        
     def dragEnterEvent(self, e):
         pos = e.pos()
         widget = e.source()
@@ -176,9 +201,12 @@ class PipelineSection(QtW.QGroupBox):
 
     def get_pipeline_objects(self):
         resulting_models = []
-        for child in self.findChildren():
+        for child in self.findChildren(QtW.QWidget):
             if isinstance(child , Draggable):
-                curr = child.sklearn_function(**child.parameters)
+                parameters_as_dict = dict(child.parameters)
+                print("Child Parameters" , parameters_as_dict)
+                print("Child funciton" , child.sklearn_function)
+                curr = child.sklearn_function(**parameters_as_dict)
                 resulting_models.append(curr)
         return resulting_models
 
@@ -256,18 +284,18 @@ class Pipeline(QtW.QGroupBox):
         self.name_pipeline.setPlaceholderText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
             title="Preproccessors",
-            accepting_function=lambda x : x.__module__.startswith("preprocessing")
+            accepting_function=GUILibary.PREPROCESSOR_FILTER
 
         )
         self.model_pipe = PipelineSection(
             title="Models",
-            accepting_function=lambda x : is_classifier(x) or is_regressor(x),
+            accepting_function=GUILibary.MODEL_FILTER,
             max_num_models=1
         )
-        self.validators = PipelineSection(
+        self.validator = PipelineSection(
             title="Validator",
             # Makes sure this is a validator by checking if it has a 'split' function which is required.
-            accepting_function=lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None)),
+            accepting_function=GUILibary.VALIDATOR_FILTER,
             max_num_models=1
         )
         self.close_pipeline_button = QtW.QPushButton("Close pipeline")
@@ -276,7 +304,7 @@ class Pipeline(QtW.QGroupBox):
         my_layout.addWidget(self.name_pipeline)
         my_layout.addWidget(self.preproccessor_pipe)
         my_layout.addWidget(self.model_pipe)
-        my_layout.addWidget(self.validators)
+        my_layout.addWidget(self.validator)
 
     def get_name_pipeline(self) -> str:
         return self.name_pipeline.text
