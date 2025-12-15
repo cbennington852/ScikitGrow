@@ -306,7 +306,6 @@ class SklearnEngine():
         ) -> EngineResults:
             pass
 
-
     class ClassificationPlotterFilter(PlotterFilter):
         def main_filter(
             main_dataframe ,
@@ -428,6 +427,8 @@ class SklearnEngine():
                     y , 
                 ):
             fig, axs = plt.subplots( 1 , len(curr_pipelines) )
+            if len(curr_pipelines) == 1:
+                axs = [axs]
             y_enc = sklearn.preprocessing.LabelEncoder().fit_transform(y)
             # Plot the decision boundary
             n_classes = len(np.unique(y_enc))
@@ -435,9 +436,6 @@ class SklearnEngine():
             classes = np.unique(main_dataframe[pipeline_y_value])
             classes_color_encoding = np.unique(y_enc)
             for i in range(0 , len(curr_pipelines)):
-                print("Current axes" ,  axs)
-                print('burger' , curr_pipelines[i].model_results.trained_model)
-                print(" X thing" , x)
                 current_ax = axs[i]
                 sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
                     curr_pipelines[i].model_results.trained_model,
@@ -656,7 +654,6 @@ class SklearnEngine():
             if len(curr_pipelines) <= 1:
                 axs = [axs]
             for i in range(0 , len(curr_pipelines)):
-                print("Axes : " , axs)
                 y_predictions = curr_pipelines[i].model_results.y_predictions
                 axs[i].scatter(y, y_predictions, alpha=SklearnEngine.get_scatter_alpha_value(len(x)), edgecolor='k', label='Predicted Points')
                 axs[i].plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2, label='Prefect Prediction')

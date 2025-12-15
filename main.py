@@ -34,7 +34,6 @@ class SplashScreen(QWidget):
         self.example_datasets.clicked.connect(SplashScreen.open_application_with_dataframe)
 
     def open_application_with_dataframe(dataframe):
-        print(dataframe)
         dataframe = sns.load_dataset("iris")
         window = MainWindow(dataframe) # Create an instance of our custom window
         window.show() # Display the window
@@ -85,8 +84,10 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
-    #splash = SplashScreen()
-    #splash.show()
+    pixmap = QPixmap(":/Full_logo_SciKit_Grow.svg")
+    splash = QtW.QSplashScreen(pixmap)
+    splash.show()
     window = MainWindow() # Create an instance of our custom window
     window.show() # Display the window
+    splash.finish(window)
     sys.exit(app.exec_()) # Start the application's event loop

@@ -90,7 +90,6 @@ class Draggable(QPushButton):
             parameters=self.parameters,
             parent=self
         )
-        print(self.parameters)
         popover.exec()
 
 
@@ -132,5 +131,4 @@ class ParameterPopup(QtW.QDialog):
                 curr = (parameter_name , eval(f'\'{q_line_edit.text()}\''))
             new_parameters.append(curr)
         self.my_parent.parameters = new_parameters
-        print(self.my_parent.parameters)
         self.accept()

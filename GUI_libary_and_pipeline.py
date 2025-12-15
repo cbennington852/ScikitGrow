@@ -28,7 +28,8 @@ class GUILibary(QtW.QTabWidget):
             sklearn.linear_model,
             sklearn.ensemble,
             sklearn.preprocessing,
-            sklearn.tree
+            sklearn.tree,
+
         ]
 
         def addModule(name , filter):    
@@ -86,7 +87,6 @@ class ColumnsSubmodule(QtW.QWidget):
         widget = e.source()
         from_parent = widget.parentWidget()
         to_parent = self
-        print(f"Prev Parent : {from_parent} , To Parent : {to_parent}")
         if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSubmodule):
             e.accept()
         elif isinstance(from_parent , ColumnsSection) and isinstance(to_parent , ColumnsSubmodule):
@@ -119,7 +119,6 @@ class GUILibarySubmodule(QtW.QGroupBox):
         widget = e.source()
         from_parent = widget.parentWidget()
         to_parent = self
-        print(f"Prev Parent : {from_parent} , To Parent : {to_parent}")
         if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , GUILibarySubmodule):
             e.accept()
         elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , GUILibarySubmodule):
@@ -141,7 +140,6 @@ class ColumnsSection(QtW.QGroupBox):
     def dragEnterEvent(self, e):
         pos = e.pos()
         widget = e.source()
-        print("Col enter : " , widget)
         if isinstance(widget , DraggableColumn):
             e.accept()        
         else:
@@ -164,11 +162,9 @@ class ColumnsSection(QtW.QGroupBox):
         pos = e.pos()
         widget = e.source()
         if (self.get_num_cols() == self.max_num_cols):
-            print("Hello, max limit hit")
             # Remove one the children from this
             for child in self.findChildren(QtW.QWidget):
                 if isinstance(child , DraggableColumn) and child != widget:
-                    print("Times called" , child , widget)
                     e.accept()
                     self.my_layout.addWidget(widget)
                     child.deleteLater()
@@ -176,7 +172,6 @@ class ColumnsSection(QtW.QGroupBox):
         # we can see the previous parent
         from_parent = widget.parentWidget()
         to_parent = self
-        print(f"Prev Parent : {from_parent} , To Parent : {to_parent}")
         self.my_layout.addWidget(widget)
         if not isinstance(widget , DraggableColumn):
             e.ignore()
@@ -204,8 +199,6 @@ class PipelineSection(QtW.QGroupBox):
         for child in self.findChildren(QtW.QWidget):
             if isinstance(child , Draggable):
                 parameters_as_dict = dict(child.parameters)
-                print("Child Parameters" , parameters_as_dict)
-                print("Child funciton" , child.sklearn_function)
                 curr = child.sklearn_function(**parameters_as_dict)
                 resulting_models.append(curr)
         return resulting_models
@@ -237,11 +230,9 @@ class PipelineSection(QtW.QGroupBox):
         pos = e.pos()
         widget = e.source()
         if (self.get_num_models() == self.max_num_models):
-            print("Hello, max limit hit")
             # Remove one the children from this
             for child in self.findChildren(QtW.QWidget):
                 if isinstance(child , Draggable) and child != widget:
-                    print("Times called" , child , widget)
                     e.accept()
                     self.my_layout.addWidget(widget)
                     child.deleteLater()
@@ -249,7 +240,6 @@ class PipelineSection(QtW.QGroupBox):
         # we can see the previous parent
         from_parent = widget.parentWidget()
         to_parent = self
-        print(f"Prev Parent : {from_parent} , To Parent : {to_parent}")
         self.my_layout.addWidget(widget)
         if not isinstance(widget , Draggable):
             e.ignore()
@@ -281,7 +271,7 @@ class Pipeline(QtW.QGroupBox):
         self.setStyleSheet("background-color: white;")
         self.setFixedSize(300 , 300)
         self.name_pipeline = QtW.QLineEdit()
-        self.name_pipeline.setPlaceholderText(f"pipeline {1 + len(self.my_parent.pipelines)}")
+        self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
             title="Preproccessors",
             accepting_function=GUILibary.PREPROCESSOR_FILTER
@@ -338,8 +328,6 @@ class Pipeline(QtW.QGroupBox):
 
     def moveEvent(self, moveEvent):
         geo = self.my_parent.geometry()
-        #print(f"Pipeline Window : {moveEvent.pos()}")
-        #print(f"Pos : {self.my_parent.pos()} , Left : {self.my_parent.width()} , Right : {self.my_parent.height()}")
         return super().moveEvent(moveEvent)
 
 
@@ -384,5 +372,3 @@ class PipelineMother(QtW.QMainWindow):
         new_pipeline.move(30 , 30)
         new_pipeline.show()
         self.pipelines.append(new_pipeline)
-        print(f"Mother Pos : ({self.pos().x()},{self.pos().y()})")
-        print(f"Pipeline Pos : ({new_pipeline.pos().x()},{new_pipeline.pos().y()})")

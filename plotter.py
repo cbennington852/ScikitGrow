@@ -19,7 +19,6 @@ from GUI_libary_and_pipeline import PipelineMother , Pipeline
 class Plotter(QtW.QTabWidget):
     def __init__(self , pipeline_mother : PipelineMother, dataframe : pd.DataFrame , **kwargs):
         super().__init__(**kwargs)
-        print("Pipeline mother" , pipeline_mother)
         self.pipeline_mother = pipeline_mother
         self.resize(400 , 400)
         self.dataframe = dataframe
@@ -57,7 +56,6 @@ class Plotter(QtW.QTabWidget):
             # 2.3 Models
             for models in gui_pipeline.model_pipe.get_pipeline_objects():
                 list_tuples_pipe_sklearn_objs.append((f"{len(list_tuples_pipe_sklearn_objs)}" , models))
-            print("List for pipeline" , list_tuples_pipe_sklearn_objs)
 
             # 2.4 Gather the validator
             if len(gui_pipeline.validator.get_pipeline_objects()) != 0:
@@ -68,14 +66,13 @@ class Plotter(QtW.QTabWidget):
             # 2.5 Assemble pipeline object
             new_pipeline = sklearn_engine.Pipeline(
                 sklearn_pipeline=sklearn.pipeline.Pipeline(list_tuples_pipe_sklearn_objs),
-                name=gui_pipeline.name_pipeline,
+                name=gui_pipeline.name_pipeline.text(),
                 validator=built_validator
             )
             lst_engine_pipelines.append(new_pipeline)
         x_cols = [item.name for item in x_value_draggables]
         y_cols = [item.name for item in y_value_draggables]
         # 3. start the engine on it's own thread.
-        print(lst_engine_pipelines)
          # 4. plot the results on the main GUI thread...
         self.worker_thread = QtCore.QThread()
         self.worker = PlotterWorker(
@@ -99,8 +96,6 @@ class Plotter(QtW.QTabWidget):
     
     @QtCore.pyqtSlot()
     def plotting_finished(self):
-        print("Hello! The plotting is finsihed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print(self.worker.engine_results)
         for i in range(0 , self.count()):
             widget = self.widget(i)
             widget.deleteLater()
@@ -108,7 +103,6 @@ class Plotter(QtW.QTabWidget):
         self.accuracy_plot = FigureCanvasQTAgg(self.worker.engine_results.accuracy_plot)
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
-        print(self.visual_plot)
         self.visual_plot.show()
         del self.worker
         
@@ -128,7 +122,6 @@ class PlotterWorker(QtCore.QObject):
 
     @QtCore.pyqtSlot() # What does this do?
     def start_plotting(self):
-        print("Starting plotting, YAY!")
         self.engine_results = sklearn_engine.SklearnEngine.main_sklearn_pipe(
             main_dataframe=self.dataframe,
             curr_pipelines=self.lst_engine_pipelines,
