@@ -50,13 +50,13 @@ class MainWindow(QMainWindow):
         self.dataframe = sns.load_dataset("iris")
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
-        libary = GUILibary(self.dataframe)
-        dataframeViewer = DataframeViewer(self.dataframe)
+        self.libary = GUILibary(self.dataframe)
+        self.dataframeViewer = DataframeViewer(self.dataframe)
         
-        pipeline_mommy = PipelineMother()
+        self.pipeline_mommy = PipelineMother()
 
-        plotter = Plotter(pipeline_mommy , self.dataframe)
-        pipeline_mommy.train_models.clicked.connect(plotter.plot_pipeline)
+        self.plotter = Plotter(self.pipeline_mommy , self.dataframe)
+        
 
         dock_libary = QtW.QDockWidget(
             "Libary",
@@ -75,22 +75,25 @@ class MainWindow(QMainWindow):
         dock_dataframe.setFeatures(dock_dataframe.features() & ~QtW.QDockWidget.DockWidgetClosable)
         dock_plot.setFeatures(dock_plot.features() & ~QtW.QDockWidget.DockWidgetClosable)
 
-        dock_libary.setWidget(libary)
-        dock_dataframe.setWidget(dataframeViewer)
-        dock_plot.setWidget(plotter)
+        dock_libary.setWidget(self.libary)
+        dock_dataframe.setWidget(self.dataframeViewer)
+        dock_plot.setWidget(self.plotter)
 
         self.addDockWidget(Qt.RightDockWidgetArea , dock_plot )
         self.addDockWidget(Qt.LeftDockWidgetArea , dock_dataframe)
         self.addDockWidget(Qt.LeftDockWidgetArea ,  dock_libary)
 
-        self.setCentralWidget(pipeline_mommy)
+        self.setCentralWidget(self.pipeline_mommy)
+
+from qt_material import apply_stylesheet
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
-    pixmap = QPixmap(":/Full_logo_SciKit_Grow.svg")
+    pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
     splash = QtW.QSplashScreen(pixmap)
-    splash.show()
+    apply_stylesheet(app, theme='dark_teal.xml')
+    #splash.show()
     window = MainWindow() # Create an instance of our custom window
     window.show() # Display the window
-    splash.finish(window)
+    #splash.finish(window)
     sys.exit(app.exec_()) # Start the application's event loop

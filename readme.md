@@ -16,11 +16,11 @@ Upon it's initial completion scratch had three defining features.
 ##  Project Goals & Summary
 The goal of this project is to make a learning software for novices and high schoolers to learn core data science concepts, such as overfiting, and linear vs non-linear models. 
 
-I plan to do so using a "Drag and Drop" system, very similar to how scratch operates.
+The goal of this project is to build a drag and drop interface, similar to scratch, where users can drag and drop parts of a data science pipeline to make charts, export models, and save.
 ![blocks v python](paper_images/blocks_vs_python.png "Optional title text")
 *A draft of the current drag and drop interface versus python code.*
 
-This would allow students and novices to learn in a similar way to scratch, dragging and dropping components, in an intuitive manner. 
+
 
 ### Project sub-goals:
 1. **Project always compiles** DataSeedlings should never not compile, the compiler should be written in a way that the project always results in an output, even if that output is a blank graph. 

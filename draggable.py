@@ -3,7 +3,7 @@ from sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag , QPixmap
+from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor
 import PyQt5.QtCore as QCore 
 
 
@@ -48,14 +48,52 @@ class DraggableColumn(QPushButton):
 
 # these are the draggable buttons
 class Draggable(QPushButton):
-    def __init__(self , name, sklearn_function , **kwargs):
+    def __init__(self , name, sklearn_function ,  **kwargs):
         super().__init__(**kwargs) 
         self.kwargs = kwargs
         self.name = name
+        self._image = QImage(":/images/base_scratch_block_pink.svg")
+        self._image.height = 60
+        self._image.width = 60
+        self.setStyleSheet("background-color: transparent;  border: none;")
+        self.setMinimumSize(200 , 50)
+        self.setMaximumSize(320  ,50)
         self.sklearn_function = sklearn_function
         self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
         self.setText(name)
         self.clicked.connect(self.on_button_clicked)
+
+    def setImage(self, image):
+        self._image = image
+        self.update()
+
+    def paintEvent(self, event):
+        print(self._image)
+        if self._image is None:
+            return
+        opt = QtW.QStyleOptionButton()
+        self.initStyleOption(opt)
+
+        rect = self.rect()
+
+        painter = QPainter(self)
+
+        self.style().drawControl(QtW.QStyle.CE_PushButtonBevel, opt, painter, self)
+
+        if opt.state & QtW.QStyle.State_Sunken:
+            rect.adjust(2,2,2,2)
+        
+        painter.drawImage(rect, self._image)
+
+        painter.setPen(QColor(Qt.white))
+        painter.drawText(20 , int(self.size().height() / 2), f"{self.name}")
+
+        if opt.state & QtW.QStyle.State_MouseOver:
+            color = self.palette().color(QPalette.Highlight)
+            color.setAlpha(50)
+            painter.fillRect(self.rect(), color)
+        
+
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

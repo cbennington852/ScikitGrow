@@ -259,15 +259,15 @@ class PipelineSection(QtW.QGroupBox):
         elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , PipelineSection):
             e.accept()
 
-class Pipeline(QtW.QGroupBox):
+class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
 
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)
         my_layout = QVBoxLayout()
+        main_thing = QtW.QWidget()
         self.my_parent = my_parent
-        self.setLayout(my_layout)
-        #self.setStyleSheet("background-color: white;")
+        main_thing.setLayout(my_layout)
         self.resize(400 , 400)
         self.name_pipeline = QtW.QLineEdit()
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
@@ -287,52 +287,24 @@ class Pipeline(QtW.QGroupBox):
             accepting_function=GUILibary.VALIDATOR_FILTER,
             max_num_models=1
         )
-        self.close_pipeline_button = QtW.QPushButton()
-        self.close_pipeline_button.setFixedSize(30 , 30)
-        self.close_pipeline_button.move(0 , 0)
-        pixmapi = getattr(QtW.QStyle, "SP_LineEditClearButton")
-        icon = self.style().standardIcon(pixmapi)
-        self.close_pipeline_button.setIcon(icon)
-        self.close_pipeline_button.clicked.connect(self.remove_pipeline)
-        my_layout.addWidget(self.close_pipeline_button)
         my_layout.addWidget(self.name_pipeline)
         my_layout.addWidget(self.preproccessor_pipe)
         my_layout.addWidget(self.model_pipe)
         my_layout.addWidget(self.validator)
+        self.setWidget(main_thing)
 
     def get_name_pipeline(self) -> str:
         return self.name_pipeline.text
 
-    def remove_pipeline(self):
+    def closeEvent(self, event):
         for x in range(0 , len(self.my_parent.pipelines)):
             if self.my_parent.pipelines[x] == self:
                 del self.my_parent.pipelines[x]
                 self.deleteLater()
+                super(QtW.QMdiSubWindow, self).closeEvent(event)
                 return
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.offset = event.pos()
-            # Bring the dragged widget to the front of its siblings
-            self.raise_() 
 
-    def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.MouseButton.LeftButton:
-            # Calculate the new position relative to the parent widget
-            # global position of mouse - global position of parent + the offset recorded in mousePressEvent
-            # overides in event of weird error I can't recreate right now.
-            try:
-                self.move(self.mapToParent(event.pos() - self.offset))
-            except:
-                pass
-
-    def mouseReleaseEvent(self, event):
-        self.offset = QPoint()
-
-
-    def moveEvent(self, moveEvent):
-        geo = self.my_parent.geometry()
-        return super().moveEvent(moveEvent)
 
 
 class PipelineMother(QtW.QMainWindow):
@@ -340,14 +312,35 @@ class PipelineMother(QtW.QMainWindow):
         super().__init__(**kwargs)
         self.setWindowFlags(Qt.WindowType.Widget)
         self.pipelines = []
+        self.train_models = None
+
         toolbar = QtW.QToolBar()
-        self.main_thing = QtW.QWidget()
+        self.main_thing = QtW.QMdiArea()
         my_layout = QtW.QVBoxLayout()
         self.main_thing.setLayout(my_layout)
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
         self.add_pipeline_button.clicked.connect(self.add_pipeline)
+        toolbar.addWidget(self.add_pipeline_button)
+        self.setCentralWidget(self.main_thing)
+        self.addToolBar(toolbar)
 
-        # X cols
+        self.add_pipeline()
+
+        self.render_x_y_train_sub_window()
+
+    def render_x_y_train_sub_window(self):
+        sub_window = QtW.QMdiSubWindow(self.main_thing)
+        main_widget = QtW.QWidget()
+        mayo = QtW.QVBoxLayout()
+        main_widget.setLayout(mayo)
+        sub_window.setWidget(main_widget)
+
+
+        self.train_models = QtW.QPushButton(
+            "Train Models"
+        )
+
+
         self.x_columns = ColumnsSection(
             "X axis",
             max_num_cols=400
@@ -357,20 +350,11 @@ class PipelineMother(QtW.QMainWindow):
             max_num_cols=1
         )
 
-        self.train_models = QtW.QPushButton(
-            "Train Models"
-        )
+        mayo.addWidget(self.train_models)
+        mayo.addWidget(self.x_columns)
+        mayo.addWidget(self.y_columns)
 
-        toolbar.addWidget(self.add_pipeline_button)
-        toolbar.addWidget(self.train_models)
-        toolbar.addWidget(self.x_columns)
-        toolbar.addWidget(self.y_columns)
-
-        self.setCentralWidget(self.main_thing)
-        self.addToolBar(toolbar)
-        self.add_pipeline()
-
-
+        sub_window.show()
 
     def add_pipeline(self):
         new_pipeline = Pipeline(self , self.main_thing)

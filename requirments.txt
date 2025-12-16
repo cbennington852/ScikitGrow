@@ -2,3 +2,4 @@ scikit-learn
 PyQt5
 matplotlib
 seaborn
+qt-material

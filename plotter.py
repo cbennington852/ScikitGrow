@@ -23,6 +23,7 @@ class Plotter(QtW.QTabWidget):
     def __init__(self , pipeline_mother : PipelineMother, dataframe : pd.DataFrame , **kwargs):
         super().__init__(**kwargs)
         self.pipeline_mother = pipeline_mother
+        self.pipeline_mother.train_models.clicked.connect(self.plot_pipeline)
         self.resize(400 , 400)
         self.dataframe = dataframe
         width=5
