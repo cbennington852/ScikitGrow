@@ -14,6 +14,9 @@ from PyQt5.QtGui import *
 from plotter import Plotter
 
 
+
+
+
 """
 class SplashScreen(QWidget):
     def __init__(self):
@@ -45,7 +48,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self ):
         super().__init__()
-        self.setWindowTitle("SciKit Grow? App name later...")
+        self.setWindowTitle("SciKit Grow")
         self.resize(800 , 600)
         self.dataframe = sns.load_dataset("iris")
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
@@ -80,18 +83,16 @@ class MainWindow(QMainWindow):
         dock_plot.setWidget(self.plotter)
 
         self.addDockWidget(Qt.RightDockWidgetArea , dock_plot )
-        self.addDockWidget(Qt.LeftDockWidgetArea , dock_dataframe)
+        self.addDockWidget(Qt.RightDockWidgetArea , dock_dataframe)
         self.addDockWidget(Qt.LeftDockWidgetArea ,  dock_libary)
 
         self.setCentralWidget(self.pipeline_mommy)
 
-from qt_material import apply_stylesheet
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
     pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
     splash = QtW.QSplashScreen(pixmap)
-    apply_stylesheet(app, theme='dark_teal.xml')
     #splash.show()
     window = MainWindow() # Create an instance of our custom window
     window.show() # Display the window

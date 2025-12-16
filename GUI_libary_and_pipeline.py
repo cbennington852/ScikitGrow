@@ -316,9 +316,11 @@ class PipelineMother(QtW.QMainWindow):
 
         toolbar = QtW.QToolBar()
         self.main_thing = QtW.QMdiArea()
+        self.main_thing.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
         my_layout = QtW.QVBoxLayout()
         self.main_thing.setLayout(my_layout)
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
+        add_icon = self.style().standardIcon(QtW.QStyle.SP_)
         self.add_pipeline_button.clicked.connect(self.add_pipeline)
         toolbar.addWidget(self.add_pipeline_button)
         self.setCentralWidget(self.main_thing)
@@ -339,6 +341,10 @@ class PipelineMother(QtW.QMainWindow):
         self.train_models = QtW.QPushButton(
             "Train Models"
         )
+        play_icon = self.style().standardIcon(QtW.QStyle.SP_MediaPlay)
+        
+        # Set the icon on the button
+        self.train_models.setIcon(play_icon)
 
 
         self.x_columns = ColumnsSection(

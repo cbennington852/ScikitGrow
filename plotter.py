@@ -14,6 +14,11 @@ import sklearn_engine
 import sklearn
 import pandas as pd
 from GUI_libary_and_pipeline import PipelineMother , Pipeline
+import matplotlib.pyplot as plt
+
+
+plt.style.use("seaborn-v0_8-darkgrid")
+
 
 
 class ScikitGrowEngineAssemblyError(Exception):
@@ -24,16 +29,25 @@ class Plotter(QtW.QTabWidget):
         super().__init__(**kwargs)
         self.pipeline_mother = pipeline_mother
         self.pipeline_mother.train_models.clicked.connect(self.plot_pipeline)
-        self.resize(400 , 400)
         self.dataframe = dataframe
-        width=5
-        height=4
-        dpi=100
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        fig1 = Figure(figsize=(width, height), dpi=dpi)
+
+        fig, ax = plt.subplots(figsize=(2, 2))
+        ax.grid(visible=True, color='white', linestyle='-', linewidth=0.5)
+        ax.set_xlim(0, 10)
+        ax.set_ylim(0, 10)
+        ax.set_xlabel('X Axis')
+        ax.set_ylabel('Y Axis')
+
+        fig2, ax2 = plt.subplots(figsize=(2, 2))
+        ax2.grid(visible=True,  linestyle='-', linewidth=0.5)
+        ax2.set_xlim(0, 10)
+        ax2.set_ylim(0, 10)
+        ax2.set_xlabel('X Axis')
+        ax2.set_ylabel('Y Axis')
+        
         
         self.visual_plot = FigureCanvasQTAgg(fig)
-        self.accuracy_plot = FigureCanvasQTAgg(fig1)
+        self.accuracy_plot = FigureCanvasQTAgg(fig)
         
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
