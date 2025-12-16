@@ -16,6 +16,9 @@ from matplotlib.colors import ListedColormap
 
     # Each plotting endpoint needs to modified, and receives a list of Pipelines
 
+class InternalEngineError(Exception):
+    pass
+
 class Pipeline():
     rand_adj = [
         "Awesome", "Beautiful", "Charming", "Delightful", "Energetic", 
@@ -38,7 +41,7 @@ class Pipeline():
         elif sklearn.base.is_regressor(last_step_model):
             self.supervised_learning_type = SklearnEngine.REGRESSION
         else:
-            raise ValueError(f"Pipeline {name} has neither a regressor or classifier. Crashing")
+            raise InternalEngineError(f"Pipeline {name} has neither a regressor or classifier. Crashing")
             
 
 class ModelTrainingResults():
@@ -70,11 +73,14 @@ class SklearnEngine():
         first = curr_pipelines[0]
         for i in range(1 , len(curr_pipelines)):
             if curr_pipelines[i].supervised_learning_type != first.supervised_learning_type:
-                raise ValueError(
-                    f"{first.name} Has a different supervised learning type than {curr_pipelines[i].name}"
+                raise InternalEngineError(
+                    f"""{first.name} Has a different supervised learning type than {curr_pipelines[i].name}. 
+                    {first.name} is a {first.supervised_learning_type}, whereas {curr_pipelines[i].name} is a {curr_pipelines[i].supervised_learning_type}
+                    """
                 )
         return first.supervised_learning_type
-    def main_sklearn_pipe(main_dataframe,  curr_pipelines : list[Pipeline] , pipeline_x_values  , pipeline_y_value ) -> EngineResults:
+
+    def main_sklearn_pipe(main_dataframe : pd.DataFrame,  curr_pipelines : list[Pipeline] , pipeline_x_values  , pipeline_y_value ) -> EngineResults:
         """Runs the main sklearn pipeline, filtering through the different options that
           the user could have inputted into this software. 
 
@@ -86,13 +92,23 @@ class SklearnEngine():
         """
 
         # make a copy of the dataframe
-        main_dataframe_copy = main_dataframe.copy(deep=True)
+        try:
+            main_dataframe_copy = main_dataframe.copy(deep=True)
+        except Exception as e:
+            raise InternalEngineError(f"Failed to deep copy the dataframe : {str(e)}")
+        
+        # Drop NaN
+        main_dataframe_copy = main_dataframe_copy.dropna()
+
         #Sort the dataframe to make plots better.
         main_dataframe_copy.sort_values(by=pipeline_x_values, inplace=True)
+
         # verify that the pipelines are 
         supervised_learning_type = SklearnEngine.check_all_same_supervised_learning_type(curr_pipelines)
+
         # If user wants a string, try to factorize.
         main_dataframe_copy = SklearnEngine.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
+
         # Preform basic validation on the inputs
         result_validation = SklearnEngine.validate_column_inputs(main_dataframe_copy , curr_pipelines, pipeline_x_values , pipeline_y_value)
 
@@ -104,13 +120,14 @@ class SklearnEngine():
         y = main_dataframe_copy[pipeline_y_value].iloc[:, 0]
 
         # Train the model
+
         SklearnEngine.train_model(
             main_dataframe=main_dataframe_copy, 
             curr_pipeline=curr_pipelines, 
             x=x,
             y=y,
         )
-
+        
 
         if supervised_learning_type == SklearnEngine.CLASSIFICATION:
             return SklearnEngine.ClassificationPlotterFilter.main_filter(
@@ -245,32 +262,33 @@ class SklearnEngine():
         """
         results = {}
         def train_single_model(curr : Pipeline):
-            curr.sklearn_pipeline.fit(x , y)
-            # Apply the user specified validator
-            if (curr.validator is not None):
-                y_preds = SklearnEngine.k_fold_general_threads(
-                    model=curr_pipeline,
-                    kf=curr.validator,
-                    X=x,
-                    y=y
+                curr.sklearn_pipeline.fit(x , y)
+                # Apply the user specified validator
+                if (curr.validator is not None):
+                    y_preds = SklearnEngine.k_fold_general_threads(
+                        model=curr_pipeline,
+                        kf=curr.validator,
+                        X=x,
+                        y=y
+                    )
+                else:
+                    y_preds = curr.sklearn_pipeline.predict(x)
+                results[curr] = (
+                    ModelTrainingResults(
+                        y_predictions=y_preds,
+                        trained_model=curr.sklearn_pipeline
+                    )
                 )
-            else:
-                y_preds = curr.sklearn_pipeline.predict(x)
-            results[curr] = (
-                ModelTrainingResults(
-                    y_predictions=y_preds,
-                    trained_model=curr.sklearn_pipeline
-                )
-            )
+            
+                
+            
         threads = []
-        # Train each pipeline on an individual thread.
+            # Train each pipeline on an individual thread.
         for pipeline in curr_pipeline:
-            curr_thread = threading.Thread(target=train_single_model , kwargs={"curr" : pipeline})
-            threads.append(curr_thread)
-            curr_thread.start()
-        # Wait for each thread to finish
-        for thread in threads:
-            thread.join()
+            try:
+                train_single_model(pipeline)
+            except sklearn.utils._param_validation.InvalidParameterError as e:
+                raise InternalEngineError(f"Failed to train pipeline {pipeline.name} because {str(e)}")
         # Attach the results to each pipeline
         for ptr_to_pipeline , model_results in results.items():
             ptr_to_pipeline.model_results = model_results
