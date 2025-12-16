@@ -73,10 +73,12 @@ class Plotter(QtW.QTabWidget):
         x_cols = [item.name for item in x_value_draggables]
         y_cols = [item.name for item in y_value_draggables]
         # 3. start the engine on it's own thread.
-         # 4. plot the results on the main GUI thread...
+        # 3.1 before we start the enngine, make sure to disable the button for this.
+        self.sender().setEnabled(False)
         self.worker_thread = QtCore.QThread()
         self.worker = PlotterWorker(
             lst_engine_pipelines=lst_engine_pipelines,
+            ptr_to_training_button=self.sender(),
             x_cols=x_cols,
             y_cols=y_cols,
             dataframe=self.dataframe
@@ -104,6 +106,8 @@ class Plotter(QtW.QTabWidget):
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
         self.visual_plot.show()
+        self.worker.ptr_to_training_button.setEnabled(True)
+
         del self.worker
         
 
@@ -112,11 +116,12 @@ class PlotterWorker(QtCore.QObject):
     progress = QtCore.pyqtSignal(int)
     finished = QtCore.pyqtSignal()
 
-    def __init__(self, lst_engine_pipelines , x_cols , y_cols , dataframe):
+    def __init__(self, lst_engine_pipelines , x_cols , y_cols , dataframe , ptr_to_training_button):
         super(PlotterWorker, self).__init__()
         self.lst_engine_pipelines = lst_engine_pipelines
         self.x_cols = x_cols
         self.y_cols = y_cols
+        self.ptr_to_training_button = ptr_to_training_button
         self.dataframe = dataframe
 
 

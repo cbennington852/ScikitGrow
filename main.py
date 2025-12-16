@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self ):
         super().__init__()
-        self.setWindowTitle("My App")
+        self.setWindowTitle("SciKit Grow? App name later...")
         self.resize(800 , 600)
         self.dataframe = sns.load_dataset("iris")
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
@@ -71,6 +71,13 @@ class MainWindow(QMainWindow):
             self
         )
 
+        dock_libary.setFeatures(dock_libary.features() & ~QtW.QDockWidget.DockWidgetClosable)
+        dock_dataframe.setFeatures(dock_dataframe.features() & ~QtW.QDockWidget.DockWidgetClosable)
+        dock_plot.setFeatures(dock_plot.features() & ~QtW.QDockWidget.DockWidgetClosable)
+
+
+
+
         dock_libary.setWidget(libary)
         dock_dataframe.setWidget(dataframeViewer)
         dock_plot.setWidget(plotter)
@@ -78,8 +85,6 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea , dock_libary)
         self.addDockWidget(Qt.LeftDockWidgetArea , dock_dataframe)
         self.addDockWidget(Qt.LeftDockWidgetArea , dock_plot)
-
-
         self.setCentralWidget(pipeline_mommy)
 
 if __name__ == "__main__":
