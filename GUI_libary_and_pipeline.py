@@ -3,7 +3,7 @@ from sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag
+from PyQt5.QtGui import QDrag , QIcon
 import PyQt5.QtCore as QtCore 
 from draggable import Draggable , DraggableColumn
 from sklearn.base import is_regressor, is_classifier
@@ -186,7 +186,6 @@ class ColumnsSection(QtW.QGroupBox):
 class PipelineSection(QtW.QGroupBox):
     def __init__(self , accepting_function, title, max_num_models = 100,  **kwargs):
         super().__init__( **kwargs)
-        self.resize(300 , 300)
         self.setTitle(title)
         self.max_num_models = max_num_models
         self.accepting_function = accepting_function
@@ -268,8 +267,8 @@ class Pipeline(QtW.QGroupBox):
         my_layout = QVBoxLayout()
         self.my_parent = my_parent
         self.setLayout(my_layout)
-        self.setStyleSheet("background-color: white;")
-        self.setFixedSize(300 , 300)
+        #self.setStyleSheet("background-color: white;")
+        self.resize(400 , 400)
         self.name_pipeline = QtW.QLineEdit()
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
@@ -288,7 +287,12 @@ class Pipeline(QtW.QGroupBox):
             accepting_function=GUILibary.VALIDATOR_FILTER,
             max_num_models=1
         )
-        self.close_pipeline_button = QtW.QPushButton("Close pipeline")
+        self.close_pipeline_button = QtW.QPushButton()
+        self.close_pipeline_button.setFixedSize(30 , 30)
+        self.close_pipeline_button.move(0 , 0)
+        pixmapi = getattr(QtW.QStyle, "SP_LineEditClearButton")
+        icon = self.style().standardIcon(pixmapi)
+        self.close_pipeline_button.setIcon(icon)
         self.close_pipeline_button.clicked.connect(self.remove_pipeline)
         my_layout.addWidget(self.close_pipeline_button)
         my_layout.addWidget(self.name_pipeline)
@@ -335,10 +339,11 @@ class PipelineMother(QtW.QMainWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.setWindowFlags(Qt.WindowType.Widget)
-        self.resize(600 , 600)
         self.pipelines = []
         toolbar = QtW.QToolBar()
         self.main_thing = QtW.QWidget()
+        my_layout = QtW.QVBoxLayout()
+        self.main_thing.setLayout(my_layout)
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
         self.add_pipeline_button.clicked.connect(self.add_pipeline)
 

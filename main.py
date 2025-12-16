@@ -75,16 +75,14 @@ class MainWindow(QMainWindow):
         dock_dataframe.setFeatures(dock_dataframe.features() & ~QtW.QDockWidget.DockWidgetClosable)
         dock_plot.setFeatures(dock_plot.features() & ~QtW.QDockWidget.DockWidgetClosable)
 
-
-
-
         dock_libary.setWidget(libary)
         dock_dataframe.setWidget(dataframeViewer)
         dock_plot.setWidget(plotter)
 
-        self.addDockWidget(Qt.RightDockWidgetArea , dock_libary)
+        self.addDockWidget(Qt.RightDockWidgetArea , dock_plot )
         self.addDockWidget(Qt.LeftDockWidgetArea , dock_dataframe)
-        self.addDockWidget(Qt.LeftDockWidgetArea , dock_plot)
+        self.addDockWidget(Qt.LeftDockWidgetArea ,  dock_libary)
+
         self.setCentralWidget(pipeline_mommy)
 
 if __name__ == "__main__":
