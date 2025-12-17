@@ -14,26 +14,29 @@ class GUILibary(QtW.QTabWidget):
     ###############################################
     # List of Filter / Accepting Functions
     ###############################################
-    PREPROCESSOR_FILTER = lambda x : hasattr(x, 'fit') and hasattr(x, 'transform')
     def model_filter(x):
         try:
             return is_classifier(x) or is_regressor(x)
         except:
             return False
-    MODEL_FILTER = model_filter
-    VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
     def regression_filter(x):
         try:
             return is_regressor(x)
         except:
             return False
-    REGRESSOR_FILTER = regression_filter
     def classification_filter(x):
         try:
             return is_classifier(x)
         except:
             return False
     CLASSIFIER_FILTER = classification_filter
+    PREPROCESSOR_FILTER = lambda x : hasattr(x, 'fit') and hasattr(x, 'transform') and (not hasattr(x , 'predict'))
+    REGRESSOR_FILTER = regression_filter
+    VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
+    MODEL_FILTER = model_filter
+
+
+
 
 
     def __init__(self , dataframe,  **kwargs):
@@ -44,6 +47,7 @@ class GUILibary(QtW.QTabWidget):
             (sklearn.ensemble,"#360185" , Draggable.BUBBLE),
             (sklearn.preprocessing, "#301CA0" ,Draggable.INTERLOCK_RIGHT),
             (sklearn.tree ,"#DE1A58" , Draggable.BUBBLE),
+            (sklearn.model_selection , "#235622" , Draggable.POINTY)
         ]
 
         def addModule(name , filter):    
