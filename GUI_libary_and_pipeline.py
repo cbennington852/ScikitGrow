@@ -50,6 +50,11 @@ class GUILibary(QtW.QTabWidget):
             (sklearn.model_selection , "#235622" , Draggable.POINTY)
         ]
 
+        # Styling
+        self.setTabPosition(QtW.QTabWidget.West)
+
+
+        self.curr_index = 0
         def addModule(name , filter):    
             regressor_box = QtW.QWidget()
             regressor_layout = QtW.QVBoxLayout()
@@ -68,16 +73,25 @@ class GUILibary(QtW.QTabWidget):
             scroll_regressor = QtW.QScrollArea()
             scroll_regressor.setWidget(regressor_box)
             scroll_regressor.setWidgetResizable(True)
-            self.addTab(scroll_regressor , name)
+            if isinstance(name , QIcon):
+                print("ICON DETECETD")
+                self.addTab(scroll_regressor , "")
+                self.setTabIcon(self.curr_index , name)
+                self.setIconSize(QtCore.QSize(70 , 70))
+            else:
+                self.addTab(scroll_regressor , name)
+            self.curr_index += 1
+            
+                
 
 
 
-        addModule("Regressors" , GUILibary.REGRESSOR_FILTER)
-        addModule("Classifiers" , GUILibary.CLASSIFIER_FILTER)
+        addModule(QIcon(":/images/reggessor_icon.png") , GUILibary.REGRESSOR_FILTER)
+        addModule(QIcon(":/images/classifier_icon.png") , GUILibary.CLASSIFIER_FILTER)
         addModule("Pre-processors" , GUILibary.PREPROCESSOR_FILTER)
         addModule("Validators" , GUILibary.VALIDATOR_FILTER)
 
-
+        curr_index = 0
 
         self.addTab(self.cols_tab() , "Columns")
 
