@@ -40,21 +40,21 @@ class GUILibary(QtW.QTabWidget):
         super().__init__(**kwargs)
         self.dataframe = dataframe
         sklearn_models = [
-            sklearn.linear_model,
-            sklearn.ensemble,
-            sklearn.preprocessing,
-            sklearn.tree,
-
+            (sklearn.linear_model,"" , Draggable.BUBBLE),
+            (sklearn.ensemble,"" , Draggable.BUBBLE),
+            (sklearn.preprocessing, "" ,Draggable.POINTY),
+            (sklearn.tree ,"" , Draggable.BUBBLE),
         ]
 
         def addModule(name , filter):    
             regressor_box = QtW.QWidget()
             regressor_layout = QtW.QVBoxLayout()
             regressor_box.setLayout(regressor_layout)
-            for subsection in sklearn_models:
+            for subsection ,hex_color , render_type in sklearn_models:
                 curr = GUILibarySubmodule(
                         SubLibary.get_public_methods(
                             library=subsection,
+
                             filter_function=filter
                         )
                     )
@@ -110,7 +110,7 @@ class ColumnsSubmodule(QtW.QWidget):
             widget.deleteLater()
 
 class GUILibarySubmodule(QtW.QGroupBox):
-    def __init__(self , sublibary : SubLibary , **kwargs):
+    def __init__(self , sublibary : SubLibary , render_type = "", hex_value = "",  **kwargs):
         super().__init__(**kwargs)
         self.layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
@@ -121,7 +121,9 @@ class GUILibarySubmodule(QtW.QGroupBox):
         for sklearn in self.sublibary.function_calls:
             self.layout.addWidget(Draggable(
                 str(sklearn.__name__),
-                sklearn
+                sklearn,
+                Draggable.BUBBLE,
+                "#360185"
             ))
         
     def dragEnterEvent(self, e):

@@ -14,7 +14,27 @@ class DraggableColumn(QPushButton):
         super().__init__(**kwargs) 
         self.kwargs = kwargs
         self.name = name
-        self.setText(self.name)
+        self.setFlat(True)
+        self.setStyleSheet("""  
+            QPushButton {
+                background-color: rgba(0, 0, 0, 0);
+                border: none;
+            }
+            QPushButton:hover {
+               background-color: none; border-style: none; 
+            }
+            QPushButton:pressed {
+                background-color: none;      /* Optional: style for when clicked */
+            }
+        """)    
+        # calculate the minmum width from the text and then set it? 
+        temp_label = QtW.QLabel(name)
+        temp_label.adjustSize()
+        required_text_width = temp_label.width()
+        print(temp_label.width())
+        self.label_inferred_width = temp_label.width()
+        self.setMaximumWidth(required_text_width + 60)
+        self.setFixedHeight(50)
 
     def copy_self(self):
         return DraggableColumn(
@@ -45,7 +65,7 @@ class DraggableColumn(QPushButton):
             self.drag_start_position = event.pos()
         super(DraggableColumn, self).mousePressEvent(event)
 
-     def paintEvent(self, event):
+    def paintEvent(self, event):
         
         opt = QtW.QStyleOptionButton()
         self.initStyleOption(opt)
@@ -109,26 +129,18 @@ class DraggableColumn(QPushButton):
 
 # these are the draggable buttons
 class Draggable(QPushButton):
-    def __init__(self , name, sklearn_function ,  **kwargs):
+
+    INTERLOCK_RIGHT = "interlock_right"
+    POINTY = "pointy"
+    BUBBLE = "bubble"
+
+    def __init__(self , name, sklearn_function , render_type, hex_color,   **kwargs):
         super().__init__(**kwargs) 
         self.kwargs = kwargs
         self.name = name
-        #self._image = QImage(":/images/base_scratch_block_pink.svg")
-        #self._image.height = 60
-        #self._image.width = 60
-        self.setFlat(True)
-        self.setStyleSheet("""  
-            QPushButton {
-                background-color: rgba(0, 0, 0, 0);
-                border: none;
-            }
-            QPushButton:hover {
-               background-color: none; border-style: none; 
-            }
-            QPushButton:pressed {
-                background-color: none;      /* Optional: style for when clicked */
-            }
-        """)    
+        self.render_type = render_type
+        self.hex_color = hex_color
+        self.setFlat(True) 
         # calculate the minmum width from the text and then set it? 
         temp_label = QtW.QLabel(name)
         temp_label.adjustSize()
@@ -141,6 +153,24 @@ class Draggable(QPushButton):
         self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
         self.setText(name)
         self.clicked.connect(self.on_button_clicked)
+
+        # rendering the actual thing
+        if render_type == Draggable.BUBBLE:
+            print("Bubble !")
+            self.setStyleSheet(f"""  
+                QPushButton {{
+                    background-color: {hex_color};
+                    border-radius: 20px;
+                    color : white;
+                    border: 5px black solid;
+                }}
+                QPushButton:hover {{
+                    background-color: {hex_color}; border-style: none; 
+                }}
+                QPushButton:pressed {{
+                    background-color: {hex_color};      /* Optional: style for when clicked */
+                }}
+            """) 
 
 
    
@@ -172,6 +202,8 @@ class Draggable(QPushButton):
         return Draggable(
             name=self.name,
             sklearn_function=self.sklearn_function,
+            render_type=self.render_type,
+            hex_color=self.hex_color
             **self.kwargs
         )
     
