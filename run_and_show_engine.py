@@ -48,19 +48,28 @@ classifier_2 =  sklearn.pipeline.Pipeline([
 #     ]
 # )
 
+# res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+#     main_dataframe=dataframe_classifier,
+#     pipeline_x_values=['petal_width' , 'sepal_length' ],
+#     pipeline_y_value=['species'],
+#     curr_pipelines=[
+#         Pipeline(
+#             sklearn_pipeline=classifier_1,
+#             validator=None
+#         ),
+#         Pipeline(
+#             sklearn_pipeline=classifier_2,
+#             validator=None
+#         )
+#     ]
+# )
+
 res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
     main_dataframe=dataframe_classifier,
     pipeline_x_values=['petal_width' , 'sepal_length' ],
     pipeline_y_value=['species'],
     curr_pipelines=[
-        Pipeline(
-            sklearn_pipeline=classifier_1,
-            validator=None
-        ),
-        Pipeline(
-            sklearn_pipeline=classifier_2,
-            validator=None
-        )
+        
     ]
 )
 

@@ -2,6 +2,7 @@
 <RCC version="1.0">
     <qresource prefix="/images">
         <file>base_scratch_block_pink.svg</file>
+        <file>base_scratch_block_pink_arrow.svg</file>
         <file>Full_logo_SciKit_Grow.svg</file>
         <file>green_arrow.svg</file>
         <file>Mini_Logo_SciKit_Grow.svg</file>
@@ -13,5 +14,9 @@
         <file>Mini_Logo_Alantis_2.svg</file>
         <file>Mini_Logo_Alantis_Learn_3.svg</file>
         <file>Mini_Logo_Alantis_Learn_book.svg</file>
+        <file>add_pipeline.svg</file>
+        <file>mouse_accepts.svg</file>
+
+
     </qresource>
 </RCC>

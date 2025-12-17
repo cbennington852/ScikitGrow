@@ -3,7 +3,7 @@ from sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag , QIcon
+from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor
 import PyQt5.QtCore as QtCore 
 from draggable import Draggable , DraggableColumn
 from sklearn.base import is_regressor, is_classifier
@@ -15,10 +15,25 @@ class GUILibary(QtW.QTabWidget):
     # List of Filter / Accepting Functions
     ###############################################
     PREPROCESSOR_FILTER = lambda x : hasattr(x, 'fit') and hasattr(x, 'transform')
-    MODEL_FILTER = lambda x : is_classifier(x) or is_regressor(x)
+    def model_filter(x):
+        try:
+            return is_classifier(x) or is_regressor(x)
+        except:
+            return False
+    MODEL_FILTER = model_filter
     VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
-    REGRESSOR_FILTER = lambda x : is_regressor(x)
-    CLASSIFIER_FILTER = lambda x : is_classifier(x)
+    def regression_filter(x):
+        try:
+            return is_regressor(x)
+        except:
+            return False
+    REGRESSOR_FILTER = regression_filter
+    def classification_filter(x):
+        try:
+            return is_classifier(x)
+        except:
+            return False
+    CLASSIFIER_FILTER = classification_filter
 
 
     def __init__(self , dataframe,  **kwargs):
@@ -209,6 +224,7 @@ class PipelineSection(QtW.QGroupBox):
             # now check to see if it meets this submodule.
             if self.accepting_function(widget.sklearn_function):
                 e.accept()        
+                
         else:
             e.ignore()
     def get_num_models(self):
@@ -320,7 +336,8 @@ class PipelineMother(QtW.QMainWindow):
         my_layout = QtW.QVBoxLayout()
         self.main_thing.setLayout(my_layout)
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
-        add_icon = self.style().standardIcon(QtW.QStyle.SP_)
+        self.add_pipeline_button.setFixedSize(150 ,60)
+        self.add_pipeline_button.setIcon(QIcon(":/images/add_pipeline.svg"))
         self.add_pipeline_button.clicked.connect(self.add_pipeline)
         toolbar.addWidget(self.add_pipeline_button)
         self.setCentralWidget(self.main_thing)
@@ -332,6 +349,7 @@ class PipelineMother(QtW.QMainWindow):
 
     def render_x_y_train_sub_window(self):
         sub_window = QtW.QMdiSubWindow(self.main_thing)
+        sub_window.resize(400 , 300)
         main_widget = QtW.QWidget()
         mayo = QtW.QVBoxLayout()
         main_widget.setLayout(mayo)

@@ -3,7 +3,8 @@ from sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor
+import PyQt5.QtGui as PGui
+from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush
 import PyQt5.QtCore as QCore 
 
 
@@ -44,33 +45,8 @@ class DraggableColumn(QPushButton):
             self.drag_start_position = event.pos()
         super(DraggableColumn, self).mousePressEvent(event)
 
-
-
-# these are the draggable buttons
-class Draggable(QPushButton):
-    def __init__(self , name, sklearn_function ,  **kwargs):
-        super().__init__(**kwargs) 
-        self.kwargs = kwargs
-        self.name = name
-        self._image = QImage(":/images/base_scratch_block_pink.svg")
-        self._image.height = 60
-        self._image.width = 60
-        self.setStyleSheet("background-color: transparent;  border: none;")
-        self.setMinimumSize(200 , 50)
-        self.setMaximumSize(320  ,50)
-        self.sklearn_function = sklearn_function
-        self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
-        self.setText(name)
-        self.clicked.connect(self.on_button_clicked)
-
-    def setImage(self, image):
-        self._image = image
-        self.update()
-
-    def paintEvent(self, event):
-        print(self._image)
-        if self._image is None:
-            return
+     def paintEvent(self, event):
+        
         opt = QtW.QStyleOptionButton()
         self.initStyleOption(opt)
 
@@ -83,15 +59,92 @@ class Draggable(QPushButton):
         if opt.state & QtW.QStyle.State_Sunken:
             rect.adjust(2,2,2,2)
         
-        painter.drawImage(rect, self._image)
 
+        painter.setPen(QColor('#005489'))
+        painter.setBrush(QColor('#005461'))
+
+        # Top level input Calculations
+        starting_x = 0
+        starting_y = 0
+        left_of_bevel_width = 20
+        bevel_depth = 10
+        bevel_width = 20
+        bevel_slant_width = 10
+        right_of_bevel_width  = self.label_inferred_width - left_of_bevel_width + 10
+        block_height = 40
+
+        top_of_left_bevel_x = starting_x + left_of_bevel_width 
+        bottom_right_of_top_bevel_x = top_of_left_bevel_x + bevel_slant_width + bevel_width
+        far_right_corner_x = bottom_right_of_top_bevel_x + bevel_slant_width + right_of_bevel_width
+
+        block_with_bevel = QPolygon([
+            QPoint(starting_x , starting_y), # Top Right point.
+
+            # Top Bevel
+            QPoint(top_of_left_bevel_x, starting_y), # top of top left bevel point.
+            QPoint(top_of_left_bevel_x + bevel_slant_width , starting_y + bevel_depth), # bottom left of top bevel point
+            QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth), # bottom right of top bevel point
+            QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y), # top right of top bevel point.
+
+            
+            QPoint(far_right_corner_x  , starting_y), # top right corner.
+            QPoint(far_right_corner_x , block_height) , # bottom right corner
+            
+            # Bottom Bevel
+            QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y + block_height), # top right of top bevel point.
+            QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth + block_height), # bottom right of top bevel point
+            QPoint(top_of_left_bevel_x + bevel_slant_width , starting_y + bevel_depth + block_height), # bottom left of top bevel point
+            QPoint(top_of_left_bevel_x, starting_y + block_height), # top of top left bevel point.
+
+            QPoint(starting_x , block_height) # bottom left corner
+        ])
+
+        painter.drawPolygon(block_with_bevel)
         painter.setPen(QColor(Qt.white))
-        painter.drawText(20 , int(self.size().height() / 2), f"{self.name}")
+        start_y_for_text = int(self.size().height() / 2) + 5
+        painter.drawText(15 , start_y_for_text, f"{self.name}")
+     
 
-        if opt.state & QtW.QStyle.State_MouseOver:
-            color = self.palette().color(QPalette.Highlight)
-            color.setAlpha(50)
-            painter.fillRect(self.rect(), color)
+
+
+# these are the draggable buttons
+class Draggable(QPushButton):
+    def __init__(self , name, sklearn_function ,  **kwargs):
+        super().__init__(**kwargs) 
+        self.kwargs = kwargs
+        self.name = name
+        #self._image = QImage(":/images/base_scratch_block_pink.svg")
+        #self._image.height = 60
+        #self._image.width = 60
+        self.setFlat(True)
+        self.setStyleSheet("""  
+            QPushButton {
+                background-color: rgba(0, 0, 0, 0);
+                border: none;
+            }
+            QPushButton:hover {
+               background-color: none; border-style: none; 
+            }
+            QPushButton:pressed {
+                background-color: none;      /* Optional: style for when clicked */
+            }
+        """)    
+        # calculate the minmum width from the text and then set it? 
+        temp_label = QtW.QLabel(name)
+        temp_label.adjustSize()
+        required_text_width = temp_label.width()
+        print(temp_label.width())
+        self.label_inferred_width = temp_label.width()
+        self.setMaximumWidth(required_text_width + 60)
+        self.setFixedHeight(50)
+        self.sklearn_function = sklearn_function
+        self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
+        self.setText(name)
+        self.clicked.connect(self.on_button_clicked)
+
+
+   
+  
         
 
 

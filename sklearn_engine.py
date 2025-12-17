@@ -72,8 +72,11 @@ class SklearnEngine():
 
     REGRESSION = "regression"
     CLASSIFICATION = "classification"
+    EMPTY = "empty"
 
     def check_all_same_supervised_learning_type(curr_pipelines : list[Pipeline]):
+        if len(curr_pipelines) == 0:
+            return SklearnEngine.EMPTY
         first = curr_pipelines[0]
         for i in range(1 , len(curr_pipelines)):
             if curr_pipelines[i].supervised_learning_type != first.supervised_learning_type:
@@ -100,6 +103,8 @@ class SklearnEngine():
             main_dataframe_copy = main_dataframe.copy(deep=True)
         except Exception as e:
             raise InternalEngineError(f"Failed to deep copy the dataframe : {str(e)}")
+        
+        
         
         # Drop NaN
         main_dataframe_copy = main_dataframe_copy.dropna()
