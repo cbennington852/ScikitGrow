@@ -40,23 +40,25 @@ class GUILibary(QtW.QTabWidget):
         super().__init__(**kwargs)
         self.dataframe = dataframe
         sklearn_models = [
-            (sklearn.linear_model,"" , Draggable.BUBBLE),
-            (sklearn.ensemble,"" , Draggable.BUBBLE),
-            (sklearn.preprocessing, "" ,Draggable.POINTY),
-            (sklearn.tree ,"" , Draggable.BUBBLE),
+            (sklearn.linear_model,"#8F0177" , Draggable.BUBBLE),
+            (sklearn.ensemble,"#360185" , Draggable.BUBBLE),
+            (sklearn.preprocessing, "#301CA0" ,Draggable.INTERLOCK_RIGHT),
+            (sklearn.tree ,"#DE1A58" , Draggable.BUBBLE),
         ]
 
         def addModule(name , filter):    
             regressor_box = QtW.QWidget()
             regressor_layout = QtW.QVBoxLayout()
             regressor_box.setLayout(regressor_layout)
-            for subsection ,hex_color , render_type in sklearn_models:
+            for subsection , hex_color , render_type in sklearn_models:
                 curr = GUILibarySubmodule(
-                        SubLibary.get_public_methods(
+                        sublibary=SubLibary.get_public_methods(
                             library=subsection,
 
                             filter_function=filter
-                        )
+                        ),
+                        render_type=render_type,
+                        hex_value=hex_color
                     )
                 regressor_layout.addWidget(curr)
             scroll_regressor = QtW.QScrollArea()
@@ -120,10 +122,10 @@ class GUILibarySubmodule(QtW.QGroupBox):
             self.deleteLater()
         for sklearn in self.sublibary.function_calls:
             self.layout.addWidget(Draggable(
-                str(sklearn.__name__),
-                sklearn,
-                Draggable.BUBBLE,
-                "#360185"
+                name=str(sklearn.__name__),
+                sklearn_function=sklearn,
+                render_type=render_type,
+                hex_color=hex_value
             ))
         
     def dragEnterEvent(self, e):

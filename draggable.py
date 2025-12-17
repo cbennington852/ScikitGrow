@@ -4,7 +4,7 @@ import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 import PyQt5.QtGui as PGui
-from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush
+from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush, QIcon
 import PyQt5.QtCore as QCore 
 
 
@@ -156,7 +156,8 @@ class Draggable(QPushButton):
 
         # rendering the actual thing
         if render_type == Draggable.BUBBLE:
-            print("Bubble !")
+            arrow_icon = QIcon(":/images/dropdown_arrow.png")
+            self.setIcon(arrow_icon)
             self.setStyleSheet(f"""  
                 QPushButton {{
                     background-color: {hex_color};
@@ -173,7 +174,67 @@ class Draggable(QPushButton):
             """) 
 
 
-   
+    def paintEvent(self, event):
+        if not self.render_type == Draggable.INTERLOCK_RIGHT:
+            return super().paintEvent(event)
+            
+        
+        opt = QtW.QStyleOptionButton()
+        self.initStyleOption(opt)
+
+        rect = self.rect()
+
+        painter = QPainter(self)
+
+        self.style().drawControl(QtW.QStyle.CE_PushButtonBevel, opt, painter, self)
+
+        if opt.state & QtW.QStyle.State_Sunken:
+            rect.adjust(2,2,2,2)
+        
+
+        painter.setPen(QColor(self.hex_color))
+        painter.setBrush(QColor(self.hex_color))
+
+        # Top level input Calculations
+        starting_x = 0
+        starting_y = 0
+        bevel_depth = 10
+        bevel_width = 20
+        bevel_slant_width = 10
+        right_of_bevel_width = 20
+        left_of_bevel_width  = self.label_inferred_width - right_of_bevel_width + 10
+        block_height = 40
+
+        top_of_left_bevel_x = starting_x + left_of_bevel_width 
+        bottom_right_of_top_bevel_x = top_of_left_bevel_x + bevel_slant_width + bevel_width
+        far_right_corner_x = bottom_right_of_top_bevel_x + bevel_slant_width + right_of_bevel_width
+
+        block_with_bevel = QPolygon([
+            QPoint(starting_x , starting_y), # Top Right point.
+
+            # Top Bevel
+            QPoint(top_of_left_bevel_x, starting_y), # top of top left bevel point.
+            QPoint(top_of_left_bevel_x + bevel_slant_width , starting_y + bevel_depth), # bottom left of top bevel point
+            QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth), # bottom right of top bevel point
+            QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y), # top right of top bevel point.
+
+            
+            QPoint(far_right_corner_x  , starting_y), # top right corner.
+            QPoint(far_right_corner_x , block_height) , # bottom right corner
+            
+            # Bottom Bevel
+            QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y + block_height), # top right of top bevel point.
+            QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth + block_height), # bottom right of top bevel point
+            QPoint(top_of_left_bevel_x + bevel_slant_width , starting_y + bevel_depth + block_height), # bottom left of top bevel point
+            QPoint(top_of_left_bevel_x, starting_y + block_height), # top of top left bevel point.
+
+            QPoint(starting_x , block_height) # bottom left corner
+        ])
+
+        painter.drawPolygon(block_with_bevel)
+        painter.setPen(QColor(Qt.white))
+        start_y_for_text = int(self.size().height() / 2) + 5
+        painter.drawText(15 , start_y_for_text, f"{self.name}")
   
         
 
@@ -255,3 +316,5 @@ class ParameterPopup(QtW.QDialog):
             new_parameters.append(curr)
         self.my_parent.parameters = new_parameters
         self.accept()
+
+
