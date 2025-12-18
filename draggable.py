@@ -91,7 +91,7 @@ class DraggableColumn(QPushButton):
             rect.adjust(2,2,2,2)
         
 
-        painter.setPen(QColor('#005489'))
+        painter.setPen(QColor("#000000"))
         painter.setBrush(QColor('#005461'))
 
         # Top level input Calculations
