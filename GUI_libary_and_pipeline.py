@@ -175,7 +175,8 @@ class ColumnsSection(QtW.QGroupBox):
         self.resize(200 , 90)
         self.setAcceptDrops(True)
         self.my_layout = QVBoxLayout()
-        self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side , 0 , 0 , 0)
+        self.setStyleSheet("")
+        self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side - 2 , 0 , 0 , 0)
         self.my_layout.setSpacing(0);  
         self.setLayout(self.my_layout)
         self.setTitle(self.my_title)
@@ -261,6 +262,24 @@ class ColumnsSection(QtW.QGroupBox):
         painter.setPen(QColor(Qt.black))
         painter.drawText(15 , 20 ,f"{self.my_title}")
 
+        # 5 putting all of the children inside of each other
+        # 5.1 gather list of children
+        lst_of_children = []
+        for i in range(0 , self.my_layout.count()):
+            print(self.my_layout.itemAt(i))
+            if isinstance(self.my_layout.itemAt(i) , QtW.QWidgetItem):
+                temp_widget = self.my_layout.itemAt(i).widget()
+                lst_of_children.append(temp_widget)
+        # 5.2 If more than one, move the bottoms inside of the ones on top of it.
+        if len(lst_of_children) > 1:
+            first_child = lst_of_children[0]
+            for i in range(1 , len(lst_of_children)):
+                tmp  = lst_of_children[i]
+                new_x = first_child.geometry().topLeft().x()
+                new_y = first_child.geometry().topLeft().y() + i*DraggableColumn.block_height
+                tmp.move(new_x , new_y)
+        
+
     def dropEvent(self, e):
         pos = e.pos()
         widget = e.source()
@@ -270,7 +289,8 @@ class ColumnsSection(QtW.QGroupBox):
                 temp_widget = self.my_layout.itemAt(i)
                 self.my_layout.removeItem(temp_widget)
                 del temp_widget
-
+        
+       
 
         if (self.get_num_cols() == self.max_num_cols):
             # Remove one the children from this
@@ -295,6 +315,8 @@ class ColumnsSection(QtW.QGroupBox):
             e.accept()
 
         self.my_layout.addStretch()
+
+         # for the not first widgets, take their positons and offset by the bevel height 
         
 
 class PipelineSection(QtW.QGroupBox):

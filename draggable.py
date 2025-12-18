@@ -66,13 +66,15 @@ class DraggableColumn(QPushButton):
         super(DraggableColumn, self).mousePressEvent(event)
 
     # Paint event options.
-    starting_x = 0
-    starting_y = 0
     left_of_bevel_width = 20
     bevel_depth = 10
     bevel_width = 20
     bevel_slant_width = 10
     block_height = 40
+    starting_x = 0
+    starting_y = 0
+
+
 
 
     def paintEvent(self, event):
