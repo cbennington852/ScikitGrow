@@ -3,7 +3,7 @@ from sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor
+from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
 import PyQt5.QtCore as QtCore 
 from draggable import Draggable , DraggableColumn
 from sklearn.base import is_regressor, is_classifier
@@ -77,7 +77,7 @@ class GUILibary(QtW.QTabWidget):
                 print("ICON DETECETD")
                 self.addTab(scroll_regressor , "")
                 self.setTabIcon(self.curr_index , name)
-                self.setIconSize(QtCore.QSize(70 , 70))
+                self.setIconSize(QtCore.QSize(90 , 90))
             else:
                 self.addTab(scroll_regressor , name)
             self.curr_index += 1
@@ -86,14 +86,18 @@ class GUILibary(QtW.QTabWidget):
 
 
 
-        addModule(QIcon(":/images/reggessor_icon.png") , GUILibary.REGRESSOR_FILTER)
-        addModule(QIcon(":/images/classifier_icon.png") , GUILibary.CLASSIFIER_FILTER)
-        addModule("Pre-processors" , GUILibary.PREPROCESSOR_FILTER)
-        addModule("Validators" , GUILibary.VALIDATOR_FILTER)
+        addModule(QIcon(":/images/reggessor_icon.svg") , GUILibary.REGRESSOR_FILTER)
+        addModule(QIcon(":/images/classification_icon.svg") , GUILibary.CLASSIFIER_FILTER)
+        addModule(QIcon(":/images/preproccessor_icon.svg") , GUILibary.PREPROCESSOR_FILTER)
+        addModule(QIcon(":/images/validators_icon.svg") , GUILibary.VALIDATOR_FILTER)
+
+
+        self.addTab(self.cols_tab() ,"")
+        self.setTabIcon(self.curr_index , QIcon(":/images/columns_icon.svg"))
 
         curr_index = 0
 
-        self.addTab(self.cols_tab() , "Columns")
+
 
     def cols_tab(self):
         cols = ColumnsSubmodule(self.dataframe.columns.to_list())
@@ -171,8 +175,12 @@ class ColumnsSection(QtW.QGroupBox):
         self.resize(200 , 90)
         self.setAcceptDrops(True)
         self.my_layout = QVBoxLayout()
+        self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side , 0 , 0 , 0)
+        self.my_layout.setSpacing(0);  
         self.setLayout(self.my_layout)
         self.setTitle(self.my_title)
+        self.my_layout.addStretch()
+
 
     def dragEnterEvent(self, e):
         pos = e.pos()
@@ -194,10 +202,76 @@ class ColumnsSection(QtW.QGroupBox):
             if isinstance(child , DraggableColumn):
                 res_cols.append(child)
         return res_cols
+    
+    bevel_left_start = DraggableColumn.bevel_width + DraggableColumn.bevel_slant_width*2 + DraggableColumn.left_of_bevel_width
+    bottom_right_of_top_bevel_x = bevel_left_start + DraggableColumn.bevel_slant_width + DraggableColumn.bevel_width
+    width_from_start_mouth_to_left_side = 10
+    height_between_top_mouth_and_top_bar = 30
+    
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        
+
+        painter.setPen(QColor("#E11B05"))
+        painter.setBrush(QColor("#CCCCCC"))
+
+
+        # Top level calculations
+        width = self.width()
+        height = self.height()
+
+        space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
+
+        # where to start the bevel from the left. 
+        holder_block = QPolygon([
+            QPoint( 0 , 0),             # Left Top corner
+            QPoint(width , 0),          # Right Top corner
+
+            # right top of mouth
+            QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar),
+
+            QPoint(ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
+            # Bottom right of bevel
+            QPoint(
+                ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
+                ),
+            # Bottom left of bevel
+            QPoint(
+                ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
+                ),
+            QPoint(
+                ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                ColumnsSection.height_between_top_mouth_and_top_bar 
+                ),
+
+            # left top of mouth
+            QPoint(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar),
+
+            # Bottom of the mouth
+            QPoint(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
+            QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
+
+            QPoint(width , height),     # Right Bottom corner
+            QPoint(0 , height)          # Left Bottom corner
+        ])
+
+        painter.drawPolygon(holder_block)
+        painter.setPen(QColor(Qt.black))
+        painter.drawText(15 , 20 ,f"{self.my_title}")
 
     def dropEvent(self, e):
         pos = e.pos()
         widget = e.source()
+        # remove the spacer ,and readadd to bottom.
+        for i in range(0 , self.my_layout.count()):
+            if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
+                temp_widget = self.my_layout.itemAt(i)
+                self.my_layout.removeItem(temp_widget)
+                del temp_widget
+
+
         if (self.get_num_cols() == self.max_num_cols):
             # Remove one the children from this
             for child in self.findChildren(QtW.QWidget):
@@ -219,6 +293,9 @@ class ColumnsSection(QtW.QGroupBox):
             from_parent.layout.insertWidget(from_parent.layout.indexOf(widget) , widget.copy_self())
         elif isinstance(from_parent , ColumnsSection) and isinstance(to_parent , ColumnsSection):
             e.accept()
+
+        self.my_layout.addStretch()
+        
 
 class PipelineSection(QtW.QGroupBox):
     def __init__(self , accepting_function, title, max_num_models = 100,  **kwargs):
@@ -299,6 +376,7 @@ class PipelineSection(QtW.QGroupBox):
 
 class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
+
 
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)

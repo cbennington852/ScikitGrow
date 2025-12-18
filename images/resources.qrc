@@ -17,11 +17,14 @@
         <file>add_pipeline.svg</file>
         <file>mouse_accepts.svg</file>
         <file>dropdown_arrow.png</file>
-        <file>classifier_icon.svg</file>
-        <file>classifier_icon.png</file>
-
+        <file>classification_icon.svg</file>
         <file>reggessor_icon.svg</file>
-        <file>reggessor_icon.png</file>
+        <file>validators_icon.svg</file>
+        <file>columns_icon.svg</file>
+        <file>preproccessor_icon.svg</file>
+
+
+
 
 
 

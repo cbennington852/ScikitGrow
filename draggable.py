@@ -65,8 +65,17 @@ class DraggableColumn(QPushButton):
             self.drag_start_position = event.pos()
         super(DraggableColumn, self).mousePressEvent(event)
 
+    # Paint event options.
+    starting_x = 0
+    starting_y = 0
+    left_of_bevel_width = 20
+    bevel_depth = 10
+    bevel_width = 20
+    bevel_slant_width = 10
+    block_height = 40
+
+
     def paintEvent(self, event):
-        
         opt = QtW.QStyleOptionButton()
         self.initStyleOption(opt)
 
@@ -84,39 +93,32 @@ class DraggableColumn(QPushButton):
         painter.setBrush(QColor('#005461'))
 
         # Top level input Calculations
-        starting_x = 0
-        starting_y = 0
-        left_of_bevel_width = 20
-        bevel_depth = 10
-        bevel_width = 20
-        bevel_slant_width = 10
-        right_of_bevel_width  = self.label_inferred_width - left_of_bevel_width + 10
-        block_height = 40
+        right_of_bevel_width  = self.label_inferred_width - DraggableColumn.left_of_bevel_width + 10
 
-        top_of_left_bevel_x = starting_x + left_of_bevel_width 
-        bottom_right_of_top_bevel_x = top_of_left_bevel_x + bevel_slant_width + bevel_width
-        far_right_corner_x = bottom_right_of_top_bevel_x + bevel_slant_width + right_of_bevel_width
+        top_of_left_bevel_x = DraggableColumn.starting_x + DraggableColumn.left_of_bevel_width 
+        bottom_right_of_top_bevel_x = top_of_left_bevel_x + DraggableColumn.bevel_slant_width + DraggableColumn.bevel_width
+        far_right_corner_x = bottom_right_of_top_bevel_x + DraggableColumn.bevel_slant_width + right_of_bevel_width
 
         block_with_bevel = QPolygon([
-            QPoint(starting_x , starting_y), # Top Right point.
+            QPoint(DraggableColumn.starting_x , DraggableColumn.starting_y), # Top Right point.
 
             # Top Bevel
-            QPoint(top_of_left_bevel_x, starting_y), # top of top left bevel point.
-            QPoint(top_of_left_bevel_x + bevel_slant_width , starting_y + bevel_depth), # bottom left of top bevel point
-            QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth), # bottom right of top bevel point
-            QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y), # top right of top bevel point.
+            QPoint(top_of_left_bevel_x, DraggableColumn.starting_y), # top of top left bevel point.
+            QPoint(top_of_left_bevel_x + DraggableColumn.bevel_slant_width , DraggableColumn.starting_y + DraggableColumn.bevel_depth), # bottom left of top bevel point
+            QPoint(bottom_right_of_top_bevel_x , DraggableColumn.starting_y + DraggableColumn.bevel_depth), # bottom right of top bevel point
+            QPoint(bottom_right_of_top_bevel_x + DraggableColumn.bevel_slant_width  , DraggableColumn.starting_y), # top right of top bevel point.
 
             
-            QPoint(far_right_corner_x  , starting_y), # top right corner.
-            QPoint(far_right_corner_x , block_height) , # bottom right corner
+            QPoint(far_right_corner_x  , DraggableColumn.starting_y), # top right corner.
+            QPoint(far_right_corner_x , DraggableColumn.block_height) , # bottom right corner
             
             # Bottom Bevel
-            QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y + block_height), # top right of top bevel point.
-            QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth + block_height), # bottom right of top bevel point
-            QPoint(top_of_left_bevel_x + bevel_slant_width , starting_y + bevel_depth + block_height), # bottom left of top bevel point
-            QPoint(top_of_left_bevel_x, starting_y + block_height), # top of top left bevel point.
+            QPoint(bottom_right_of_top_bevel_x + DraggableColumn.bevel_slant_width  , DraggableColumn.starting_y + DraggableColumn.block_height), # top right of top bevel point.
+            QPoint(bottom_right_of_top_bevel_x , DraggableColumn.starting_y + DraggableColumn.bevel_depth + DraggableColumn.block_height), # bottom right of top bevel point
+            QPoint(top_of_left_bevel_x + DraggableColumn.bevel_slant_width , DraggableColumn.starting_y + DraggableColumn.bevel_depth + DraggableColumn.block_height), # bottom left of top bevel point
+            QPoint(top_of_left_bevel_x, DraggableColumn.starting_y + DraggableColumn.block_height), # top of top left bevel point.
 
-            QPoint(starting_x , block_height) # bottom left corner
+            QPoint(DraggableColumn.starting_x , DraggableColumn.block_height) # bottom left corner
         ])
 
         painter.drawPolygon(block_with_bevel)
@@ -225,13 +227,16 @@ class Draggable(QPushButton):
             bevel_depth = 10
             bevel_width = 20
             bevel_slant_width = 10
-            right_of_bevel_width = 20
-            left_of_bevel_width  = self.label_inferred_width - right_of_bevel_width + 10
+            left_of_bevel_width  = 20
+            right_of_bevel_width = max(self.label_inferred_width - left_of_bevel_width + 5,120)
+            space_in_between_two_bevels = 10
+            second_bevel_width = 10
             block_height = 40
 
             top_of_left_bevel_x = starting_x + left_of_bevel_width 
             bottom_right_of_top_bevel_x = top_of_left_bevel_x + bevel_slant_width + bevel_width
             far_right_corner_x = bottom_right_of_top_bevel_x + bevel_slant_width + right_of_bevel_width
+            start_second_bevel = bottom_right_of_top_bevel_x + bevel_slant_width + space_in_between_two_bevels
 
             block_with_bevel = QPolygon([
                 QPoint(starting_x , starting_y), # Top Right point.
@@ -242,10 +247,23 @@ class Draggable(QPushButton):
                 QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth), # bottom right of top bevel point
                 QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y), # top right of top bevel point.
 
+                # second top bevel
+                QPoint(start_second_bevel, starting_y), # top of top left bevel point.
+                QPoint(start_second_bevel + bevel_slant_width , starting_y + bevel_depth), # bottom left of top bevel point
+                QPoint(bottom_right_of_top_bevel_x + start_second_bevel , starting_y + bevel_depth), # bottom right of top bevel point
+                QPoint(bottom_right_of_top_bevel_x + bevel_slant_width + start_second_bevel , starting_y), # top right of top bevel point.
+
                 
                 QPoint(far_right_corner_x  , starting_y), # top right corner.
                 QPoint(far_right_corner_x , block_height) , # bottom right corner
                 
+                # second bottom bevel
+                QPoint(start_second_bevel, starting_y + block_height), # top of top left bevel point.
+                QPoint(start_second_bevel + bevel_slant_width , starting_y + bevel_depth + block_height), # bottom left of top bevel point
+                QPoint(bottom_right_of_top_bevel_x + start_second_bevel , starting_y + bevel_depth + block_height), # bottom right of top bevel point
+                QPoint(bottom_right_of_top_bevel_x + bevel_slant_width + start_second_bevel , starting_y + block_height), # top right of top bevel point.
+
+
                 # Bottom Bevel
                 QPoint(bottom_right_of_top_bevel_x + bevel_slant_width  , starting_y + block_height), # top right of top bevel point.
                 QPoint(bottom_right_of_top_bevel_x , starting_y + bevel_depth + block_height), # bottom right of top bevel point
