@@ -1,4 +1,15 @@
 import pickle
+from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel, QAction
+from sklearn_libary import SubLibary
+import PyQt5.QtWidgets as QtW
+from PyQt5.QtCore import  QPoint
+from PyQt5.QtCore import Qt, QMimeData
+from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
+import PyQt5.QtCore as QtCore 
+from draggable import Draggable , DraggableColumn
+from sklearn.base import is_regressor, is_classifier
+import sklearn
+
 
 
 class Parsel():

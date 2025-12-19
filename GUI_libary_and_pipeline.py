@@ -81,10 +81,7 @@ class GUILibary(QtW.QTabWidget):
             else:
                 self.addTab(scroll_regressor , name)
             self.curr_index += 1
-            
-                
-
-
+        
 
         addModule(QIcon(":/images/reggessor_icon.svg") , GUILibary.REGRESSOR_FILTER)
         addModule(QIcon(":/images/classification_icon.svg") , GUILibary.CLASSIFIER_FILTER)
@@ -213,15 +210,16 @@ class ColumnsSection(QtW.QGroupBox):
         painter = QPainter(self)
         
 
-        painter.setPen(QColor("#E11B05"))
-        painter.setBrush(QColor("#CCCCCC"))
+        painter.setPen(QColor("#040404"))
+        painter.setBrush(QColor("#B5B3B3"))
 
 
         # Top level calculations
         width = self.width()
         height = self.height()
 
-        space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
+        #space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
+        space_needed_for_mouth = max(self.get_num_cols() * DraggableColumn.block_height , DraggableColumn.block_height )
 
         # where to start the bevel from the left. 
         holder_block = QPolygon([

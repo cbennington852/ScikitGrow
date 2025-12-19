@@ -75,8 +75,6 @@ class DraggableColumn(QPushButton):
     starting_y = 0
 
 
-
-
     def paintEvent(self, event):
         opt = QtW.QStyleOptionButton()
         self.initStyleOption(opt)
@@ -172,14 +170,17 @@ class Draggable(QPushButton):
                     border: 5px black solid;
                 }}
                 QPushButton:hover {{
-                    background-color: {hex_color}; border-style: none; 
+                    background-color: {hex_color};
                     border-radius: 20px;
+                    color : white;
+                    border: 5px black solid;
 
                 }}
                 QPushButton:pressed {{
-                    background-color: {hex_color};      /* Optional: style for when clicked */
+                    background-color: {hex_color};
                     border-radius: 20px;
-
+                    color : white;
+                    border: 5px black solid;
                 }}
             """) 
         

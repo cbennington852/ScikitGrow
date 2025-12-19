@@ -1,6 +1,6 @@
 import sys
 import PyQt5.QtWidgets as QtW
-from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QAction
 from layout_colorwidget import Color
 from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline , PipelineMother , GUILibary
 from sklearn_libary import SubLibary 
@@ -12,35 +12,8 @@ from PyQt5.QtGui import QIcon , QPixmap
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from plotter import Plotter
+from parsel import Parsel
 
-
-
-
-
-"""
-class SplashScreen(QWidget):
-    def __init__(self):
-        super().__init__()
-        
-        layout = QVBoxLayout()
-        self.setFixedSize(800 , 600)
-        self.label = Qt.QLabel("Scikit Grow")
-        pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
-        self.label.setPixmap(pixmap)
-        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
-        layout.addWidget(self.label)
-        self.example_datasets = QPushButton("Example Datasets")
-        self.import_dataset = QPushButton("Import Dataset from file")
-        layout.addWidget(self.example_datasets)
-        layout.addWidget(self.import_dataset)
-        self.setLayout(layout)
-        self.example_datasets.clicked.connect(SplashScreen.open_application_with_dataframe)
-
-    def open_application_with_dataframe(dataframe):
-        dataframe = sns.load_dataset("iris")
-        window = MainWindow(dataframe) # Create an instance of our custom window
-        window.show() # Display the window
-"""
 
 
 
@@ -60,6 +33,7 @@ class MainWindow(QMainWindow):
 
         self.plotter = Plotter(self.pipeline_mommy , self.dataframe)
         
+        self.render_menu_bar()
 
         dock_libary = QtW.QDockWidget(
             "Libary",
@@ -89,10 +63,31 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.pipeline_mommy)
 
 
+    def render_menu_bar(self):
+        menu = self.menuBar()
+        
+        # for file related actions.
+        file_menu = menu.addMenu("&File")
+        
+        # Save action
+        save_action = QAction("Save Project" , self)
+        save_action.triggered.connect(lambda : print("saving attempted"))
+        file_menu.addAction(save_action)
+
+        # Save action
+        save_as_action = QAction("Save Project As" , self)
+        save_as_action.triggered.connect(lambda : print("saving attempted"))
+        file_menu.addAction(save_as_action)
+
+        # Open action
+        open_action = QAction("Open Project" , self)
+        open_action.triggered.connect(lambda : print("opening attempted"))
+        file_menu.addAction(open_action)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
     pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
-    splash = QtW.QSplashScreen(pixmap)
+    #splash = QtW.QSplashScreen(pixmap)
     #splash.show()
     window = MainWindow() # Create an instance of our custom window
     window.show() # Display the window
