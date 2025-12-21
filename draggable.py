@@ -10,6 +10,8 @@ import PyQt5.QtCore as QCore
 
 
 class DraggableColumn(QPushButton):
+    BASE_HEIGHT = 50
+
     def __init__(self, name, **kwargs):
         super().__init__(**kwargs) 
         self.kwargs = kwargs
@@ -34,7 +36,7 @@ class DraggableColumn(QPushButton):
         print(temp_label.width())
         self.label_inferred_width = temp_label.width()
         self.setMaximumWidth(required_text_width + 60)
-        self.setFixedHeight(50)
+        self.setFixedHeight(DraggableColumn.BASE_HEIGHT)
 
     def copy_self(self):
         return DraggableColumn(
@@ -135,6 +137,7 @@ class Draggable(QPushButton):
     INTERLOCK_RIGHT = "interlock_right"
     POINTY = "pointy"
     BUBBLE = "bubble"
+    BASE_HEIGHT = 50
 
     def __init__(self , name, sklearn_function , render_type, hex_color,   **kwargs):
         super().__init__(**kwargs) 
@@ -150,7 +153,7 @@ class Draggable(QPushButton):
         print(temp_label.width())
         self.label_inferred_width = temp_label.width()
         self.setMaximumWidth(required_text_width + 60)
-        self.setFixedHeight(50)
+        self.setFixedHeight(Draggable.BASE_HEIGHT)
         self.sklearn_function = sklearn_function
         self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
         self.setText(name)
@@ -283,12 +286,6 @@ class Draggable(QPushButton):
         else:
             return super().paintEvent(event)
             
-        
-       
-  
-        
-
-
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.drag_start_position = event.pos()

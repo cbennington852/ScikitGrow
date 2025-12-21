@@ -202,11 +202,7 @@ class ColumnsSection(QtW.QGroupBox):
         e.accept() 
     
     def get_num_cols(self):
-        num = 0
-        for child in self.findChildren(QtW.QWidget):
-            if isinstance(child , DraggableColumn):
-                num += 1
-        return num
+        return len(self.get_cols())
     
     def get_cols(self) -> list[DraggableColumn]:
         res_cols = []
@@ -365,6 +361,9 @@ class PipelineSection(QtW.QGroupBox):
     """
     This only holds one thing. 
     """
+
+    BASE_MINIMUM_HEIGHT = 80
+
     def __init__(self , accepting_function, title, my_parent , max_num_models = 100,  **kwargs):
         super().__init__( **kwargs)
         self.my_title = title
@@ -373,6 +372,7 @@ class PipelineSection(QtW.QGroupBox):
         self.max_num_models = max_num_models
         self.accepting_function = accepting_function
         self.setAcceptDrops(True)
+        self.setMinimumHeight(PipelineSection.BASE_MINIMUM_HEIGHT)
         self.my_layout = QVBoxLayout()
         self.model_hovering = False
         self.is_holding = False
@@ -401,15 +401,19 @@ class PipelineSection(QtW.QGroupBox):
 
     def dragLeaveEvent(self, event):
         self.model_hovering = False
+
+        # Check to see if this is empty, and change the is_holding status.
+        self.is_holding = False 
+        for child in self.findChildren(QtW.QWidget):
+            self.is_holding = True
+            break
+
+        # Repaint the module
         self.repaint()
         event.accept() # Accept the leave event
 
     def get_num_models(self):
-        num = 0
-        for child in self.findChildren(QtW.QWidget):
-            if isinstance(child , Draggable):
-                num += 1
-        return num
+        return len(self.get_models())
     
     def get_models(self) -> list[Draggable]:
         res_models = []
@@ -520,14 +524,14 @@ class PipelineSection(QtW.QGroupBox):
         # Handle replacement with parent module. If applicable
         if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
             self.my_layout.addWidget(widget.copy_self())
-            e.accept()
         else:
             # accept
-            e.accept()
             # Add the dang widget
             self.my_layout.addWidget(widget)
-            
-
+        # Accepts
+        e.accept()
+        # update is holding.
+        self.is_holding = True            
         # tell the parent to resize.
         self.my_parent.resize_based_on_children()
         # add space to end of the layout to make it all squished to top.
@@ -540,13 +544,16 @@ class PipelineSection(QtW.QGroupBox):
 class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
 
+    BASE_PIPELINE_WIDTH = 400
+    BASE_PIPELINE_HEIGHT = 400
+
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)
         my_layout = QVBoxLayout()
         main_thing = QtW.QWidget()
         self.my_parent = my_parent
         main_thing.setLayout(my_layout)
-        self.resize(400 , 400)
+        self.resize(Pipeline.BASE_PIPELINE_WIDTH , Pipeline.BASE_PIPELINE_HEIGHT)
         self.name_pipeline = QtW.QLineEdit()
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
@@ -568,6 +575,7 @@ class Pipeline(QtW.QMdiSubWindow):
             my_parent=self,
             max_num_models=1
         )
+        # set mimumum heights
         my_layout.addWidget(self.name_pipeline)
         my_layout.addWidget(self.preproccessor_pipe)
         my_layout.addWidget(self.model_pipe)
@@ -576,6 +584,12 @@ class Pipeline(QtW.QMdiSubWindow):
 
     def get_name_pipeline(self) -> str:
         return self.name_pipeline.text
+    
+    def resize_based_on_children(self):
+        # get the number of pre-proccessors and their height, default to zero if one or below. 
+        pre_proccessor_height = max((self.preproccessor_pipe.get_num_models()-1) * Draggable.BASE_HEIGHT , 0)
+        # Resize the pipeline based on the children size n_stuff.
+        self.setFixedHeight(Pipeline.BASE_PIPELINE_HEIGHT + pre_proccessor_height)
     
 
     def closeEvent(self, event):
@@ -647,11 +661,11 @@ class PipelineMother(QtW.QMainWindow):
 
 
 class ColumnsMDIWindow(QtW.QMdiSubWindow):
-    STARTING_HEIGHT = 300
-    STARTING_WIDTH = 400
+    BASE_HEIGHT = 300
+    BASE_WIDTH = 400
     def __init__(self, parent , **kwargs):
         super().__init__(parent, **kwargs)
-        self.setFixedSize(ColumnsMDIWindow.STARTING_WIDTH , ColumnsMDIWindow.STARTING_HEIGHT)
+        self.setFixedSize(ColumnsMDIWindow.BASE_WIDTH , ColumnsMDIWindow.BASE_HEIGHT)
         main_widget = QtW.QWidget()
         mayo = QtW.QVBoxLayout()
         main_widget.setLayout(mayo)
@@ -689,11 +703,7 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
         event.ignore()
     
     def resize_based_on_children(self):
-        print(f"Before height : {self.height()}")
-        button_and_extra_height = self.train_models.height() + 55
-        num_x_cols_recommended_height = self.x_columns.get_num_cols() * DraggableColumn.block_height + ColumnsSection.height_between_top_mouth_and_top_bar*2
-        num_y_cols_recommended_height = self.y_columns.get_num_cols() * DraggableColumn.block_height + ColumnsSection.height_between_top_mouth_and_top_bar*2
-        purposed_height = num_x_cols_recommended_height + num_y_cols_recommended_height + button_and_extra_height
-        print(f"Purposed height {purposed_height}")
-        self.setFixedHeight(max(purposed_height, ColumnsMDIWindow.STARTING_HEIGHT))
-        print(f"After height {self.height()}")
+        # get the number of pre-proccessors and their height, default to zero if one or below. 
+        y_col_height = max((self.x_columns.get_num_cols()-1) * DraggableColumn.BASE_HEIGHT , 0)
+        # Resize the pipeline based on the children size n_stuff.
+        self.setFixedHeight(ColumnsMDIWindow.BASE_HEIGHT + y_col_height)

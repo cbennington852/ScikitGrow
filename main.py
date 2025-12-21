@@ -19,10 +19,13 @@ import pandas as pd
 
 class MainWindow(QMainWindow):
 
+    BASE_WINDOW_WIDTH = 1200
+    BASE_WINDOW_HEIGHT = 800
+
     def __init__(self ):
         super().__init__()
         self.setWindowTitle("SciKit Grow")
-        self.resize(800 , 600)
+        self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
         #self.dataframe = sns.load_dataset("iris")
 
         # load dataframe from a non-internet source.

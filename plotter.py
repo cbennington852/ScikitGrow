@@ -117,7 +117,7 @@ class Plotter(QtW.QTabWidget):
                 # 2.3 Models
                 model_pipeline_lst =  gui_pipeline.model_pipe.get_pipeline_objects()
                 if model_pipeline_lst == []:
-                    raise ScikitGrowEngineAssemblyError(f"Pipeline {gui_pipeline.name_pipeline} is missing a model")
+                    raise ScikitGrowEngineAssemblyError(f"{gui_pipeline.name_pipeline.text()} is missing a model")
                 for models in model_pipeline_lst:
                     list_tuples_pipe_sklearn_objs.append((f"{len(list_tuples_pipe_sklearn_objs)}" , models))
 
