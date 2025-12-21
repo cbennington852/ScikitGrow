@@ -40,14 +40,13 @@ Currently, there is still a lot to work on for this application, most of the cor
 ## Running the current GUI
 
 Works on Linux , Windows , Mac
-Install dependencies
 ```
 python -m venv myenv
+echo "Then activate your venv, this varies slightly from platform to platform."
 pip install -r requirements.txt
 ```
 Running the GUI
 ```
-echo "Then activate your venv, this varies slightly from platform to platform."
 python main.py
 ```
 

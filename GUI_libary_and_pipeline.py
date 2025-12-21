@@ -45,6 +45,7 @@ class GUILibary(QtW.QTabWidget):
         sklearn_models = [
             (sklearn.linear_model,"#8F0177" , Draggable.BUBBLE),
             (sklearn.ensemble,"#360185" , Draggable.BUBBLE),
+            (sklearn.neural_network, "#38008C", Draggable.BUBBLE)
             (sklearn.preprocessing, "#301CA0" ,Draggable.INTERLOCK_RIGHT),
             (sklearn.tree ,"#DE1A58" , Draggable.BUBBLE),
             (sklearn.model_selection , "#235622" , Draggable.POINTY)
@@ -74,7 +75,6 @@ class GUILibary(QtW.QTabWidget):
             scroll_regressor.setWidget(regressor_box)
             scroll_regressor.setWidgetResizable(True)
             if isinstance(name , QIcon):
-                print("ICON DETECETD")
                 self.addTab(scroll_regressor , "")
                 self.setTabIcon(self.curr_index , name)
                 self.setIconSize(QtCore.QSize(90 , 90))
@@ -162,14 +162,18 @@ class GUILibarySubmodule(QtW.QGroupBox):
         elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , GUILibarySubmodule):
             e.accept()
             from_parent.layout().removeWidget(widget)
+            if from_parent.is_holding:
+                from_parent.is_holding = False
             widget.deleteLater()
 
 class ColumnsSection(QtW.QGroupBox):
-    def __init__(self , title, max_num_cols = 100, **kwargs):
+    def __init__(self , title, my_parent , max_num_cols = 100, **kwargs):
         super().__init__( **kwargs)
         self.my_title = title
+        self.my_parent = my_parent
         self.max_num_cols = max_num_cols
         self.resize(200 , 90)
+        self.hovering = False
         self.setAcceptDrops(True)
         self.my_layout = QVBoxLayout()
         self.setStyleSheet("")
@@ -184,9 +188,17 @@ class ColumnsSection(QtW.QGroupBox):
         pos = e.pos()
         widget = e.source()
         if isinstance(widget , DraggableColumn):
-            e.accept()        
+            e.accept()
+            self.hovering=True        
+            self.repaint()
         else:
             e.ignore()
+
+    def dragLeaveEvent(self, e):
+        self.hovering = False
+        self.repaint()
+        e.accept() 
+    
     def get_num_cols(self):
         num = 0
         for child in self.findChildren(QtW.QWidget):
@@ -213,6 +225,8 @@ class ColumnsSection(QtW.QGroupBox):
         painter.setPen(QColor("#040404"))
         painter.setBrush(QColor("#B5B3B3"))
 
+        if self.hovering == True:
+            painter.fillRect(self.rect(), QColor("lightgray"))
 
         # Top level calculations
         width = self.width()
@@ -282,7 +296,6 @@ class ColumnsSection(QtW.QGroupBox):
         # 5.1 gather list of children
         lst_of_children = []
         for i in range(0 , self.my_layout.count()):
-            print(self.my_layout.itemAt(i))
             if isinstance(self.my_layout.itemAt(i) , QtW.QWidgetItem):
                 temp_widget = self.my_layout.itemAt(i).widget()
                 lst_of_children.append(temp_widget)
@@ -306,8 +319,6 @@ class ColumnsSection(QtW.QGroupBox):
                 self.my_layout.removeItem(temp_widget)
                 del temp_widget
         
-       
-
         if (self.get_num_cols() == self.max_num_cols):
             # Remove one the children from this
             for child in self.findChildren(QtW.QWidget):
@@ -325,24 +336,36 @@ class ColumnsSection(QtW.QGroupBox):
             return
         if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSection):
             e.accept()
+            self.my_parent.resize_based_on_children()
             # Below adds a new widget copy of draggable to the library
             from_parent.layout.insertWidget(from_parent.layout.indexOf(widget) , widget.copy_self())
         elif isinstance(from_parent , ColumnsSection) and isinstance(to_parent , ColumnsSection):
             e.accept()
+            self.my_parent.resize_based_on_children()
+
 
         self.my_layout.addStretch()
+        self.hovering=False        
+        self.repaint()
 
          # for the not first widgets, take their positons and offset by the bevel height 
-        
+
+#class PreProccessorPipelineSection(QtW.QGroupBox):
 
 class PipelineSection(QtW.QGroupBox):
+    """
+    This only holds one thing. 
+    """
     def __init__(self , accepting_function, title, max_num_models = 100,  **kwargs):
         super().__init__( **kwargs)
+        self.my_title = title
         self.setTitle(title)
         self.max_num_models = max_num_models
         self.accepting_function = accepting_function
         self.setAcceptDrops(True)
         self.my_layout = QVBoxLayout()
+        self.model_hovering = False
+        self.is_holding = False
         self.setLayout(self.my_layout)
 
     def get_pipeline_objects(self):
@@ -358,12 +381,19 @@ class PipelineSection(QtW.QGroupBox):
         pos = e.pos()
         widget = e.source()
         if isinstance(widget , Draggable):
-            # now check to see if it meets this submodule.
             if self.accepting_function(widget.sklearn_function):
                 e.accept()        
+                self.model_hovering = True
+                self.repaint()
                 
         else:
             e.ignore()
+
+    def dragLeaveEvent(self, event):
+        self.model_hovering = False
+        self.repaint()
+        event.accept() # Accept the leave event
+
     def get_num_models(self):
         num = 0
         for child in self.findChildren(QtW.QWidget):
@@ -377,6 +407,76 @@ class PipelineSection(QtW.QGroupBox):
             if isinstance(child , Draggable):
                 res_models.append(child)
         return res_models
+    
+    
+    def paintEvent(self, e):
+        if self.my_title == "Validator":
+            if self.is_holding == True:
+                painter = QPainter(self)
+                painter.setPen(QColor("#040404"))
+                painter.drawText( 0 , 15 , self.my_title)
+            else:
+                painter = QPainter(self)
+                # Writing the name of the thing.
+                painter.setPen(QColor("#040404"))
+                painter.drawText( 0 , 15 , self.my_title)
+                if self.model_hovering == True:
+                    painter.setBrush(QColor("#787878"))
+                else:
+                    painter.setBrush(QColor("#DFDFDF"))
+
+                left_right_margin = 10
+                top_bottom_margin = 20
+                
+                # tunable parameters
+                height_block = self.height() - top_bottom_margin*2
+                width_triangle = Draggable.POINTY_TRIANGLE_WIDTH
+                width_center_block = self.width() - left_right_margin*2 - left_right_margin - width_triangle*2
+                triangle_mid_y_axis = int(height_block / 2) + top_bottom_margin
+                
+                pointy_block = QPolygon([
+                    QPoint(left_right_margin , triangle_mid_y_axis), # end of left point.
+                    QPoint(width_triangle + left_right_margin, top_bottom_margin), # Top Left corner of triangle / box
+                    QPoint(width_center_block + width_triangle  , top_bottom_margin), # Top Right corner of triangle / box
+                    QPoint(width_center_block + 2*width_triangle , triangle_mid_y_axis), # end of right point.
+                    QPoint(width_center_block + width_triangle , height_block + top_bottom_margin),
+                    QPoint(width_triangle + left_right_margin , height_block + top_bottom_margin),
+                ])
+
+                painter.drawPolygon(pointy_block)
+
+        elif self.my_title == "Models":
+            if self.is_holding == True:
+                painter = QPainter(self)
+                painter.setPen(QColor("#040404"))
+                painter.drawText( 0 , 15 , self.my_title)
+            else:
+                painter = QPainter(self)
+                # Writing the name of the thing.
+                painter.setPen(QColor("#040404"))
+                painter.drawText( 0 , 15 , self.my_title)
+                if self.model_hovering == True:
+                    painter.setBrush(QColor("#787878"))
+                else:
+                    painter.setBrush(QColor("#DFDFDF"))
+
+                left_right_margin = 10
+                top_bottom_margin = 20
+                width_rect = self.width() - left_right_margin*2
+                height_rect = self.height() - top_bottom_margin*2
+                corner_radius = 15
+                round_rect_y = top_bottom_margin
+                round_rect_x = int(self.width() / 2) - int(width_rect/2)
+                painter.drawRoundedRect(
+                    round_rect_x, 
+                    round_rect_y, 
+                    width_rect,
+                    height_rect,
+                    corner_radius,
+                    corner_radius
+                )
+        else:
+            return super().paintEvent(e)
 
     def dropEvent(self, e):
         pos = e.pos()
@@ -411,10 +511,10 @@ class PipelineSection(QtW.QGroupBox):
             from_parent.layout.insertWidget(from_parent.layout.indexOf(widget) , widget.copy_self())
         elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , PipelineSection):
             e.accept()
+        self.is_holding = True
 
 class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
-
 
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)
@@ -486,13 +586,32 @@ class PipelineMother(QtW.QMainWindow):
         self.render_x_y_train_sub_window()
 
     def render_x_y_train_sub_window(self):
-        sub_window = QtW.QMdiSubWindow(self.main_thing)
-        sub_window.resize(400 , 300)
+        sub_window = ColumnsMDIWindow(self.main_thing)
+        self.x_columns = sub_window.x_columns
+        self.y_columns = sub_window.y_columns
+        self.train_models = sub_window.train_models
+      
+
+    def add_pipeline(self):
+        new_pipeline = Pipeline(self , self.main_thing)
+        new_pipeline.move(30 , 30)
+        new_pipeline.show()
+        self.pipelines.append(new_pipeline)
+
+
+class ColumnsMDIWindow(QtW.QMdiSubWindow):
+    STARTING_HEIGHT = 300
+    STARTING_WIDTH = 400
+    def __init__(self, parent , **kwargs):
+        super().__init__(parent, **kwargs)
+        self.setFixedSize(ColumnsMDIWindow.STARTING_WIDTH , ColumnsMDIWindow.STARTING_HEIGHT)
         main_widget = QtW.QWidget()
         mayo = QtW.QVBoxLayout()
         main_widget.setLayout(mayo)
-        sub_window.setWidget(main_widget)
-
+        self.setWidget(main_widget)
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint , False)
+        self.setWindowFlag(Qt.WindowMaximizeButtonHint , False)
+        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
 
         self.train_models = QtW.QPushButton(
             "Train Models"
@@ -505,21 +624,29 @@ class PipelineMother(QtW.QMainWindow):
 
         self.x_columns = ColumnsSection(
             "X axis",
+            my_parent=self,
             max_num_cols=400
         )
         self.y_columns = ColumnsSection(
             "Y axis",
+            my_parent=self,
             max_num_cols=1
         )
 
         mayo.addWidget(self.train_models)
         mayo.addWidget(self.x_columns)
         mayo.addWidget(self.y_columns)
+        self.show()
 
-        sub_window.show()
-
-    def add_pipeline(self):
-        new_pipeline = Pipeline(self , self.main_thing)
-        new_pipeline.move(30 , 30)
-        new_pipeline.show()
-        self.pipelines.append(new_pipeline)
+    def closeEvent(self, event):
+        event.ignore()
+    
+    def resize_based_on_children(self):
+        print(f"Before height : {self.height()}")
+        button_and_extra_height = self.train_models.height() + 55
+        num_x_cols_recommended_height = self.x_columns.get_num_cols() * DraggableColumn.block_height + ColumnsSection.height_between_top_mouth_and_top_bar*2
+        num_y_cols_recommended_height = self.y_columns.get_num_cols() * DraggableColumn.block_height + ColumnsSection.height_between_top_mouth_and_top_bar*2
+        purposed_height = num_x_cols_recommended_height + num_y_cols_recommended_height + button_and_extra_height
+        print(f"Purposed height {purposed_height}")
+        self.setFixedHeight(max(purposed_height, ColumnsMDIWindow.STARTING_HEIGHT))
+        print(f"After height {self.height()}")

@@ -13,7 +13,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from plotter import Plotter
 from parsel import Parsel
-
+import pandas as pd
 
 
 
@@ -23,7 +23,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("SciKit Grow")
         self.resize(800 , 600)
-        self.dataframe = sns.load_dataset("iris")
+        #self.dataframe = sns.load_dataset("iris")
+
+        # load dataframe from a non-internet source.
+        self.dataframe = pd.read_csv("example_datasets/test.csv")
+
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
         self.libary = GUILibary(self.dataframe)

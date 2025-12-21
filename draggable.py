@@ -184,7 +184,7 @@ class Draggable(QPushButton):
                 }}
             """) 
         
-
+    POINTY_TRIANGLE_WIDTH = 20
 
     def paintEvent(self, event):
         if self.render_type == Draggable.POINTY:
@@ -195,7 +195,7 @@ class Draggable(QPushButton):
             # tunable parameters
             height_block = 40
             width_center_block = self.label_inferred_width + 10
-            width_triangle = 20
+            width_triangle = Draggable.POINTY_TRIANGLE_WIDTH
             triangle_mid_y_axis = int(height_block / 2)
             
             pointy_block = QPolygon([
