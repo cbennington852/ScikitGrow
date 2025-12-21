@@ -29,8 +29,10 @@ class GUILibary(QtW.QTabWidget):
             return is_classifier(x)
         except:
             return False
+    def preproccessor_filter(x):
+        return hasattr(x, 'fit') and hasattr(x, 'transform') and ('preprocessing' in getattr(x , '__module__' , ''))
     CLASSIFIER_FILTER = classification_filter
-    PREPROCESSOR_FILTER = lambda x : hasattr(x, 'fit') and hasattr(x, 'transform') and (not hasattr(x , 'predict'))
+    PREPROCESSOR_FILTER = preproccessor_filter
     REGRESSOR_FILTER = regression_filter
     VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
     MODEL_FILTER = model_filter
@@ -45,7 +47,7 @@ class GUILibary(QtW.QTabWidget):
         sklearn_models = [
             (sklearn.linear_model,"#8F0177" , Draggable.BUBBLE),
             (sklearn.ensemble,"#360185" , Draggable.BUBBLE),
-            (sklearn.neural_network, "#38008C", Draggable.BUBBLE)
+            (sklearn.neural_network, "#38008C", Draggable.BUBBLE),
             (sklearn.preprocessing, "#301CA0" ,Draggable.INTERLOCK_RIGHT),
             (sklearn.tree ,"#DE1A58" , Draggable.BUBBLE),
             (sklearn.model_selection , "#235622" , Draggable.POINTY)
@@ -312,45 +314,52 @@ class ColumnsSection(QtW.QGroupBox):
     def dropEvent(self, e):
         pos = e.pos()
         widget = e.source()
-        # remove the spacer ,and readadd to bottom.
-        for i in range(0 , self.my_layout.count()):
-            if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
-                temp_widget = self.my_layout.itemAt(i)
-                self.my_layout.removeItem(temp_widget)
-                del temp_widget
-        
-        if (self.get_num_cols() == self.max_num_cols):
-            # Remove one the children from this
-            for child in self.findChildren(QtW.QWidget):
-                if isinstance(child , DraggableColumn) and child != widget:
-                    e.accept()
-                    self.my_layout.addWidget(widget)
-                    child.deleteLater()
-                    return
-        # we can see the previous parent
         from_parent = widget.parentWidget()
         to_parent = self
-        self.my_layout.addWidget(widget)
-        if not isinstance(widget , DraggableColumn):
-            e.ignore()
-            return
+        def check_is_correct_type():
+            if not isinstance(widget , DraggableColumn):
+                e.ignore()
+                return
+        # remove the spacer ,and readadd to bottom.
+        def remove_all_spacers():
+            for i in range(0 , self.my_layout.count()):
+                if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
+                    temp_widget = self.my_layout.itemAt(i)
+                    self.my_layout.removeItem(temp_widget)
+                    del temp_widget
+        
+        def if_limit_remove_all_other_widgets():
+            if (self.get_num_cols() == self.max_num_cols):
+                # Remove one the children from this
+                for child in self.findChildren(QtW.QWidget):
+                    if isinstance(child , DraggableColumn) and child != widget:
+                        child.deleteLater()
+            else:
+                e.accept()
+            
+        check_is_correct_type()
+        remove_all_spacers()
+        if_limit_remove_all_other_widgets()
+        # Handle replacement with parent module. If applicable
         if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSection):
+            self.my_layout.addWidget(widget.copy_self())
             e.accept()
-            self.my_parent.resize_based_on_children()
-            # Below adds a new widget copy of draggable to the library
-            from_parent.layout.insertWidget(from_parent.layout.indexOf(widget) , widget.copy_self())
-        elif isinstance(from_parent , ColumnsSection) and isinstance(to_parent , ColumnsSection):
+        else:
+            # accept
             e.accept()
-            self.my_parent.resize_based_on_children()
+            # Add the dang widget
+            self.my_layout.addWidget(widget)
+            
 
-
+        # tell the parent to resize.
+        self.my_parent.resize_based_on_children()
+        # add space to end of the layout to make it all squished to top.
         self.my_layout.addStretch()
+        # Remove hovering attribute.
         self.hovering=False        
+        # Re-render the group box
         self.repaint()
 
-         # for the not first widgets, take their positons and offset by the bevel height 
-
-#class PreProccessorPipelineSection(QtW.QGroupBox):
 
 class PipelineSection(QtW.QGroupBox):
     """
@@ -559,6 +568,26 @@ class Pipeline(QtW.QMdiSubWindow):
                 return
 
 
+class PipelineMDIArea(QtW.QMdiArea):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setAcceptDrops(True)
+        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
+        my_layout = QtW.QVBoxLayout()
+        self.setLayout(my_layout)
+
+    def dragEnterEvent(self, e):
+        e.accept()
+
+    def dropEvent(self, e):
+        pos = e.pos()
+        widget = e.source()
+        new_widget = widget.copy_self()
+        new_window = self.addSubWindow(new_widget)
+        new_window.show()
+        print("Added new window" , new_window)
+        new_window.move(pos)
+        e.accept()
 
 
 class PipelineMother(QtW.QMainWindow):
@@ -569,10 +598,9 @@ class PipelineMother(QtW.QMainWindow):
         self.train_models = None
 
         toolbar = QtW.QToolBar()
-        self.main_thing = QtW.QMdiArea()
-        self.main_thing.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
-        my_layout = QtW.QVBoxLayout()
-        self.main_thing.setLayout(my_layout)
+        self.main_thing = PipelineMDIArea(self)
+        
+        
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
         self.add_pipeline_button.setFixedSize(150 ,60)
         self.add_pipeline_button.setIcon(QIcon(":/images/add_pipeline.svg"))

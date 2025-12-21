@@ -44,6 +44,10 @@ class Plotter(QtW.QTabWidget):
         ax2.set_ylim(0, 10)
         ax2.set_xlabel('X Axis')
         ax2.set_ylabel('Y Axis')
+
+        self.prediction_tab = QtW.QWidget()
+        self.prediction_tab_layout = QtW.QFormLayout()
+        self.prediction_tab.setLayout(self.prediction_tab_layout)
         
         
         self.visual_plot = FigureCanvasQTAgg(fig)
@@ -51,6 +55,28 @@ class Plotter(QtW.QTabWidget):
         
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
+        self.addTab(self.prediction_tab , "Manual Predictions")
+
+
+    def render_prediction_tab(self):
+        # Ran during plotting, uses the worker as input.
+        lst_input_cols = self.worker.x_cols
+        # Per model
+            # 1. Get the number of points for a single prediction.
+            # 1.1 create text entry boxes for these.
+            # 2. Add some sort of error handling to these.
+            # 3. Add a button for calling prediction function. 
+            # 4. Add a label that holds the predictions.
+        lst_tuple_ptr_entry_and_name = []
+        for input_col_name in lst_input_cols:
+            # make a entry
+            curr = QtW.QLineEdit()
+            curr_label = QtW.QLabel(input_col_name)
+            self.prediction_tab_layout.addRow(curr_label,curr)
+            lst_tuple_ptr_entry_and_name.append((input_col_name , curr))
+        print("Below is data to serialise the predictuon tab")
+        print(f"{lst_tuple_ptr_entry_and_name}")
+        # 
 
     def handle_thread_crashing(self):
         self.ptr_to_train_models_button.setEnabled(True)
@@ -171,7 +197,7 @@ class Plotter(QtW.QTabWidget):
         self.addTab(self.accuracy_plot , "Accuracy")
         self.visual_plot.show()
         self.worker.ptr_to_training_button.setEnabled(True)
-        del self.worker
+        self.render_prediction_tab()
         
 
 

@@ -13,13 +13,25 @@ import sklearn
 
 class DragAndDropHolder(QtW.QGroupBox):
     def __init__(self , 
-                 title : str, 
-                 my_parent ,
-                   holds_one_thing : bool, 
-                   type_draggable, 
-                   render_function,
-                     parent_submodule_type, 
-                     **kwargs):
+                title : str, 
+                my_parent : QtW.QMdiSubWindow,
+                holds_one_thing : bool, 
+                type_draggable, 
+                render_function,
+                parent_submodule_type, 
+                **kwargs
+                ):
+        """
+        A general class to handle drop and dropping into things. From library tp draggable should have just been a copy operation.
+
+        Args:
+            title (str): The name to be displayed in the box, telling what goes here.
+            my_parent (_type_): The subwindow parent, who should have a method called "resize_based_on_children"
+            holds_one_thing (bool): States if it holds one thing
+            type_draggable (_type_): Class of the draggable that this accepts
+            render_function (_type_): Function to render this to the screen. This overrides paintEvent()
+            parent_submodule_type (_type_): 
+        """
         super().__init__( **kwargs)
         self.my_title = title
         self.parent_submodule_type = parent_submodule_type
@@ -39,21 +51,18 @@ class DragAndDropHolder(QtW.QGroupBox):
         if isinstance(widget , self.type_draggable):
             e.accept()        
             self.model_hovering = True
-            self.repaint()  
         else:
             e.ignore()
+        self.repaint()  
+        
 
     def dragLeaveEvent(self, e):
         self.model_hovering = False
         self.repaint()
         e.accept() 
 
-    def get_num_held(self):
-        num = 0
-        for child in self.findChildren(QtW.QWidget):
-            if isinstance(child , self.type_draggable):
-                num += 1
-        return num
+    def get_num_held(self) -> int:
+        return len(self.get_held())
     
     def get_held(self) -> list:
         res_cols = []
@@ -68,28 +77,32 @@ class DragAndDropHolder(QtW.QGroupBox):
         else:
             return super().paintEvent(event)
 
-    def dropEvent(self, e):
-        widget = e.source()        
-        if (self.holds_one_thing == True):
-            # Remove one the children from this
-            for child in self.findChildren(QtW.QWidget):
-                if isinstance(child , self.type_draggable) and child != widget:
-                    e.accept()
-                    self.my_layout.addWidget(widget)
-                    child.deleteLater()
-                    return
-        # we can see the previous parent
-        from_parent = widget.parentWidget()
-        to_parent = self
-        self.my_layout.addWidget(widget)
+    # def dropEvent(self, e):
+    #     widget = e.source()        
+    #     if (self.holds_one_thing == True):
+    #         for child in self.findChildren(QtW.QWidget):
+    #             if isinstance(child , self.type_draggable) and child != widget:
+    #                 e.accept()
+    #                 self.my_layout.addWidget(widget.copy_self())
+    #                 child.deleteLater()
+    #                 return
+    #     else:
+    #         self.my_layout.addWidget(widget.copy_self())
 
-        self.clean_up_parent(
-            e=e,
-            widget=widget,
-            from_parent=from_parent,
-            to_parent=to_parent
-        )
-        
+
+    def dropEvent(self , e):
+        widget = e.source()
+        parent = widget.parentWidget()     
+
+        if self.holds_one_thing == True:
+            # Remove all children, add a copy of this puppy.
+            for child in self.findChildren(QtW.QWidget):
+                child.deleteLater()
+            self.my_layout.addWidget(widget.copy_self())
+            e.accept()
+        else:
+            self.my_layout.addWidget(widget.copy_self())
+            e.accept()
 
 
     def clean_up_parent(self, e , widget , from_parent, to_parent):
@@ -97,11 +110,16 @@ class DragAndDropHolder(QtW.QGroupBox):
         if not isinstance(widget , self.type_draggable):
             e.ignore()
             return
+        
         if isinstance(from_parent , self.parent_submodule_type) and isinstance(to_parent , DragAndDropHolder):
             e.accept()
             self.my_parent.resize_based_on_children()
             # Below adds a new widget copy of draggable to the library
             from_parent.layout.insertWidget(from_parent.layout.indexOf(widget)-1 , widget.copy_self())
+
         elif isinstance(from_parent , DragAndDropHolder) and isinstance(to_parent , DragAndDropHolder):
             e.accept()
             self.my_parent.resize_based_on_children()
+
+        else:
+            raise ValueError("Unknown drag and drop operation.")

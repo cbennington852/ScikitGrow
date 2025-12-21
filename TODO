@@ -38,14 +38,11 @@ Whereas a conference is a brisker 5 pages.
     - Color Redesign and CSS
 
 
-### 9. Make the pre-processors and validators have drop down.
-
-### 10. Libary sidebar re-design to make easier to reach
-    - Make this vertically tabbed? 
-    - Maybe also add some icons? 
+### 9. Make the pre-processors and validators have drop down (This is a graphical change.).
 
 ### 11. Add "predict" tab
 
 ### 12. Re-factor the "Drag and drop system" 
 1. make a clear class to inherit from. 
 2. clean up some lingering bugs and such related to this through our new drag_holder.
+3. ake form libary to droppable a copy operation
