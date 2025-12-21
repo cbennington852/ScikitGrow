@@ -365,10 +365,11 @@ class PipelineSection(QtW.QGroupBox):
     """
     This only holds one thing. 
     """
-    def __init__(self , accepting_function, title, max_num_models = 100,  **kwargs):
+    def __init__(self , accepting_function, title, my_parent , max_num_models = 100,  **kwargs):
         super().__init__( **kwargs)
         self.my_title = title
         self.setTitle(title)
+        self.my_parent = my_parent
         self.max_num_models = max_num_models
         self.accepting_function = accepting_function
         self.setAcceptDrops(True)
@@ -490,37 +491,51 @@ class PipelineSection(QtW.QGroupBox):
     def dropEvent(self, e):
         pos = e.pos()
         widget = e.source()
-        if (self.get_num_models() == self.max_num_models):
-            # Remove one the children from this
-            for child in self.findChildren(QtW.QWidget):
-                if isinstance(child , Draggable) and child != widget:
-                    e.accept()
-                    self.my_layout.addWidget(widget)
-                    child.deleteLater()
-                    return
-        # we can see the previous parent
         from_parent = widget.parentWidget()
         to_parent = self
-        self.my_layout.addWidget(widget)
-        if not isinstance(widget , Draggable):
-            e.ignore()
-            return
-        # Sudo code:
-            # Libary -> Libary
-                # No replacement, only accept
-            # Libary -> Pipeline
-                # Yes replacement
-            # Pipeline -> Libary
-                # No replacement, only accept
-            # Pipeline -> Pipeline
-                # only accept
+        def check_is_correct_type():
+            if not isinstance(widget , Draggable):
+                e.ignore()
+                return
+        # remove the spacer ,and readadd to bottom.
+        def remove_all_spacers():
+            for i in range(0 , self.my_layout.count()):
+                if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
+                    temp_widget = self.my_layout.itemAt(i)
+                    self.my_layout.removeItem(temp_widget)
+                    del temp_widget
+        
+        def if_limit_remove_all_other_widgets():
+            if (self.get_num_models() == self.max_num_models):
+                # Remove one the children from this
+                for child in self.findChildren(QtW.QWidget):
+                    if isinstance(child , Draggable) and child != widget:
+                        child.deleteLater()
+            else:
+                e.accept()
+            
+        check_is_correct_type()
+        remove_all_spacers()
+        if_limit_remove_all_other_widgets()
+        # Handle replacement with parent module. If applicable
         if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
+            self.my_layout.addWidget(widget.copy_self())
             e.accept()
-            # Below adds a new widget copy of draggable to the library
-            from_parent.layout.insertWidget(from_parent.layout.indexOf(widget) , widget.copy_self())
-        elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , PipelineSection):
+        else:
+            # accept
             e.accept()
-        self.is_holding = True
+            # Add the dang widget
+            self.my_layout.addWidget(widget)
+            
+
+        # tell the parent to resize.
+        self.my_parent.resize_based_on_children()
+        # add space to end of the layout to make it all squished to top.
+        self.my_layout.addStretch()
+        # Remove hovering attribute.
+        self.hovering=False        
+        # Re-render the group box
+        self.repaint()
 
 class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
@@ -536,18 +551,21 @@ class Pipeline(QtW.QMdiSubWindow):
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
             title="Preproccessors",
-            accepting_function=GUILibary.PREPROCESSOR_FILTER
+            accepting_function=GUILibary.PREPROCESSOR_FILTER,
+            my_parent=self
 
         )
         self.model_pipe = PipelineSection(
             title="Models",
             accepting_function=GUILibary.MODEL_FILTER,
+            my_parent=self,
             max_num_models=1
         )
         self.validator = PipelineSection(
             title="Validator",
             # Makes sure this is a validator by checking if it has a 'split' function which is required.
             accepting_function=GUILibary.VALIDATOR_FILTER,
+            my_parent=self,
             max_num_models=1
         )
         my_layout.addWidget(self.name_pipeline)
@@ -558,6 +576,7 @@ class Pipeline(QtW.QMdiSubWindow):
 
     def get_name_pipeline(self) -> str:
         return self.name_pipeline.text
+    
 
     def closeEvent(self, event):
         for x in range(0 , len(self.my_parent.pipelines)):
