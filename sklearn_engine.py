@@ -11,7 +11,16 @@ from matplotlib.colors import ListedColormap
 
 
 
-
+def is_regressor(x):
+    try:
+        return sklearn.base.is_regressor(x)
+    except:
+        return False
+def classification_filter(x):
+    try:
+        return sklearn.base.is_classifier(x)
+    except:
+        return False
 
 
 # Feature expansion plan ... multiple pipelines

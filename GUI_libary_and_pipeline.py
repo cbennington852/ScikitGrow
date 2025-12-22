@@ -26,7 +26,7 @@ class GUILibary(QtW.QTabWidget):
             return False
     def classification_filter(x):
         try:
-            return is_classifier(x)
+            return is_classifier(x) and (not 'preprocessing' in getattr(x , '__module__' , ''))
         except:
             return False
     def preproccessor_filter(x):
@@ -584,6 +584,26 @@ class PipelineSection(QtW.QGroupBox):
                         ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
                         ), # right start bevel.
+
+
+                    QPoint(
+                        second_bevel_x_offset + ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
+                        ),
+                    QPoint(
+                        second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
+                        ),
+                    # Bottom right of bevel
+                    QPoint(
+                        second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
+                        ),
+                    # Bottom left of bevel
+                    QPoint(second_bevel_x_offset + ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
+                           ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth), # right start bevel.
+                    
+                    
                     
                 
                     QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
