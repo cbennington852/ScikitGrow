@@ -757,10 +757,18 @@ class PipelineMDIArea(QtW.QMdiArea):
         e.accept()
 
     def dropEvent(self, e):
+        #Disable below, as not essental.
+        return super().dropEvent(e)
+
         pos = e.pos()
         widget = e.source()
         new_widget = widget.copy_self()
-        new_window = self.addSubWindow(new_widget)
+        # New frameless window to hold said widget.
+        sub_window = QtW.QMdiSubWindow()
+        sub_window.setWidget(new_widget)
+        sub_window.setWindowFlag(Qt.FramelessWindowHint , True)
+        # Add to MDI area
+        new_window = self.addSubWindow(sub_window)
         new_window.show()
         print("Added new window" , new_window)
         new_window.move(pos)

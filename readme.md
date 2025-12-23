@@ -42,7 +42,8 @@ Currently, there is still a lot to work on for this application, most of the cor
 Works on Linux , Windows , Mac
 ```
 python -m venv myenv
-echo "Then activate your venv, this varies slightly from platform to platform."
+echo "Then activate your venv, this varies slightly from platform to platform. The below command is for Unix-like systems. It is different for Mac and Powershell."
+source ./myenv/bin/activate
 pip install -r requirements.txt
 ```
 Running the GUI
