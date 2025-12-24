@@ -5,7 +5,7 @@ from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
 import PyQt5.QtCore as QtCore 
-from draggable import Draggable , DraggableColumn
+from draggable import Draggable , DraggableColumn , DraggableData
 from sklearn.base import is_regressor, is_classifier
 import sklearn
 
@@ -356,7 +356,6 @@ class ColumnsSection(QtW.QGroupBox):
         # Re-render the group box
         self.repaint()
 
-
 class PipelineSection(QtW.QGroupBox):
     """
     This only holds one thing. 
@@ -384,16 +383,35 @@ class PipelineSection(QtW.QGroupBox):
         resulting_models = []
         for child in self.findChildren(QtW.QWidget):
             if isinstance(child , Draggable):
-                parameters_as_dict = dict(child.parameters)
-                curr = child.sklearn_function(**parameters_as_dict)
+                parameters_as_dict = dict(child.data.parameters)
+                curr = child.data.sklearn_function(**parameters_as_dict)
                 resulting_models.append(curr)
         return resulting_models
+
+    def pipeline_section_from_data( accepting_function, title, my_parent , data : list[DraggableData]):
+        new_pipe = PipelineSection(
+            accepting_function=accepting_function,
+            title=title,
+            my_parent=my_parent,
+        )
+        for drag_data in data:
+            # Make a new draggable.
+            new_drag = Draggable.new_draggable_from_data(drag_data)
+            new_pipe.my_layout.addWidget(new_drag)
+            # add it to this.
+        return new_pipe
+
+    def get_data(self) -> list[DraggableData]:
+        lst_data = []
+        for model in self.get_models():
+            lst_data.append(model.data)
+        return lst_data
 
     def dragEnterEvent(self, e):
         pos = e.pos()
         widget = e.source()
         if isinstance(widget , Draggable):
-            if self.accepting_function(widget.sklearn_function):
+            if self.accepting_function(widget.data.sklearn_function):
                 e.accept()        
                 self.model_hovering = True
                 self.repaint()
@@ -423,7 +441,6 @@ class PipelineSection(QtW.QGroupBox):
             if isinstance(child , Draggable):
                 res_models.append(child)
         return res_models
-    
     
     def paintEvent(self, e):
         if self.my_title == "Validator":
@@ -685,11 +702,32 @@ class PipelineSection(QtW.QGroupBox):
         # Re-render the group box
         self.repaint()
 
+class PipelineData():
+    def __init__(
+            self ,
+              pipeline_name : str,
+              preprocessor_section : list[DraggableData],
+              model_pipeline  : list[DraggableData],
+              validator : list[DraggableData],
+              x_pos : int,
+              y_pos : int,
+              ):
+        # get_models -> data
+        self.pipeline_name = pipeline_name
+        self.preprocessor_section = preprocessor_section
+        self.model_pipeline = model_pipeline
+        self.validator = validator
+        self.x_pos = x_pos,
+        self.y_pos = y_pos
+
 class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
 
     BASE_PIPELINE_WIDTH = 400
     BASE_PIPELINE_HEIGHT = 400
+    SECTION_PREPROCCESSOR_TITLE="Preprocessors"
+    SECTION_MODEL_TITLE="Models"
+    SECTION_VALIDATOR_TITLE="Validator"
 
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)
@@ -701,19 +739,19 @@ class Pipeline(QtW.QMdiSubWindow):
         self.name_pipeline = QtW.QLineEdit()
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
-            title="Preprocessors",
+            title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
             accepting_function=GUILibary.PREPROCESSOR_FILTER,
             my_parent=self
 
         )
         self.model_pipe = PipelineSection(
-            title="Models",
+            title=Pipeline.SECTION_MODEL_TITLE,
             accepting_function=GUILibary.MODEL_FILTER,
             my_parent=self,
             max_num_models=1
         )
         self.validator = PipelineSection(
-            title="Validator",
+            title=Pipeline.SECTION_VALIDATOR_TITLE,
             # Makes sure this is a validator by checking if it has a 'split' function which is required.
             accepting_function=GUILibary.VALIDATOR_FILTER,
             my_parent=self,
@@ -726,6 +764,48 @@ class Pipeline(QtW.QMdiSubWindow):
         my_layout.addWidget(self.validator)
         self.setWidget(main_thing)
 
+    def get_pipeline_data(self) -> PipelineData:
+        pipeline_data = PipelineData(
+            pipeline_name=self.name_pipeline.text(),
+            preprocessor_section=self.preproccessor_pipe.get_data(),
+            model_pipeline=self.model_pipe.get_data(),
+            validator=self.validator.get_data(),
+            x_pos=self.pos().x(),
+            y_pos=self.pos().y()
+        )
+        return pipeline_data
+
+    def pipeline_from_data(GUI_parent , my_parent, data : PipelineData):
+        # THIS RETURNS A PIPELINE.
+        new_pipeline = Pipeline(
+            my_parent=my_parent,
+            GUI_parent=GUI_parent
+        )
+        new_pipeline.validator = PipelineSection.pipeline_section_from_data(
+            accepting_function=GUILibary.VALIDATOR_FILTER,
+            title=Pipeline.SECTION_VALIDATOR_TITLE,
+            my_parent=new_pipeline,
+            data=data.validator
+        )
+        new_pipeline.model_pipe = PipelineSection.pipeline_section_from_data(
+            accepting_function=GUILibary.MODEL_FILTER,
+            title=Pipeline.SECTION_MODEL_TITLE,
+            my_parent=new_pipeline,
+            data=data.model_pipeline
+        )
+        new_pipeline.preproccessor_pipe = PipelineSection.pipeline_section_from_data(
+            accepting_function=GUILibary.PREPROCESSOR_FILTER,
+            title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
+            my_parent=new_pipeline,
+            data=data.preprocessor_section
+        )
+        new_pipeline.name_pipeline.setText(data.pipeline_name)
+        new_pipeline.move(data.x_pos , data.y_pos)
+        return new_pipeline
+        
+
+
+            
     def get_name_pipeline(self) -> str:
         return self.name_pipeline.text
     
@@ -760,31 +840,17 @@ class PipelineMDIArea(QtW.QMdiArea):
         #Disable below, as not essental.
         return super().dropEvent(e)
 
-        pos = e.pos()
-        widget = e.source()
-        new_widget = widget.copy_self()
-        # New frameless window to hold said widget.
-        sub_window = QtW.QMdiSubWindow()
-        sub_window.setWidget(new_widget)
-        sub_window.setWindowFlag(Qt.FramelessWindowHint , True)
-        # Add to MDI area
-        new_window = self.addSubWindow(sub_window)
-        new_window.show()
-        print("Added new window" , new_window)
-        new_window.move(pos)
-        e.accept()
 
 
 class PipelineMother(QtW.QMainWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.setWindowFlags(Qt.WindowType.Widget)
-        self.pipelines = []
+        self.pipelines : Pipeline = []
         self.train_models = None
 
         toolbar = QtW.QToolBar()
         self.main_thing = PipelineMDIArea(self)
-        
         
         self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
         self.add_pipeline_button.setFixedSize(150 ,60)
@@ -804,6 +870,23 @@ class PipelineMother(QtW.QMainWindow):
         self.y_columns = sub_window.y_columns
         self.train_models = sub_window.train_models
       
+    def get_data(self) -> list[PipelineData]:
+        # Only really need to save the pipelines ... and maybe also the column sections.
+        lst_pipeline_data = []
+        for pipeline in self.pipelines:
+            lst_pipeline_data.append(pipeline.get_pipeline_data())
+        return lst_pipeline_data
+    
+    def load_from_data(self , pipelines_data : list[PipelineData]):
+        # Simply loop thru the parsel, and re-populate the pipelines.
+        for pipe_data in pipelines_data:
+            curr = Pipeline.pipeline_from_data(
+                my_parent=self, 
+                GUI_parent=self.main_thing,
+                data=pipe_data,
+            )
+            self.pipelines.append(curr)
+
 
     def add_pipeline(self):
         new_pipeline = Pipeline(self , self.main_thing)

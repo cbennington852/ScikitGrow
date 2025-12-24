@@ -8,7 +8,6 @@ from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor 
 import PyQt5.QtCore as QCore 
 
 
-
 class DraggableColumn(QPushButton):
     BASE_HEIGHT = 50
 
@@ -130,7 +129,12 @@ class DraggableColumn(QPushButton):
      
 
 
-
+class DraggableData():
+        def __init__(self , sklearn_function , parameters , render_type, hex_color):
+            self.sklearn_function = sklearn_function
+            self.parameters = parameters
+            self.render_type = render_type
+            self.hex_color = hex_color
 # these are the draggable buttons
 class Draggable(QPushButton):
 
@@ -138,7 +142,7 @@ class Draggable(QPushButton):
     POINTY = "pointy"
     BUBBLE = "bubble"
     BASE_HEIGHT = 50
-
+    
     def __init__(self , name, sklearn_function , render_type, hex_color,   **kwargs):
         super().__init__(**kwargs) 
         self.kwargs = kwargs
@@ -154,8 +158,12 @@ class Draggable(QPushButton):
         self.label_inferred_width = temp_label.width()
         self.setMaximumWidth(required_text_width + 60)
         self.setFixedHeight(Draggable.BASE_HEIGHT)
-        self.sklearn_function = sklearn_function
-        self.parameters = SubLibary.get_sklearn_parameters(sklearn_function)
+        self.data = DraggableData(
+            sklearn_function=sklearn_function,
+            parameters=SubLibary.get_sklearn_parameters(sklearn_function),
+            render_type=render_type,
+            hex_color=hex_color
+        )
         self.setText(name)
         self.clicked.connect(self.on_button_clicked)
 
@@ -186,6 +194,9 @@ class Draggable(QPushButton):
                     border: 5px black solid;
                 }}
             """) 
+
+    def get_data(self) -> DraggableData:
+        return self.data
         
     POINTY_TRIANGLE_WIDTH = 20
 
@@ -313,16 +324,33 @@ class Draggable(QPushButton):
     def copy_self(self):
         return Draggable(
             name=self.name,
-            sklearn_function=self.sklearn_function,
+            sklearn_function=self.data.sklearn_function,
             render_type=self.render_type,
             hex_color=self.hex_color,
             **self.kwargs
         )
     
+    def new_draggable_from_data(data  : DraggableData):
+        """Returns a new draggable from a data parsel.
+
+        Args:
+            data (DraggableData): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        new_drag = Draggable(
+            data.name,
+            data.sklearn_function,
+            data.render_type,
+            data.hex_color,
+        )
+        new_drag.data.parameters = data.parameters
+        return new_drag
+    
     def on_button_clicked(self):
         popover = ParameterPopup(
-            sklearn_function=self.sklearn_function,
-            parameters=self.parameters,
+            draggable_data=self.data,
             parent=self
         )
         popover.exec()
@@ -330,7 +358,7 @@ class Draggable(QPushButton):
 
 
 class ParameterPopup(QtW.QDialog):
-    def __init__(self , sklearn_function , parameters, parent : Draggable,  **kwargs):
+    def __init__(self , draggable_data  : DraggableData , parent : Draggable,  **kwargs):
         super().__init__(**kwargs) 
         self.my_parent = parent
         self.setWindowTitle(f"{parent.name} hyper parameters")
@@ -339,7 +367,7 @@ class ParameterPopup(QtW.QDialog):
 
         layout = QtW.QFormLayout()
 
-        for parameter_name , default_value in parameters:
+        for parameter_name , default_value in draggable_data.parameters:
             curr = QtW.QLineEdit()
             curr.setText(str(default_value))
             layout.addRow(
@@ -363,7 +391,7 @@ class ParameterPopup(QtW.QDialog):
             except:
                 curr = (parameter_name , eval(f'\'{q_line_edit.text()}\''))
             new_parameters.append(curr)
-        self.my_parent.parameters = new_parameters
+        self.my_parent.data.parameters = new_parameters
         self.accept()
 
 

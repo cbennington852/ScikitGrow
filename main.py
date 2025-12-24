@@ -12,8 +12,8 @@ from PyQt5.QtGui import QIcon , QPixmap
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from plotter import Plotter
-from parsel import Parsel
 import os
+import pickle
 import pandas as pd
 
 
@@ -37,12 +37,17 @@ class MainMenu(QMainWindow):
 
         # add the example datasets button
         self.example_datasets_button = QtW.QPushButton("Example datasets")
-        self.my_layout.addWidget(self.example_datasets_button)
         self.import_dataset_button = QtW.QPushButton("Import datasets")
+        self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
         self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
-        self.my_layout.addWidget(self.import_dataset_button)
 
         self.example_datasets_button.clicked.connect(lambda : self.open_main_window_on_sns_dataset(pd.read_csv("example_datasets/test.csv")))
+
+        self.my_layout.addWidget(self.title_image)
+        self.my_layout.addWidget(self.example_datasets_button)
+        self.my_layout.addWidget(self.import_dataset_button)
+
+
 
     def open_main_window_on_sns_dataset(self, dataframe):
         splash = QtW.QSplashScreen(pixmap)
@@ -64,6 +69,12 @@ class MainMenu(QMainWindow):
             print("No file selected")
 
 
+class SaveFile():
+    def __init__(self , pipelines_data , dataframe):
+        self.pipelines_data = pipelines_data
+        self.dataframe = dataframe
+
+
 class MainWindow(QMainWindow):
 
     BASE_WINDOW_WIDTH = 1200
@@ -73,10 +84,9 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("SciKit Grow")
         self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
-        #self.dataframe = sns.load_dataset("iris")
-
-        # load dataframe from a non-internet source.
-        self.dataframe = pd.read_csv("example_datasets/test.csv")
+        # start a parsel. 
+        # load dataframe 
+        self.dataframe = dataframe
 
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
@@ -116,6 +126,23 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.pipeline_mommy)
 
+    def save_button_pressed(self):
+        save_file = SaveFile(
+            pipelines_data=self.pipeline_mommy.get_data(),
+            dataframe=self.dataframe
+        )
+        with open('data.pkl', 'wb') as file:
+            # Use 'wb' mode for writing binary
+            pickle.dump(save_file, file)
+        print(save_file)
+
+    def load_button_pressed(self , file_name='data.pkl'):
+        with open(file_name, 'rb') as file:
+            # Use 'rb' mode for reading binary
+            print("Loading from pickle")
+            save_file = pickle.load(file)
+            print("modifying pipeline mother")
+            self.pipeline_mommy.load_from_data(save_file.pipelines_data)
 
     def render_menu_bar(self):
         menu = self.menuBar()
@@ -130,12 +157,12 @@ class MainWindow(QMainWindow):
 
         # Save action
         save_as_action = QAction("Save Project As" , self)
-        save_as_action.triggered.connect(lambda : print("saving attempted"))
+        save_as_action.triggered.connect(self.save_button_pressed)
         file_menu.addAction(save_as_action)
 
         # Open action
         open_action = QAction("Open Project" , self)
-        open_action.triggered.connect(lambda : print("opening attempted"))
+        open_action.triggered.connect(self.load_button_pressed)
         file_menu.addAction(open_action)
 
 def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
