@@ -43,3 +43,6 @@ Whereas a conference is a brisker 5 pages.
 
 
 ### 13. The models still transform into blocks upon drag. 
+
+### 14. Consider the removal of the CV
+    - The automatically do cross validation of the model, which might be worth disabling for clarity or adding it as a option later.

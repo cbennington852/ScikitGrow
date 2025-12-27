@@ -185,7 +185,12 @@ def open_on_file_handle(file_handle):
         try:
             df = filter_command_line_argument_return_dataframe(file_handle)
             main_menu = MainMenu()
-            main_menu.open_main_window_on_sns_dataset(df)
+            try:
+                main_menu.open_main_window_on_sns_dataset(df)
+            except Exception as e:
+                print("Internal Error")
+                print(e)
+                sys.exit()
         except Exception:
             print("File type not supported.")
     else:

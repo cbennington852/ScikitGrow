@@ -8,6 +8,7 @@ import PyQt5.QtCore as QtCore
 from draggable import Draggable , DraggableColumn , DraggableData
 from sklearn.base import is_regressor, is_classifier
 import sklearn
+from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
 class GUILibary(QtW.QTabWidget):
 
@@ -44,37 +45,16 @@ class GUILibary(QtW.QTabWidget):
     def __init__(self , dataframe,  **kwargs):
         super().__init__(**kwargs)
         self.dataframe = dataframe
-        sklearn_models = [
-            (sklearn.linear_model,"#8F0177" , Draggable.BUBBLE),
-            (sklearn.ensemble,"#360185" , Draggable.BUBBLE),
-            (sklearn.neural_network, "#38008C", Draggable.BUBBLE),
-            (sklearn.preprocessing, "#301CA0" ,Draggable.INTERLOCK_RIGHT),
-            (sklearn.tree ,"#DE1A58" , Draggable.BUBBLE),
-            (sklearn.model_selection , "#235622" , Draggable.POINTY)
-        ]
+      
 
         # Styling
         self.setTabPosition(QtW.QTabWidget.West)
 
 
         self.curr_index = 0
-        def addModule(name , filter):    
-            regressor_box = QtW.QWidget()
-            regressor_layout = QtW.QVBoxLayout()
-            regressor_box.setLayout(regressor_layout)
-            for subsection , hex_color , render_type in sklearn_models:
-                curr = GUILibarySubmodule(
-                        sublibary=SubLibary.get_public_methods(
-                            library=subsection,
-
-                            filter_function=filter
-                        ),
-                        render_type=render_type,
-                        hex_value=hex_color
-                    )
-                regressor_layout.addWidget(curr)
+        def addModule(name , q_widget_list):    
             scroll_regressor = QtW.QScrollArea()
-            scroll_regressor.setWidget(regressor_box)
+            scroll_regressor.setWidget(q_widget_list)
             scroll_regressor.setWidgetResizable(True)
             if isinstance(name , QIcon):
                 self.addTab(scroll_regressor , "")
@@ -83,12 +63,110 @@ class GUILibary(QtW.QTabWidget):
             else:
                 self.addTab(scroll_regressor , name)
             self.curr_index += 1
-        
 
-        addModule(QIcon(":/images/reggessor_icon.svg") , GUILibary.REGRESSOR_FILTER)
-        addModule(QIcon(":/images/classification_icon.svg") , GUILibary.CLASSIFIER_FILTER)
-        addModule(QIcon(":/images/preproccessor_icon.svg") , GUILibary.PREPROCESSOR_FILTER)
-        addModule(QIcon(":/images/validators_icon.svg") , GUILibary.VALIDATOR_FILTER)
+        ########################################################
+        # COLOR PALETTES
+        ########################################################
+        LINEAR_COLOR = "#57BDAC"
+        ENSEMBLE_COLOR = "#241C72"
+        TREE_COLOR = "#234234"
+        NEURAL_COLOR = "#235235"
+
+        ########################################################
+        # REGRESSORS
+        ########################################################
+
+        regressor_box = QtW.QWidget()
+        regressor_layout = QtW.QVBoxLayout()
+        regressor_box.setLayout(regressor_layout)
+
+        # make sublibaries from the picked out lists. 
+        lin_reg = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.REGRESSORS_LINEAR,
+                "Linear Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=LINEAR_COLOR
+        ) 
+        lin_ens = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.REGRESSORS_ENSEMBLE,
+                "Ensemble Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=ENSEMBLE_COLOR
+        ) 
+        lin_neu = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.REGRESSORS_NEURAL_NETWORK,
+                "Neural Network Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=NEURAL_COLOR
+        ) 
+        lin_tre = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.REGRESSORS_TREE,
+                "Tree Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=TREE_COLOR
+        ) 
+        regressor_layout.addWidget(lin_reg)
+        regressor_layout.addWidget(lin_ens)
+        regressor_layout.addWidget(lin_tre)
+        regressor_layout.addWidget(lin_neu)
+
+        ########################################################
+        # CLASSIFIERS 
+        ########################################################
+
+        classifier_box = QtW.QWidget()
+        classifier_layout = QtW.QVBoxLayout()
+        classifier_box.setLayout(classifier_layout)
+        cla_reg = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.CLASSIFIERS_LINEAR,
+                "Linear Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=LINEAR_COLOR
+        ) 
+        cla_ens = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.CLASSIFIERS_ENSEMBLE,
+                "Ensemble Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=ENSEMBLE_COLOR
+        ) 
+        cla_neu = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.CLASSIFIERS_NEURAL,
+                "Neural Network Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=NEURAL_COLOR
+        ) 
+        cla_tre = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.CLASSIFIERS_TREE,
+                "Tree Models"
+            ),
+            render_type=Draggable.BUBBLE,
+            hex_value=TREE_COLOR
+        ) 
+        classifier_layout.addWidget(cla_reg)
+        classifier_layout.addWidget(cla_ens)
+        classifier_layout.addWidget(cla_tre)
+        classifier_layout.addWidget(cla_neu)
+
+
+        addModule(QIcon(":/images/reggessor_icon.svg") , regressor_box)
+        addModule(QIcon(":/images/classification_icon.svg") , classifier_box)
+        #addModule(QIcon(":/images/preproccessor_icon.svg") , GUILibary.PREPROCESSOR_FILTER)
+        #addModule(QIcon(":/images/validators_icon.svg") , GUILibary.VALIDATOR_FILTER)
 
 
         self.addTab(self.cols_tab() ,"")
