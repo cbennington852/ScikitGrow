@@ -71,6 +71,7 @@ class GUILibary(QtW.QTabWidget):
         ENSEMBLE_COLOR = "#241C72"
         TREE_COLOR = "#234234"
         NEURAL_COLOR = "#235235"
+        PREPROCESSOR_COLOR = "#DD6A34"
 
         ########################################################
         # REGRESSORS
@@ -163,9 +164,31 @@ class GUILibary(QtW.QTabWidget):
         classifier_layout.addWidget(cla_neu)
 
 
+        ########################################################
+        # PRE_PROCESSORS
+        ########################################################
+        preproccessor_box = QtW.QWidget()
+        preproccessor_layout = QtW.QVBoxLayout()
+        preproccessor_box.setLayout(preproccessor_layout)
+        pre_sub_module = GUILibarySubmodule(
+            sublibary=SubLibary(
+                SklearnAcceptableFunctions.PREPROCESSORS,
+                "vb"
+            ),
+            render_type=Draggable.INTERLOCK_RIGHT,
+            hex_value=PREPROCESSOR_COLOR
+        ) 
+        preproccessor_layout.addWidget(pre_sub_module)
+
+
+        ########################################################
+        # VALIDATORS
+        ########################################################
+
+
         addModule(QIcon(":/images/reggessor_icon.svg") , regressor_box)
         addModule(QIcon(":/images/classification_icon.svg") , classifier_box)
-        #addModule(QIcon(":/images/preproccessor_icon.svg") , GUILibary.PREPROCESSOR_FILTER)
+        addModule(QIcon(":/images/preproccessor_icon.svg") , preproccessor_box)
         #addModule(QIcon(":/images/validators_icon.svg") , GUILibary.VALIDATOR_FILTER)
 
 

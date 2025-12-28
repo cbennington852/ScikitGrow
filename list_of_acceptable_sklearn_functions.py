@@ -2,6 +2,7 @@ import sklearn
 import sklearn.linear_model as lin
 import sklearn.ensemble as ens
 import sklearn.preprocessing as pre
+import sklearn.model_selection as val
 import sklearn.neural_network as neu
 import sklearn.tree as tre
 
@@ -68,3 +69,18 @@ class SklearnAcceptableFunctions():
         tre.DecisionTreeClassifier,
         tre.ExtraTreeClassifier
     ]
+
+    def _multi_line_lambda_for_pre_processors():
+        res = []
+        for function in dir(pre):
+            if function[0] != '_' and function[0].isupper():
+               res.append(getattr(pre , function)) # getattr fetches the higher order function.
+        return res
+
+    PREPROCESSORS = _multi_line_lambda_for_pre_processors()
+
+    VALIDATORS = [
+        val.BaseShuffleSplit,
+    ]
+
+    
