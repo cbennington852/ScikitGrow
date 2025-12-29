@@ -15,31 +15,12 @@ class GUILibary(QtW.QTabWidget):
     ###############################################
     # List of Filter / Accepting Functions
     ###############################################
-    def model_filter(x):
-        try:
-            return is_classifier(x) or is_regressor(x)
-        except:
-            return False
-    def regression_filter(x):
-        try:
-            return is_regressor(x)
-        except:
-            return False
-    def classification_filter(x):
-        try:
-            return is_classifier(x) and (not 'preprocessing' in getattr(x , '__module__' , ''))
-        except:
-            return False
-    def preproccessor_filter(x):
-        return hasattr(x, 'fit') and hasattr(x, 'transform') and ('preprocessing' in getattr(x , '__module__' , ''))
-    CLASSIFIER_FILTER = classification_filter
-    PREPROCESSOR_FILTER = preproccessor_filter
-    REGRESSOR_FILTER = regression_filter
+
+    CLASSIFIER_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS
+    PREPROCESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.PREPROCESSORS
+    REGRESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.REGRESSORS
     VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
-    MODEL_FILTER = model_filter
-
-
-
+    MODEL_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS or SklearnAcceptableFunctions.REGRESSORS
 
 
     def __init__(self , dataframe,  **kwargs):
@@ -198,8 +179,6 @@ class GUILibary(QtW.QTabWidget):
             hex_value=VALIDATOR_COLOR
         ) 
         validator_layout.addWidget(vali_submodule)
-
-
 
         addModule(QIcon(":/images/reggessor_icon.svg") , regressor_box)
         addModule(QIcon(":/images/classification_icon.svg") , classifier_box)
