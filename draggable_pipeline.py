@@ -77,11 +77,12 @@ class PipelineSection(QtW.QGroupBox):
                 resulting_models.append(curr)
         return resulting_models
 
-    def pipeline_section_from_data( accepting_function, title, my_parent , data : list[DraggableData]):
+    def pipeline_section_from_data( accepting_function, title, my_parent , data : list[DraggableData] , max_num_models):
         new_pipe = PipelineSection(
             accepting_function=accepting_function,
             title=title,
             my_parent=my_parent,
+            max_num_models=max_num_models
         )
         for drag_data in data:
             # Make a new draggable.
@@ -485,19 +486,22 @@ class Pipeline(QtW.QMdiSubWindow):
             accepting_function=Pipeline.VALIDATOR_FILTER,
             title=Pipeline.SECTION_VALIDATOR_TITLE,
             my_parent=new_pipeline,
-            data=data.validator
+            data=data.validator,
+            max_num_models=1
         )
         new_pipeline.model_pipe = PipelineSection.pipeline_section_from_data(
             accepting_function=Pipeline.MODEL_FILTER,
             title=Pipeline.SECTION_MODEL_TITLE,
             my_parent=new_pipeline,
-            data=data.model_pipeline
+            data=data.model_pipeline,
+            max_num_models=1
         )
         new_pipeline.preproccessor_pipe = PipelineSection.pipeline_section_from_data(
             accepting_function=Pipeline.PREPROCESSOR_FILTER,
             title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
             my_parent=new_pipeline,
-            data=data.preprocessor_section
+            data=data.preprocessor_section,
+            max_num_models=None
         )
         # Remove old layout
         new_pipeline.main_thing.deleteLater()
