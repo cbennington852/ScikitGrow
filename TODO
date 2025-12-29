@@ -31,16 +31,9 @@ Whereas a conference is a brisker 5 pages.
 
 
 ### 2. Saving and loading from file.
-
-### 3. Redesign the UX of the windows to be nicer.
-    - SubWindow Pipeline
-    - Draggables as scratch-like blocks.
-    - Color Redesign and CSS
-
-
+    - Columns
 
 ### 11. Add "predict" tab
-
 
 ### 13. The models still transform into blocks upon drag. 
 

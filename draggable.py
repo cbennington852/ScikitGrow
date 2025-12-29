@@ -172,30 +172,7 @@ class Draggable(QPushButton):
         # rendering the actual thing
         if render_type == Draggable.POINTY:
             self.arrow_icon = QIcon(":/images/dropdown_arrow.png")
-        elif render_type == Draggable.BUBBLE:
-            arrow_icon = QIcon(":/images/dropdown_arrow.png")
-            self.setIcon(arrow_icon)
-            self.setStyleSheet(f"""  
-                QPushButton {{
-                    background-color: {hex_color};
-                    border-radius: 20px;
-                    color : white;
-                    border: 5px black solid;
-                }}
-                QPushButton:hover {{
-                    background-color: {hex_color};
-                    border-radius: 20px;
-                    color : white;
-                    border: 5px black solid;
-
-                }}
-                QPushButton:pressed {{
-                    background-color: {hex_color};
-                    border-radius: 20px;
-                    color : white;
-                    border: 5px black solid;
-                }}
-            """) 
+        
 
     def get_data(self) -> DraggableData:
         return self.data
@@ -234,6 +211,31 @@ class Draggable(QPushButton):
             ])
 
             painter.drawPolygon(pointy_block)
+            painter.setPen(QColor(Qt.white))
+            start_y_for_text = int(self.size().height() / 2) + 5
+            painter.drawText(width_triangle + 5 , start_y_for_text, f"{self.name}")
+
+        elif self.render_type == Draggable.BUBBLE:
+            painter = QPainter(self)
+            painter.setPen(QColor(self.hex_color))
+            painter.setBrush(QColor(self.hex_color))
+
+            # tunable parameters
+            height_block = 40
+            width_center_block = self.label_inferred_width + 10
+            width_triangle = Draggable.POINTY_TRIANGLE_WIDTH
+            triangle_mid_y_axis = int(height_block / 2)
+
+            painter.drawRoundedRect(
+                0 , # x
+                0 , # y
+                self.width()-10, # w
+                self.height()-10, # h
+                10, # x radius
+                10 # y radius
+
+            )
+
             painter.setPen(QColor(Qt.white))
             start_y_for_text = int(self.size().height() / 2) + 5
             painter.drawText(width_triangle + 5 , start_y_for_text, f"{self.name}")

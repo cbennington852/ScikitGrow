@@ -12,6 +12,11 @@ from column_pipeline import ColumnsSection , ColumnsSubmodule
 from draggable_pipeline import DraggableColumn , PipelineSection, Pipeline, PipelineData, GUILibarySubmodule
 from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
+class ColumnsWindowData():
+    def __init__(self , x_cols , y_cols):
+        self.x_cols = x_cols
+        self.y_cols = y_cols
+
 class GUILibary(QtW.QTabWidget):
     def __init__(self , dataframe,  **kwargs):
         super().__init__(**kwargs)
@@ -225,14 +230,14 @@ class PipelineMother(QtW.QMainWindow):
 
         self.add_pipeline()
 
-        self.render_x_y_train_sub_window()
+        self.columns_subwindow = ColumnsMDIWindow(self.main_thing)
+        
+        self.x_columns = self.columns_subwindow.x_columns
+        self.y_columns = self.columns_subwindow.y_columns
+        self.train_models = self.columns_subwindow.train_models
 
-    def render_x_y_train_sub_window(self):
-        sub_window = ColumnsMDIWindow(self.main_thing)
-        self.x_columns = sub_window.x_columns
-        self.y_columns = sub_window.y_columns
-        self.train_models = sub_window.train_models
-
+    def get_columns_data(self) -> ColumnsWindowData:
+        return self.columns_subwindow.save_data()
       
     def get_data(self) -> list[PipelineData]:
         # Only really need to save the pipelines ... and maybe also the column sections.
@@ -260,6 +265,7 @@ class PipelineMother(QtW.QMainWindow):
         new_pipeline.move(30 , 30)
         new_pipeline.show()
         self.pipelines.append(new_pipeline)
+
 
 
 class ColumnsMDIWindow(QtW.QMdiSubWindow):
@@ -300,6 +306,12 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
         mayo.addWidget(self.x_columns)
         mayo.addWidget(self.y_columns)
         self.show()
+
+    def save_data(self):
+        return ColumnsWindowData(
+            self.x_columns.get_cols_as_string_list(),
+            self.y_columns.get_cols_as_string_list()
+        )
 
     def closeEvent(self, event):
         event.ignore()

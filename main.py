@@ -129,7 +129,8 @@ class MainWindow(QMainWindow):
     def save_button_pressed(self):
         save_file = SaveFile(
             pipelines_data=self.pipeline_mommy.get_data(),
-            dataframe=self.dataframe
+            dataframe=self.dataframe,
+            columns_data=self.pipeline_mommy.get_columns_data()
         )
         with open('data.pkl', 'wb') as file:
             # Use 'wb' mode for writing binary

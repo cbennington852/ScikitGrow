@@ -16,10 +16,12 @@ class ColumnsSubmodule(QtW.QWidget):
         for col in self.lst_cols:
             new_widget = DraggableColumn(col)
             self.layout.addWidget(new_widget)
+
     def dragEnterEvent(self, e):
         pos = e.pos()
         widget = e.source()
         e.accept()
+
         
     def dropEvent(self, e):
         pos = e.pos()
@@ -68,6 +70,9 @@ class ColumnsSection(QtW.QGroupBox):
     
     def get_num_cols(self):
         return len(self.get_cols())
+    
+    def get_cols_as_string_list(self) -> list[str]:
+        return [drag_col.name for drag_col in self.get_cols()]
     
     def get_cols(self) -> list[DraggableColumn]:
         res_cols = []
