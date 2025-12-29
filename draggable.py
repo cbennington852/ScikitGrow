@@ -130,11 +130,12 @@ class DraggableColumn(QPushButton):
 
 
 class DraggableData():
-        def __init__(self , sklearn_function , parameters , render_type, hex_color):
+        def __init__(self , sklearn_function , parameters , render_type, hex_color , name):
             self.sklearn_function = sklearn_function
             self.parameters = parameters
             self.render_type = render_type
             self.hex_color = hex_color
+            self.name = name
 # these are the draggable buttons
 class Draggable(QPushButton):
 
@@ -162,7 +163,8 @@ class Draggable(QPushButton):
             sklearn_function=sklearn_function,
             parameters=SubLibary.get_sklearn_parameters(sklearn_function),
             render_type=render_type,
-            hex_color=hex_color
+            hex_color=hex_color,
+            name=name
         )
         self.setText(name)
         self.clicked.connect(self.on_button_clicked)

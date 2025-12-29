@@ -1,234 +1,15 @@
+from draggable import Draggable , DraggableData
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel
-from sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
+from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
-import PyQt5.QtCore as QtCore 
-from draggable import Draggable , DraggableColumn , DraggableData
-from sklearn.base import is_regressor, is_classifier
-import sklearn
+from column_pipeline import DraggableColumn , ColumnsSection
 from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
-class GUILibary(QtW.QTabWidget):
-
-    ###############################################
-    # List of Filter / Accepting Functions
-    ###############################################
-
-    CLASSIFIER_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS
-    PREPROCESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.PREPROCESSORS
-    REGRESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.REGRESSORS
-    VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
-    MODEL_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS or SklearnAcceptableFunctions.REGRESSORS
-
-
-    def __init__(self , dataframe,  **kwargs):
-        super().__init__(**kwargs)
-        self.dataframe = dataframe
-      
-
-        # Styling
-        self.setTabPosition(QtW.QTabWidget.West)
-
-
-        self.curr_index = 0
-        def addModule(name , q_widget_list):    
-            scroll_regressor = QtW.QScrollArea()
-            scroll_regressor.setWidget(q_widget_list)
-            scroll_regressor.setWidgetResizable(True)
-            if isinstance(name , QIcon):
-                self.addTab(scroll_regressor , "")
-                self.setTabIcon(self.curr_index , name)
-                self.setIconSize(QtCore.QSize(90 , 90))
-            else:
-                self.addTab(scroll_regressor , name)
-            self.curr_index += 1
-
-        ########################################################
-        # COLOR PALETTES
-        ########################################################
-        LINEAR_COLOR = "#57BDAC"
-        ENSEMBLE_COLOR = "#241C72"
-        TREE_COLOR = "#234234"
-        NEURAL_COLOR = "#235235"
-        PREPROCESSOR_COLOR = "#DD6A34"
-        VALIDATOR_COLOR = "#8D064E"
-
-        ########################################################
-        # REGRESSORS
-        ########################################################
-
-        regressor_box = QtW.QWidget()
-        regressor_layout = QtW.QVBoxLayout()
-        regressor_box.setLayout(regressor_layout)
-
-        # make sublibaries from the picked out lists. 
-        lin_reg = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.REGRESSORS_LINEAR,
-                "Linear Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=LINEAR_COLOR
-        ) 
-        lin_ens = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.REGRESSORS_ENSEMBLE,
-                "Ensemble Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=ENSEMBLE_COLOR
-        ) 
-        lin_neu = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.REGRESSORS_NEURAL_NETWORK,
-                "Neural Network Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=NEURAL_COLOR
-        ) 
-        lin_tre = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.REGRESSORS_TREE,
-                "Tree Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=TREE_COLOR
-        ) 
-        regressor_layout.addWidget(lin_reg)
-        regressor_layout.addWidget(lin_ens)
-        regressor_layout.addWidget(lin_tre)
-        regressor_layout.addWidget(lin_neu)
-
-        ########################################################
-        # CLASSIFIERS 
-        ########################################################
-
-        classifier_box = QtW.QWidget()
-        classifier_layout = QtW.QVBoxLayout()
-        classifier_box.setLayout(classifier_layout)
-        cla_reg = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.CLASSIFIERS_LINEAR,
-                "Linear Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=LINEAR_COLOR
-        ) 
-        cla_ens = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.CLASSIFIERS_ENSEMBLE,
-                "Ensemble Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=ENSEMBLE_COLOR
-        ) 
-        cla_neu = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.CLASSIFIERS_NEURAL,
-                "Neural Network Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=NEURAL_COLOR
-        ) 
-        cla_tre = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.CLASSIFIERS_TREE,
-                "Tree Models"
-            ),
-            render_type=Draggable.BUBBLE,
-            hex_value=TREE_COLOR
-        ) 
-        classifier_layout.addWidget(cla_reg)
-        classifier_layout.addWidget(cla_ens)
-        classifier_layout.addWidget(cla_tre)
-        classifier_layout.addWidget(cla_neu)
-
-
-        ########################################################
-        # PRE_PROCESSORS
-        ########################################################
-        preproccessor_box = QtW.QWidget()
-        preproccessor_layout = QtW.QVBoxLayout()
-        preproccessor_box.setLayout(preproccessor_layout)
-        pre_sub_module = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.PREPROCESSORS,
-                ""
-            ),
-            render_type=Draggable.INTERLOCK_RIGHT,
-            hex_value=PREPROCESSOR_COLOR
-        ) 
-        preproccessor_layout.addWidget(pre_sub_module)
-
-
-        ########################################################
-        # VALIDATORS
-        ########################################################
-
-        validator_box = QtW.QWidget()
-        validator_layout = QtW.QVBoxLayout()
-        validator_box.setLayout(validator_layout)
-        vali_submodule = GUILibarySubmodule(
-            sublibary=SubLibary(
-                SklearnAcceptableFunctions.PREPROCESSORS,
-                ""
-            ),
-            render_type=Draggable.POINTY,
-            hex_value=VALIDATOR_COLOR
-        ) 
-        validator_layout.addWidget(vali_submodule)
-
-        addModule(QIcon(":/images/reggessor_icon.svg") , regressor_box)
-        addModule(QIcon(":/images/classification_icon.svg") , classifier_box)
-        addModule(QIcon(":/images/preproccessor_icon.svg") , preproccessor_box)
-        addModule(QIcon(":/images/validators_icon.svg") , validator_box)
-
-
-        self.addTab(self.cols_tab() ,"")
-        self.setTabIcon(self.curr_index , QIcon(":/images/columns_icon.svg"))
-
-        curr_index = 0
-
-
-
-    def cols_tab(self):
-        cols = ColumnsSubmodule(self.dataframe.columns.to_list())
-        scroll = QtW.QScrollArea()
-        scroll.setWidget(cols)
-        scroll.setWidgetResizable(True)
-        return scroll
-
-
-class ColumnsSubmodule(QtW.QWidget):
-    def __init__(self , lst_cols , **kwargs):
-        super().__init__(**kwargs)
-        self.layout = QVBoxLayout(self)
-        self.setAcceptDrops(True)
-        self.lst_cols = lst_cols
-        for col in self.lst_cols:
-            new_widget = DraggableColumn(col)
-            self.layout.addWidget(new_widget)
-    def dragEnterEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        e.accept()
-        
-    def dropEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        from_parent = widget.parentWidget()
-        to_parent = self
-        if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSubmodule):
-            e.accept()
-        elif isinstance(from_parent , ColumnsSection) and isinstance(to_parent , ColumnsSubmodule):
-            e.accept()
-            from_parent.layout().removeWidget(widget)
-            widget.deleteLater()
 
 class GUILibarySubmodule(QtW.QGroupBox):
-    def __init__(self , sublibary : SubLibary , render_type = "", hex_value = "",  **kwargs):
+    def __init__(self , sublibary , render_type = "", hex_value = "",  **kwargs):
         super().__init__(**kwargs)
         self.layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
@@ -263,193 +44,6 @@ class GUILibarySubmodule(QtW.QGroupBox):
                 from_parent.is_holding = False
             widget.deleteLater()
 
-class ColumnsSection(QtW.QGroupBox):
-    def __init__(self , title, my_parent , max_num_cols = 100, **kwargs):
-        super().__init__( **kwargs)
-        self.my_title = title
-        self.my_parent = my_parent
-        self.max_num_cols = max_num_cols
-        self.resize(200 , 90)
-        self.hovering = False
-        self.setAcceptDrops(True)
-        self.my_layout = QVBoxLayout()
-        self.setStyleSheet("")
-        self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side - 2 , 0 , 0 , 0)
-        self.my_layout.setSpacing(0);  
-        self.setLayout(self.my_layout)
-        self.setTitle(self.my_title)
-        self.my_layout.addStretch()
-
-
-    def dragEnterEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        if isinstance(widget , DraggableColumn):
-            e.accept()
-            self.hovering=True        
-            self.repaint()
-        else:
-            e.ignore()
-
-    def dragLeaveEvent(self, e):
-        self.hovering = False
-        self.repaint()
-        e.accept() 
-    
-    def get_num_cols(self):
-        return len(self.get_cols())
-    
-    def get_cols(self) -> list[DraggableColumn]:
-        res_cols = []
-        for child in self.findChildren(QtW.QWidget):
-            if isinstance(child , DraggableColumn):
-                res_cols.append(child)
-        return res_cols
-    
-    bevel_left_start = DraggableColumn.bevel_width + DraggableColumn.bevel_slant_width*2 + DraggableColumn.left_of_bevel_width
-    bottom_right_of_top_bevel_x = bevel_left_start + DraggableColumn.bevel_slant_width + DraggableColumn.bevel_width
-    width_from_start_mouth_to_left_side = 10
-    height_between_top_mouth_and_top_bar = 30
-    
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        
-
-        painter.setPen(QColor("#040404"))
-        painter.setBrush(QColor("#B5B3B3"))
-
-        if self.hovering == True:
-            painter.fillRect(self.rect(), QColor("lightgray"))
-
-        # Top level calculations
-        width = self.width()
-        height = self.height()
-
-        #space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
-        space_needed_for_mouth = max(self.get_num_cols() * DraggableColumn.block_height , DraggableColumn.block_height )
-
-        # where to start the bevel from the left. 
-        holder_block = QPolygon([
-            QPoint( 0 , 0),             # Left Top corner
-            QPoint(width , 0),          # Right Top corner
-
-            # right top of mouth
-            QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar),
-
-            QPoint(ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
-            # Bottom right of bevel
-            QPoint(
-                ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
-                ),
-            # Bottom left of bevel
-            QPoint(
-                ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
-                ),
-            QPoint(
-                ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                ColumnsSection.height_between_top_mouth_and_top_bar 
-                ),
-
-            # left top of mouth
-            QPoint(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar),
-             # Bottom of the mouth
-            QPoint(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
-
-            QPoint(
-                ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
-                ),
-            QPoint(
-                ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
-                ),
-            QPoint(
-                ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
-                ),
-            QPoint(
-                ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
-                ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
-                ), # right start bevel.
-            
-           
-            QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
-
-            QPoint(width , height),     # Right Bottom corner
-            QPoint(0 , height)          # Left Bottom corner
-        ])
-
-        painter.drawPolygon(holder_block)
-        painter.setPen(QColor(Qt.black))
-        painter.drawText(15 , 20 ,f"{self.my_title}")
-
-        # 5 putting all of the children inside of each other
-        # 5.1 gather list of children
-        lst_of_children = []
-        for i in range(0 , self.my_layout.count()):
-            if isinstance(self.my_layout.itemAt(i) , QtW.QWidgetItem):
-                temp_widget = self.my_layout.itemAt(i).widget()
-                lst_of_children.append(temp_widget)
-        # 5.2 If more than one, move the bottoms inside of the ones on top of it.
-        if len(lst_of_children) > 1:
-            first_child = lst_of_children[0]
-            for i in range(1 , len(lst_of_children)):
-                tmp  = lst_of_children[i]
-                new_x = first_child.geometry().topLeft().x()
-                new_y = first_child.geometry().topLeft().y() + i*DraggableColumn.block_height
-                tmp.move(new_x , new_y)
-        
-
-    def dropEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        from_parent = widget.parentWidget()
-        to_parent = self
-        def check_is_correct_type():
-            if not isinstance(widget , DraggableColumn):
-                e.ignore()
-                return
-        # remove the spacer ,and readadd to bottom.
-        def remove_all_spacers():
-            for i in range(0 , self.my_layout.count()):
-                if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
-                    temp_widget = self.my_layout.itemAt(i)
-                    self.my_layout.removeItem(temp_widget)
-                    del temp_widget
-        
-        def if_limit_remove_all_other_widgets():
-            if (self.get_num_cols() == self.max_num_cols):
-                # Remove one the children from this
-                for child in self.findChildren(QtW.QWidget):
-                    if isinstance(child , DraggableColumn) and child != widget:
-                        child.deleteLater()
-            else:
-                e.accept()
-            
-        check_is_correct_type()
-        remove_all_spacers()
-        if_limit_remove_all_other_widgets()
-        # Handle replacement with parent module. If applicable
-        if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSection):
-            self.my_layout.addWidget(widget.copy_self())
-            e.accept()
-        else:
-            # accept
-            e.accept()
-            # Add the dang widget
-            self.my_layout.addWidget(widget)
-            
-
-        # tell the parent to resize.
-        self.my_parent.resize_based_on_children()
-        # add space to end of the layout to make it all squished to top.
-        self.my_layout.addStretch()
-        # Remove hovering attribute.
-        self.hovering=False        
-        # Re-render the group box
-        self.repaint()
 
 class PipelineSection(QtW.QGroupBox):
     """
@@ -492,7 +86,9 @@ class PipelineSection(QtW.QGroupBox):
         for drag_data in data:
             # Make a new draggable.
             new_drag = Draggable.new_draggable_from_data(drag_data)
+            print("New draggable" , new_drag)
             new_pipe.my_layout.addWidget(new_drag)
+            print(new_drag)
             # add it to this.
         return new_pipe
 
@@ -635,7 +231,6 @@ class PipelineSection(QtW.QGroupBox):
             space_needed_for_mouth = max(self.get_num_models() * DraggableColumn.block_height , DraggableColumn.block_height)
 
             second_bevel_x_offset = 40 + space_in_between_two_bevels
-            print("second_x_offset:  " , second_bevel_x_offset)
             # where to start the bevel from the left. 
             holder_block = QPolygon([
                     QPoint( 0 , 0),             # Left Top corner
@@ -823,32 +418,42 @@ class Pipeline(QtW.QMdiSubWindow):
     SECTION_PREPROCCESSOR_TITLE="Preprocessors"
     SECTION_MODEL_TITLE="Models"
     SECTION_VALIDATOR_TITLE="Validator"
+    ###############################################
+    # List of Filter / Accepting Functions
+    ###############################################
+
+    CLASSIFIER_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS
+    PREPROCESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.PREPROCESSORS
+    REGRESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.REGRESSORS
+    VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
+    MODEL_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS or SklearnAcceptableFunctions.REGRESSORS
+
 
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)
         my_layout = QVBoxLayout()
-        main_thing = QtW.QWidget()
+        self.main_thing = QtW.QWidget()
         self.my_parent = my_parent
-        main_thing.setLayout(my_layout)
-        self.resize(Pipeline.BASE_PIPELINE_WIDTH , Pipeline.BASE_PIPELINE_HEIGHT)
+        self.main_thing.setLayout(my_layout)
+        self.setFixedSize(Pipeline.BASE_PIPELINE_WIDTH , Pipeline.BASE_PIPELINE_HEIGHT)
         self.name_pipeline = QtW.QLineEdit()
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
             title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
-            accepting_function=GUILibary.PREPROCESSOR_FILTER,
+            accepting_function=Pipeline.PREPROCESSOR_FILTER,
             my_parent=self
 
         )
         self.model_pipe = PipelineSection(
             title=Pipeline.SECTION_MODEL_TITLE,
-            accepting_function=GUILibary.MODEL_FILTER,
+            accepting_function=Pipeline.MODEL_FILTER,
             my_parent=self,
             max_num_models=1
         )
         self.validator = PipelineSection(
             title=Pipeline.SECTION_VALIDATOR_TITLE,
             # Makes sure this is a validator by checking if it has a 'split' function which is required.
-            accepting_function=GUILibary.VALIDATOR_FILTER,
+            accepting_function=Pipeline.VALIDATOR_FILTER,
             my_parent=self,
             max_num_models=1
         )
@@ -857,7 +462,7 @@ class Pipeline(QtW.QMdiSubWindow):
         my_layout.addWidget(self.preproccessor_pipe)
         my_layout.addWidget(self.model_pipe)
         my_layout.addWidget(self.validator)
-        self.setWidget(main_thing)
+        self.setWidget(self.main_thing)
 
     def get_pipeline_data(self) -> PipelineData:
         pipeline_data = PipelineData(
@@ -871,35 +476,51 @@ class Pipeline(QtW.QMdiSubWindow):
         return pipeline_data
 
     def pipeline_from_data(GUI_parent , my_parent, data : PipelineData):
-        # THIS RETURNS A PIPELINE.
+        # THIS RETURNS A PIPELINE
         new_pipeline = Pipeline(
             my_parent=my_parent,
             GUI_parent=GUI_parent
         )
         new_pipeline.validator = PipelineSection.pipeline_section_from_data(
-            accepting_function=GUILibary.VALIDATOR_FILTER,
+            accepting_function=Pipeline.VALIDATOR_FILTER,
             title=Pipeline.SECTION_VALIDATOR_TITLE,
             my_parent=new_pipeline,
             data=data.validator
         )
         new_pipeline.model_pipe = PipelineSection.pipeline_section_from_data(
-            accepting_function=GUILibary.MODEL_FILTER,
+            accepting_function=Pipeline.MODEL_FILTER,
             title=Pipeline.SECTION_MODEL_TITLE,
             my_parent=new_pipeline,
             data=data.model_pipeline
         )
         new_pipeline.preproccessor_pipe = PipelineSection.pipeline_section_from_data(
-            accepting_function=GUILibary.PREPROCESSOR_FILTER,
+            accepting_function=Pipeline.PREPROCESSOR_FILTER,
             title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
             my_parent=new_pipeline,
             data=data.preprocessor_section
         )
+        # Remove old layout
+        new_pipeline.main_thing.deleteLater()
+        # make new layout. 
+        main_thing = QWidget()
+        my_layout = QtW.QVBoxLayout()
+        my_layout.addWidget(new_pipeline.validator)
+        my_layout.addWidget(new_pipeline.model_pipe)
+        my_layout.addWidget(new_pipeline.preproccessor_pipe)        
+        main_thing.setLayout(my_layout)
+        new_pipeline.setWidget(main_thing)
+        print("Model form pipeline" , new_pipeline.model_pipe.get_models())
         new_pipeline.name_pipeline.setText(data.pipeline_name)
+        print(data.x_pos , data.y_pos, type(data.x_pos) , type(data.y_pos))
+        if isinstance(data.x_pos , tuple):
+            data.x_pos = data.x_pos[0]
+        if isinstance(data.y_pos , tuple):
+            data.y_pos = data.y_pos[0]
+        print(new_pipeline)
         new_pipeline.move(data.x_pos , data.y_pos)
+        new_pipeline.resize_based_on_children()
         return new_pipeline
         
-
-
             
     def get_name_pipeline(self) -> str:
         return self.name_pipeline.text
@@ -918,122 +539,3 @@ class Pipeline(QtW.QMdiSubWindow):
                 self.deleteLater()
                 super(QtW.QMdiSubWindow, self).closeEvent(event)
                 return
-
-
-class PipelineMDIArea(QtW.QMdiArea):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.setAcceptDrops(True)
-        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
-        my_layout = QtW.QVBoxLayout()
-        self.setLayout(my_layout)
-
-    def dragEnterEvent(self, e):
-        e.accept()
-
-    def dropEvent(self, e):
-        #Disable below, as not essental.
-        return super().dropEvent(e)
-
-
-
-class PipelineMother(QtW.QMainWindow):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.setWindowFlags(Qt.WindowType.Widget)
-        self.pipelines : Pipeline = []
-        self.train_models = None
-
-        toolbar = QtW.QToolBar()
-        self.main_thing = PipelineMDIArea(self)
-        
-        self.add_pipeline_button = QtW.QPushButton("Add Pipeline")
-        self.add_pipeline_button.setFixedSize(150 ,60)
-        self.add_pipeline_button.setIcon(QIcon(":/images/add_pipeline.svg"))
-        self.add_pipeline_button.clicked.connect(self.add_pipeline)
-        toolbar.addWidget(self.add_pipeline_button)
-        self.setCentralWidget(self.main_thing)
-        self.addToolBar(toolbar)
-
-        self.add_pipeline()
-
-        self.render_x_y_train_sub_window()
-
-    def render_x_y_train_sub_window(self):
-        sub_window = ColumnsMDIWindow(self.main_thing)
-        self.x_columns = sub_window.x_columns
-        self.y_columns = sub_window.y_columns
-        self.train_models = sub_window.train_models
-      
-    def get_data(self) -> list[PipelineData]:
-        # Only really need to save the pipelines ... and maybe also the column sections.
-        lst_pipeline_data = []
-        for pipeline in self.pipelines:
-            lst_pipeline_data.append(pipeline.get_pipeline_data())
-        return lst_pipeline_data
-    
-    def load_from_data(self , pipelines_data : list[PipelineData]):
-        # Simply loop thru the parsel, and re-populate the pipelines.
-        for pipe_data in pipelines_data:
-            curr = Pipeline.pipeline_from_data(
-                my_parent=self, 
-                GUI_parent=self.main_thing,
-                data=pipe_data,
-            )
-            self.pipelines.append(curr)
-
-
-    def add_pipeline(self):
-        new_pipeline = Pipeline(self , self.main_thing)
-        new_pipeline.move(30 , 30)
-        new_pipeline.show()
-        self.pipelines.append(new_pipeline)
-
-
-class ColumnsMDIWindow(QtW.QMdiSubWindow):
-    BASE_HEIGHT = 300
-    BASE_WIDTH = 400
-    def __init__(self, parent , **kwargs):
-        super().__init__(parent, **kwargs)
-        self.setFixedSize(ColumnsMDIWindow.BASE_WIDTH , ColumnsMDIWindow.BASE_HEIGHT)
-        main_widget = QtW.QWidget()
-        mayo = QtW.QVBoxLayout()
-        main_widget.setLayout(mayo)
-        self.setWidget(main_widget)
-        self.setWindowFlag(Qt.WindowMinimizeButtonHint , False)
-        self.setWindowFlag(Qt.WindowMaximizeButtonHint , False)
-        self.setWindowFlag(Qt.WindowCloseButtonHint, False)
-
-        self.train_models = QtW.QPushButton(
-            "Train Models"
-        )
-        play_icon = self.style().standardIcon(QtW.QStyle.SP_MediaPlay)
-        
-        # Set the icon on the button
-        self.train_models.setIcon(play_icon)
-
-
-        self.x_columns = ColumnsSection(
-            "X axis",
-            my_parent=self,
-            max_num_cols=400
-        )
-        self.y_columns = ColumnsSection(
-            "Y axis",
-            my_parent=self,
-            max_num_cols=1
-        )
-
-        mayo.addWidget(self.train_models)
-        mayo.addWidget(self.x_columns)
-        mayo.addWidget(self.y_columns)
-        self.show()
-
-    def closeEvent(self, event):
-        event.ignore()
-    
-    def resize_based_on_children(self):
-        # get the number of pre-proccessors and their height, default to zero if one or below. 
-        y_col_height = max((self.x_columns.get_num_cols()-1) * DraggableColumn.BASE_HEIGHT , 0)
-        # Resize the pipeline based on the children size n_stuff.
-        self.setFixedHeight(ColumnsMDIWindow.BASE_HEIGHT + y_col_height)

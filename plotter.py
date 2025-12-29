@@ -13,7 +13,7 @@ from matplotlib.figure import Figure
 import sklearn_engine
 import sklearn
 import pandas as pd
-from GUI_libary_and_pipeline import PipelineMother , Pipeline
+from GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
 import matplotlib.pyplot as plt
 
 

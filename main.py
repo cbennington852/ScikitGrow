@@ -2,7 +2,7 @@ import sys
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QAction
 from layout_colorwidget import Color
-from GUI_libary_and_pipeline import GUILibarySubmodule , Pipeline , PipelineMother , GUILibary
+from GUI_libary_and_pipeline_mother import PipelineMother , GUILibary
 from sklearn_libary import SubLibary 
 from dataframe_viewer import DataframeViewer
 import sklearn
@@ -12,9 +12,13 @@ from PyQt5.QtGui import QIcon , QPixmap
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from plotter import Plotter
+from save_file import SaveFileException , SaveFile
 import os
 import pickle
+import traceback
+
 import pandas as pd
+
 
 
 class MainMenu(QMainWindow):
@@ -69,10 +73,6 @@ class MainMenu(QMainWindow):
             print("No file selected")
 
 
-class SaveFile():
-    def __init__(self , pipelines_data , dataframe):
-        self.pipelines_data = pipelines_data
-        self.dataframe = dataframe
 
 
 class MainWindow(QMainWindow):
@@ -137,12 +137,7 @@ class MainWindow(QMainWindow):
         print(save_file)
 
     def load_button_pressed(self , file_name='data.pkl'):
-        with open(file_name, 'rb') as file:
-            # Use 'rb' mode for reading binary
-            print("Loading from pickle")
-            save_file = pickle.load(file)
-            print("modifying pipeline mother")
-            self.pipeline_mommy.load_from_data(save_file.pipelines_data)
+        raise ValueError("Not working yet")
 
     def render_menu_bar(self):
         menu = self.menuBar()
@@ -169,7 +164,7 @@ def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
     # NOTE: We can later expand this to work on HTML tables and later SQL databases.
     if file_path.endswith('.csv'):
         return pd.read_csv(file_path)
-    elif file_path.endswiht('.parquet'):
+    elif file_path.endswith('.parquet'):
         return pd.read_parquet(file_path)
     excel_endings = ['.xls' , '.xlsx' , '.xlsm' , '.xlsb' , '.odf' , '.odt']
     for ending in excel_endings:
@@ -178,23 +173,78 @@ def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
     # Else implied
     raise ValueError("Does not end in a valid file extension format")
 
+def open_on_saved_file(file_handle):
+    # basically open the file and then pass in all of the info for the things.
+    with open('data.pkl', 'rb') as file_handle:
+        loaded_data = pickle.load(file_handle)
+        if not isinstance(loaded_data , SaveFile):
+            raise SaveFileException("File did not unpickle as a save file type.")
+        
+        #   self.pipeline_mommy.load_from_data(save_file.pipelines_data)
+        # TODO:
+        # 1. Retrieve the dataframe 
+        df = loaded_data.dataframe
+        if not isinstance(df , pd.DataFrame):
+            raise SaveFileException("Pandas Dataframe could not be loaded.")
+        # 2. Startup a new instance of a main window
+        main_window = MainWindow(df)
+        # 3. load the pipeline data into that main_window
+        main_window.pipeline_mommy.load_from_data(loaded_data.pipelines_data)
+        # 4. display the data.
+        print(main_window)
+        return main_window
+
+
+
+
+    
+
 
 def open_on_file_handle(file_handle):
     if os.path.exists(file_handle):
         # parse command line argument
-        try:
-            df = filter_command_line_argument_return_dataframe(file_handle)
-            main_menu = MainMenu()
+        if file_handle.endswith('.pkl'):
             try:
-                main_menu.open_main_window_on_sns_dataset(df)
+                # Make a splash 
+                splash_screen = MainMenu()
+                splash_screen.main_window = open_on_saved_file(file_handle)
+                splash_screen.main_window.show()
+                splash_screen.hide()
             except Exception as e:
-                print("Internal Error")
-                print(e)
+                traceback.print_exc()
+                QtW.QMessageBox.critical(
+                        None,                        # Parent: Use None if not within a QWidget class
+                        "Error opening Save file",            # Title bar text
+                        f"{str(e)}" # Main message
+                    )
+        else:
+            try:
+                df = filter_command_line_argument_return_dataframe(file_handle)
+                main_menu = MainMenu()
+                try:
+                    main_menu.open_main_window_on_sns_dataset(df)
+                except Exception as e:
+                    QtW.QMessageBox.critical(
+                        None,                        # Parent: Use None if not within a QWidget class
+                        "Internal Error opening file",            # Title bar text
+                        f"{str(e)}" # Main message
+                    )
+                    sys.exit()
+            except Exception:
+                QtW.QMessageBox.critical(
+                        None,                        # Parent: Use None if not within a QWidget class
+                        "File type not supported",            # Title bar text
+                        f"{str(e)}" # Main message
+                    )
                 sys.exit()
-        except Exception:
-            print("File type not supported.")
     else:
-        print("The file path specified does not exist.")
+        QtW.QMessageBox.critical(
+                        None,                        # Parent: Use None if not within a QWidget class
+                        "Error opening file. File does not exist.",            # Title bar text
+                        f"{str(e)}" # Main message
+                    )
+        sys.exit()
+        
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
