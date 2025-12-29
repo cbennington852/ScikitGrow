@@ -7,7 +7,7 @@ import sklearn.neural_network as neu
 import sklearn.tree as tre
 
 class SklearnAcceptableFunctions():
-    REGRESSORS_LINEAR = [
+    REGRESSORS_LINEAR = {
         lin.ARDRegression,
         lin.BayesianRidge,
         lin.ElasticNet,
@@ -26,8 +26,8 @@ class SklearnAcceptableFunctions():
         lin.SGDRegressor,
         lin.TheilSenRegressor,
         lin.TweedieRegressor
-    ]
-    REGRESSORS_ENSEMBLE = [
+    }
+    REGRESSORS_ENSEMBLE = {
         ens.AdaBoostRegressor,
         ens.BaggingRegressor,
         ens.ExtraTreesRegressor,
@@ -35,52 +35,71 @@ class SklearnAcceptableFunctions():
         ens.HistGradientBoostingRegressor,
         ens.RandomForestRegressor,
         ens.StackingRegressor,
-    ]
-    REGRESSORS_NEURAL_NETWORK = [
+    }
+    REGRESSORS_NEURAL_NETWORK = {
         neu.MLPRegressor
-    ]
-    REGRESSORS_TREE = [
+    }
+    REGRESSORS_TREE = {
         tre.DecisionTreeRegressor,
         tre.ExtraTreeRegressor
-    ]
+    }
 
-    CLASSIFIERS_LINEAR = [
+    REGRESSORS = REGRESSORS_ENSEMBLE | REGRESSORS_LINEAR | REGRESSORS_NEURAL_NETWORK | REGRESSORS_TREE
+
+    CLASSIFIERS_LINEAR = {
         lin.LogisticRegression,
         lin.PassiveAggressiveClassifier,
         lin.Perceptron,
         lin.RidgeClassifier,
         lin.SGDClassifier,
-    ]
+    }
 
-    CLASSIFIERS_ENSEMBLE = [
+    CLASSIFIERS_ENSEMBLE = {
         ens.AdaBoostClassifier,
         ens.BaggingClassifier,
         ens.ExtraTreesClassifier,
         ens.GradientBoostingClassifier,
         ens.HistGradientBoostingClassifier,
         ens.RandomForestClassifier,
-    ]
+    }
 
-    CLASSIFIERS_NEURAL = [
+    CLASSIFIERS_NEURAL = {
         neu.MLPClassifier
-    ]
+    }
 
-    CLASSIFIERS_TREE = [
+    CLASSIFIERS_TREE = {
         tre.DecisionTreeClassifier,
         tre.ExtraTreeClassifier
-    ]
+    }
+
+    # | is union in set
+    CLASSIFIERS = CLASSIFIERS_ENSEMBLE | CLASSIFIERS_LINEAR | CLASSIFIERS_NEURAL | CLASSIFIERS_TREE
 
     def _multi_line_lambda_for_pre_processors():
-        res = []
+        res = set()
         for function in dir(pre):
             if function[0] != '_' and function[0].isupper():
-               res.append(getattr(pre , function)) # getattr fetches the higher order function.
+               res.add(getattr(pre , function)) # getattr fetches the higher order function.
         return res
 
     PREPROCESSORS = _multi_line_lambda_for_pre_processors()
 
-    VALIDATORS = [
-        val.BaseShuffleSplit,
-    ]
+    VALIDATORS = {
+        val.KFold,
+        val.StratifiedKFold,
+        val.RepeatedKFold,
+        val.RepeatedStratifiedKFold,
+        val.LeaveOneOut,
+        val.LeavePOut,
+        val.LeaveOneGroupOut,
+        val.LeavePGroupsOut,
+        val.ShuffleSplit,
+        val.StratifiedShuffleSplit,
+        val.GroupShuffleSplit,
+        val.GroupKFold,
+        val.StratifiedGroupKFold,
+        val.TimeSeriesSplit,
+        val.PredefinedSplit
+    }
 
     

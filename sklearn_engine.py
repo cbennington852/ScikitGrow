@@ -8,14 +8,16 @@ import pandas as pd
 import numpy as np
 from abc import ABC , abstractmethod
 from matplotlib.colors import ListedColormap
+from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
 
 
 def is_regressor(x):
-    try:
-        return sklearn.base.is_regressor(x)
-    except:
+    if x in SklearnAcceptableFunctions.REGRESSORS:
+        return True
+    else:
         return False
+
 def classification_filter(x):
     try:
         return sklearn.base.is_classifier(x)

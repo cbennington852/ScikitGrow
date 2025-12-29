@@ -44,5 +44,4 @@ Whereas a conference is a brisker 5 pages.
 
 ### 13. The models still transform into blocks upon drag. 
 
-### 14. Consider the removal of the CV
-    - The automatically do cross validation of the model, which might be worth disabling for clarity or adding it as a option later.
+### 16. On windows there is a weird offset for the layout manager, this is beacuse linux and windows have diffrent left margins and CSS styles. 
