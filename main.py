@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
                 None, "Save Project", file_name, "Pickle Files (*.pkl);;All Files (*)"
             )
         else:
-            time.sleep(0.1)
+            #this is nessicay to prevent race conditions on linux
             file_path = file_name
         if file_path:
             try:

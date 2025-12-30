@@ -49,7 +49,6 @@ class Plotter(QtW.QTabWidget):
         self.prediction_tab_layout = QtW.QFormLayout()
         self.prediction_tab.setLayout(self.prediction_tab_layout)
         
-        
         self.visual_plot = FigureCanvasQTAgg(fig)
         self.accuracy_plot = FigureCanvasQTAgg(fig)
         
