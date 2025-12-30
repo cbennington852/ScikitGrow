@@ -123,21 +123,34 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.pipeline_mother)
 
-    def save_button_pressed(self , file_name='data.pkl'):
+    def save_button_pressed(self , file_name='data_2.pkl'):
         print(f"Dataframe {self.dataframe}")
-        save_file = SaveFile(
-            pipelines_data=self.pipeline_mother.get_data(),
-            dataframe=self.dataframe,
-            columns_data=self.pipeline_mother.get_columns_data()
+        print(f"file_name : {file_name}")
+        file_path, _ = QtW.QFileDialog.getSaveFileName(
+            None, "Save Project", file_name, "Pickle Files (*.pkl);;All Files (*)"
         )
-        try:
-            with open(file_name, 'wb') as f:
-                # Use 'wb' mode for writing binary
-                pickle.dump(save_file, f)
-        except Exception as e:
-            print(e)
-            traceback.print_exc()
-    def open_on_saved_file(file_name='data.pkl'):
+        if file_path:
+            try:
+                # Prepare your data object
+                save_file = SaveFile(
+                    pipelines_data=self.pipeline_mother.get_data(),
+                    dataframe=self.dataframe,
+                    columns_data=self.pipeline_mother.get_columns_data()
+                )
+
+                # 2. Single 'wb' open. 
+                # This TRUNCATES the file automatically (replaces existing content).
+                with open(file_path, 'wb') as f:
+                    pickle.dump(save_file, f)
+                
+                print(f"Saved successfully to: {file_path}")
+            except OSError as e:
+                QMessageBox.critical(None, "File Error", f"Could not open file: {e}")
+            except Exception as e:
+                traceback.print_exc()
+
+
+    def open_on_saved_file(file_name='data_2.pkl'):
         # basically open the file and then pass in all of the info for the things.
         with open(file_name, 'rb') as file:
             loaded_data = pickle.load(file)
@@ -165,12 +178,12 @@ class MainWindow(QMainWindow):
         
         # Save action
         save_action = QAction("Save Project" , self)
-        save_action.triggered.connect(self.save_button_pressed)
+        save_action.triggered.connect(lambda x : self.save_button_pressed())
         file_menu.addAction(save_action)
 
         # Save action
         save_as_action = QAction("Save Project As" , self)
-        save_as_action.triggered.connect(self.save_button_pressed)
+        save_as_action.triggered.connect(lambda x : self.save_button_pressed())
         file_menu.addAction(save_as_action)
 
         # Open action

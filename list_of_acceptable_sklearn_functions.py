@@ -99,7 +99,7 @@ class SklearnAcceptableFunctions():
         val.GroupKFold,
         val.StratifiedGroupKFold,
         val.TimeSeriesSplit,
-        val.PredefinedSplit
+        val.PredefinedSplit,
     }
 
     MODELS = CLASSIFIERS | REGRESSORS
