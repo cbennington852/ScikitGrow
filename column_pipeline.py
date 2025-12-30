@@ -4,6 +4,7 @@ import PyQt5.QtWidgets as QtW
 from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
+from colors_and_appearance import AppAppearance
 
 
 
@@ -100,11 +101,13 @@ class ColumnsSection(QtW.QGroupBox):
         painter = QPainter(self)
         
 
-        painter.setPen(QColor("#040404"))
-        painter.setBrush(QColor("#B5B3B3"))
+        painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
+        painter.setBrush(QColor(AppAppearance.PIPELINE_BACKGROUND_COLOR))
 
         if self.hovering == True:
-            painter.fillRect(self.rect(), QColor("lightgray"))
+            painter.fillRect(self.rect(), QColor(AppAppearance.PIPELINE_HOVER_COLOR))
+        else:
+            painter.fillRect(self.rect(), QColor(AppAppearance.PIPELINE_NOT_HOVER_COLOR))
 
         # Top level calculations
         width = self.width()

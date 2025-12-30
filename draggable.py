@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt, QMimeData
 import PyQt5.QtGui as PGui
 from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush, QIcon
 import PyQt5.QtCore as QCore 
+from colors_and_appearance import AppAppearance
 
 
 class DraggableColumn(QPushButton):
@@ -90,8 +91,8 @@ class DraggableColumn(QPushButton):
             rect.adjust(2,2,2,2)
         
 
-        painter.setPen(QColor("#000000"))
-        painter.setBrush(QColor('#005461'))
+        painter.setPen(QColor(AppAppearance.DRAGGABLE_COLOMN_BORDER_COLOR))
+        painter.setBrush(QColor(AppAppearance.DRAGGABLE_COLUMN_COLOR))
 
         # Top level input Calculations
         right_of_bevel_width  = self.label_inferred_width - DraggableColumn.left_of_bevel_width + 10
@@ -250,7 +251,7 @@ class Draggable(QPushButton):
             if opt.state & QtW.QStyle.State_Sunken:
                 rect.adjust(2,2,2,2)
             
-            painter.setPen(QColor("#040404"))
+            painter.setPen(QColor(AppAppearance.PREPROCESSOR_BORDER_COLOR))
             painter.setBrush(QColor(self.hex_color))
 
             # Top level input Calculations

@@ -11,6 +11,7 @@ import sklearn
 from column_pipeline import ColumnsSection , ColumnsSubmodule
 from draggable_pipeline import DraggableColumn , PipelineSection, Pipeline, PipelineData, GUILibarySubmodule
 from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
+from colors_and_appearance import AppAppearance
 
 class ColumnsWindowData():
     def __init__(self , x_cols : list[str] , y_cols : list[str]):
@@ -41,12 +42,12 @@ class GUILibary(QtW.QTabWidget):
         ########################################################
         # COLOR PALETTES
         ########################################################
-        LINEAR_COLOR = "#57BDAC"
-        ENSEMBLE_COLOR = "#241C72"
-        TREE_COLOR = "#234234"
-        NEURAL_COLOR = "#235235"
-        PREPROCESSOR_COLOR = "#DD6A34"
-        VALIDATOR_COLOR = "#8D064E"
+        LINEAR_COLOR = AppAppearance.LINEAR_COLOR
+        ENSEMBLE_COLOR = AppAppearance.ENSEMBLE_COLOR
+        TREE_COLOR = AppAppearance.TREE_COLOR
+        NEURAL_COLOR = AppAppearance.NEURAL_COLOR
+        PREPROCESSOR_COLOR = AppAppearance.PREPROCESSOR_COLOR
+        VALIDATOR_COLOR = AppAppearance.VALIDATOR_COLOR
 
         ########################################################
         # REGRESSORS
@@ -283,6 +284,8 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
         self.setWindowFlag(Qt.WindowMinimizeButtonHint , False)
         self.setWindowFlag(Qt.WindowMaximizeButtonHint , False)
         self.setWindowFlag(Qt.WindowCloseButtonHint, False)
+
+        self.setStyleSheet(f"background-color:{AppAppearance.PIPELINE_BACKGROUND_COLOR}")
 
         self.train_models = QtW.QPushButton(
             "Train Models"

@@ -6,7 +6,7 @@ from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 from column_pipeline import DraggableColumn , ColumnsSection
 from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
-
+from colors_and_appearance import AppAppearance
 
 class GUILibarySubmodule(QtW.QGroupBox):
     def __init__(self , sublibary , render_type = "", hex_value = "",  **kwargs):
@@ -139,20 +139,21 @@ class PipelineSection(QtW.QGroupBox):
         if self.my_title == "Validator":
             if self.is_holding == True:
                 painter = QPainter(self)
-                painter.setPen(QColor("#040404"))
+                painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
                 painter.drawText( 0 , 15 , self.my_title)
             else:
                 painter = QPainter(self)
                 # Writing the name of the thing.
-                painter.setPen(QColor("#040404"))
+                painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
                 painter.drawText( 0 , 15 , self.my_title)
                 if self.model_hovering == True:
-                    painter.setBrush(QColor("#787878"))
+                    painter.setBrush(QColor(AppAppearance.PIPELINE_HOVER_COLOR))
                 else:
-                    painter.setBrush(QColor("#DFDFDF"))
+                    painter.setBrush(QColor(AppAppearance.PIPELINE_NOT_HOVER_COLOR))
 
                 left_right_margin = 10
                 top_bottom_margin = 20
+                painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
                 
                 # tunable parameters
                 height_block = self.height() - top_bottom_margin*2
@@ -174,17 +175,18 @@ class PipelineSection(QtW.QGroupBox):
         elif self.my_title == "Models":
             if self.is_holding == True:
                 painter = QPainter(self)
-                painter.setPen(QColor("#040404"))
+                painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
                 painter.drawText( 0 , 15 , self.my_title)
             else:
                 painter = QPainter(self)
                 # Writing the name of the thing.
-                painter.setPen(QColor("#040404"))
+                painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
                 painter.drawText( 0 , 15 , self.my_title)
                 if self.model_hovering == True:
-                    painter.setBrush(QColor("#787878"))
+                    painter.setBrush(QColor(AppAppearance.PIPELINE_HOVER_COLOR))
                 else:
-                    painter.setBrush(QColor("#DFDFDF"))
+                    painter.setBrush(QColor(AppAppearance.PIPELINE_NOT_HOVER_COLOR))
+                painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
 
                 left_right_margin = 10
                 top_bottom_margin = 20
@@ -205,15 +207,17 @@ class PipelineSection(QtW.QGroupBox):
             painter = QPainter(self)
             
             if self.model_hovering == True:
-                painter.fillRect(self.rect(), QColor("lightgray"))
+                painter.fillRect(self.rect(), QColor(AppAppearance.PIPELINE_HOVER_COLOR))
+            else:
+                painter.fillRect(self.rect(), QColor(AppAppearance.PIPELINE_NOT_HOVER_COLOR))
 
 
-            painter.setPen(QColor("#040404"))
-            painter.setBrush(QColor("#B5B3B3"))
+            painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
+            painter.setBrush(QColor(AppAppearance.PIPELINE_PREPROCESSOR_BACKGROUND_COLOR))
             # Top level calculations
             width = self.width()
             height = self.height()
-
+        
 
             # Top level input Calculations
             starting_x = 0
@@ -225,7 +229,6 @@ class PipelineSection(QtW.QGroupBox):
             far_right_corner_x = bottom_right_of_top_bevel_x + Draggable.bevel_slant_width + right_of_bevel_width
             start_second_bevel = bottom_right_of_top_bevel_x + Draggable.bevel_slant_width + Draggable.space_in_between_two_bevels
             left_margin = 10
-
 
             space_in_between_two_bevels = Draggable.space_in_between_two_bevels
 
@@ -323,7 +326,7 @@ class PipelineSection(QtW.QGroupBox):
 
             painter.drawPolygon(holder_block)
             # Render title
-            painter.setPen(QColor("#040404"))
+            painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
             painter.drawText(15 , 20, self.my_title)
 
             # 5 putting all of the children inside of each other
@@ -390,7 +393,7 @@ class PipelineSection(QtW.QGroupBox):
         # add space to end of the layout to make it all squished to top.
         self.my_layout.addStretch()
         # Remove hovering attribute.
-        self.hovering=False        
+        self.model_hovering=False        
         # Re-render the group box
         self.repaint()
 
@@ -436,6 +439,7 @@ class Pipeline(QtW.QMdiSubWindow):
         my_layout = QVBoxLayout()
         self.main_thing = QtW.QWidget()
         self.my_parent = my_parent
+        self.setStyleSheet(f"background-color:{AppAppearance.PIPELINE_BACKGROUND_COLOR}")
         self.main_thing.setLayout(my_layout)
         self.setFixedSize(Pipeline.BASE_PIPELINE_WIDTH , Pipeline.BASE_PIPELINE_HEIGHT)
         self.name_pipeline = QtW.QLineEdit()
