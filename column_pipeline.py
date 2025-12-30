@@ -22,7 +22,6 @@ class ColumnsSubmodule(QtW.QWidget):
         widget = e.source()
         e.accept()
 
-        
     def dropEvent(self, e):
         pos = e.pos()
         widget = e.source()
@@ -70,6 +69,17 @@ class ColumnsSection(QtW.QGroupBox):
     
     def get_num_cols(self):
         return len(self.get_cols())
+    
+    def set_cols_as_string_list(self , str_lst : list[str]):
+        # Remove all prior draggable (If applicable). 
+        for child in self.findChildren(QtW.QWidget):
+            if isinstance(child , DraggableColumn):
+                child.deleteLater()
+        # now generate an add the new widgets. 
+        for curr in str_lst:
+            new_drag = DraggableColumn(curr)
+            self.my_layout.addWidget(new_drag)
+        
     
     def get_cols_as_string_list(self) -> list[str]:
         return [drag_col.name for drag_col in self.get_cols()]

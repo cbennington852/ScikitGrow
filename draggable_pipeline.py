@@ -103,6 +103,7 @@ class PipelineSection(QtW.QGroupBox):
         pos = e.pos()
         widget = e.source()
         if isinstance(widget , Draggable):
+            print("TEST" , widget.render_type , self.accepting_function(widget.data.sklearn_function) , self.accepting_function)
             if self.accepting_function(widget.data.sklearn_function):
                 e.accept()        
                 self.model_hovering = True
@@ -426,8 +427,8 @@ class Pipeline(QtW.QMdiSubWindow):
     CLASSIFIER_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS
     PREPROCESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.PREPROCESSORS
     REGRESSOR_FILTER = lambda x : x in SklearnAcceptableFunctions.REGRESSORS
-    VALIDATOR_FILTER = lambda x : getattr(x, 'split', None) is not None and callable(getattr(x, 'split', None))
-    MODEL_FILTER = lambda x : x in SklearnAcceptableFunctions.CLASSIFIERS or SklearnAcceptableFunctions.REGRESSORS
+    VALIDATOR_FILTER = lambda x : x in SklearnAcceptableFunctions.VALIDATORS
+    MODEL_FILTER = lambda x : x in SklearnAcceptableFunctions.MODELS
 
 
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
@@ -453,7 +454,6 @@ class Pipeline(QtW.QMdiSubWindow):
         )
         self.validator = PipelineSection(
             title=Pipeline.SECTION_VALIDATOR_TITLE,
-            # Makes sure this is a validator by checking if it has a 'split' function which is required.
             accepting_function=Pipeline.VALIDATOR_FILTER,
             my_parent=self,
             max_num_models=1

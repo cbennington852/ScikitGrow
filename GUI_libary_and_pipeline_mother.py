@@ -165,7 +165,7 @@ class GUILibary(QtW.QTabWidget):
         validator_box.setLayout(validator_layout)
         vali_submodule = GUILibarySubmodule(
             sublibary=SubLibary(
-                SklearnAcceptableFunctions.PREPROCESSORS,
+                SklearnAcceptableFunctions.VALIDATORS,
                 ""
             ),
             render_type=Draggable.POINTY,
@@ -313,6 +313,9 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
             self.y_columns.get_cols_as_string_list()
         )
     
+    def load_data(self , data : ColumnsWindowData):
+        self.x_columns.set_cols_as_string_list(data.x_cols)
+        self.y_columns.set_cols_as_string_list(data.y_cols)
 
     def closeEvent(self, event):
         event.ignore()

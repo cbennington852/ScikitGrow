@@ -102,4 +102,6 @@ class SklearnAcceptableFunctions():
         val.PredefinedSplit
     }
 
+    MODELS = CLASSIFIERS | REGRESSORS
+
     
