@@ -124,16 +124,19 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.pipeline_mother)
 
     def save_button_pressed(self , file_name='data.pkl'):
+        print(f"Dataframe {self.dataframe}")
         save_file = SaveFile(
             pipelines_data=self.pipeline_mother.get_data(),
             dataframe=self.dataframe,
             columns_data=self.pipeline_mother.get_columns_data()
         )
-        with open(file_name, 'wb') as file:
-            # Use 'wb' mode for writing binary
-            pickle.dump(save_file, file)
-        print(save_file)
-
+        try:
+            with open(file_name, 'wb') as f:
+                # Use 'wb' mode for writing binary
+                pickle.dump(save_file, f)
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
     def open_on_saved_file(file_name='data.pkl'):
         # basically open the file and then pass in all of the info for the things.
         with open(file_name, 'rb') as file:
@@ -148,7 +151,7 @@ class MainWindow(QMainWindow):
             # 2. Startup a new instance of a main window
             main_window = MainWindow(df)
             # 3. load the pipeline data into that main_window
-            main_window.pipeline_mother.load_from_data(loaded_data.pipelines_data)
+            main_window.pipeline_mother.load_from_data(loaded_data.pipelines_data , loaded_data.columns_data)
             # 4. display the data.
             print(main_window)
             return main_window
@@ -162,7 +165,7 @@ class MainWindow(QMainWindow):
         
         # Save action
         save_action = QAction("Save Project" , self)
-        save_action.triggered.connect(lambda : print("saving attempted"))
+        save_action.triggered.connect(self.save_button_pressed)
         file_menu.addAction(save_action)
 
         # Save action
@@ -172,7 +175,7 @@ class MainWindow(QMainWindow):
 
         # Open action
         open_action = QAction("Open Project" , self)
-        open_action.triggered.connect(self.open_on_saved_file)
+        open_action.triggered.connect(MainWindow.open_on_saved_file)
         file_menu.addAction(open_action)
 
 def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
@@ -189,8 +192,6 @@ def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
     raise ValueError("Does not end in a valid file extension format")
 
 
-
-
 def open_on_file_handle(file_handle):
     if os.path.exists(file_handle):
         # parse command line argument
@@ -198,7 +199,7 @@ def open_on_file_handle(file_handle):
             try:
                 # Make a splash 
                 splash_screen = MainMenu()
-                splash_screen.main_window = open_on_saved_file(file_handle)
+                splash_screen.main_window = MainWindow.open_on_saved_file(file_handle)
                 splash_screen.main_window.show()
                 splash_screen.hide()
             except Exception as e:

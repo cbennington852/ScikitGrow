@@ -13,7 +13,7 @@ from draggable_pipeline import DraggableColumn , PipelineSection, Pipeline, Pipe
 from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
 class ColumnsWindowData():
-    def __init__(self , x_cols , y_cols):
+    def __init__(self , x_cols : list[str] , y_cols : list[str]):
         self.x_cols = x_cols
         self.y_cols = y_cols
 
@@ -246,7 +246,7 @@ class PipelineMother(QtW.QMainWindow):
             lst_pipeline_data.append(pipeline.get_pipeline_data())
         return lst_pipeline_data
     
-    def load_from_data(self , pipelines_data : list[PipelineData]):
+    def load_from_data(self , pipelines_data : list[PipelineData] , cols_data : ColumnsWindowData):
         # Make sure to remove the starter pipeline
         for pipeline in self.pipelines:
             pipeline.close()
@@ -258,6 +258,8 @@ class PipelineMother(QtW.QMainWindow):
                 data=pipe_data,
             )
             self.pipelines.append(curr)
+        #also tell the cols to re-populate
+        self.columns_subwindow.load_data(cols_data)
 
 
     def add_pipeline(self):

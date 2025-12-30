@@ -508,9 +508,9 @@ class Pipeline(QtW.QMdiSubWindow):
         # make new layout. 
         main_thing = QWidget()
         my_layout = QtW.QVBoxLayout()
-        my_layout.addWidget(new_pipeline.validator)
-        my_layout.addWidget(new_pipeline.model_pipe)
         my_layout.addWidget(new_pipeline.preproccessor_pipe)        
+        my_layout.addWidget(new_pipeline.model_pipe)
+        my_layout.addWidget(new_pipeline.validator)
         main_thing.setLayout(my_layout)
         new_pipeline.setWidget(main_thing)
         print("Model form pipeline" , new_pipeline.model_pipe.get_models())
