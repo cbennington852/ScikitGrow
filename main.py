@@ -16,7 +16,7 @@ from save_file import SaveFileException , SaveFile
 import os
 import pickle
 import traceback
-
+import time
 import pandas as pd
 
 
@@ -123,12 +123,16 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.pipeline_mother)
 
-    def save_button_pressed(self , file_name='data_2.pkl'):
+    def save_button_pressed(self , file_name='data_2.pkl' , no_popup=False):
         print(f"Dataframe {self.dataframe}")
         print(f"file_name : {file_name}")
-        file_path, _ = QtW.QFileDialog.getSaveFileName(
-            None, "Save Project", file_name, "Pickle Files (*.pkl);;All Files (*)"
-        )
+        if not no_popup:
+            file_path, _ = QtW.QFileDialog.getSaveFileName(
+                None, "Save Project", file_name, "Pickle Files (*.pkl);;All Files (*)"
+            )
+        else:
+            time.sleep(0.1)
+            file_path = file_name
         if file_path:
             try:
                 # Prepare your data object
@@ -156,7 +160,7 @@ class MainWindow(QMainWindow):
             loaded_data = pickle.load(file)
             if not isinstance(loaded_data , SaveFile):
                 raise SaveFileException("File did not unpickle as a save file type.")
-            
+        
             # 1. Retrieve the dataframe 
             df = loaded_data.dataframe
             if not isinstance(df , pd.DataFrame):
@@ -167,6 +171,7 @@ class MainWindow(QMainWindow):
             main_window.pipeline_mother.load_from_data(loaded_data.pipelines_data , loaded_data.columns_data)
             # 4. display the data.
             print(main_window)
+            print("X cols" , main_window.pipeline_mother.x_columns.get_cols())
             return main_window
         
 
@@ -188,7 +193,7 @@ class MainWindow(QMainWindow):
 
         # Open action
         open_action = QAction("Open Project" , self)
-        open_action.triggered.connect(MainWindow.open_on_saved_file)
+        open_action.triggered.connect(lambda x : ValueError("Not made yet"))
         file_menu.addAction(open_action)
 
 def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:

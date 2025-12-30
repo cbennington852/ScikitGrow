@@ -41,7 +41,8 @@ def setup_test_environment_one():
 def test_save_single_model():
     window = setup_test_environment_one()
     file_name = 'data_test.pkl'
-    window.save_button_pressed(file_name=file_name)
+    window.save_button_pressed(file_name=file_name , no_popup=True)
+    # Simulate a key press.
     with open(file_name, 'rb') as file:
         loaded_data = pickle.load(file)
         assert len(loaded_data.pipelines_data) == 1 # check only one pipeline
@@ -52,10 +53,37 @@ def test_save_single_model():
 def test_save_single_column():
     window = setup_test_environment_one()
     file_name = 'data_test.pkl'
-    window.save_button_pressed(file_name=file_name)
+    window.save_button_pressed(file_name=file_name , no_popup=True)
     with open(file_name, 'rb') as file:
         loaded_data : SaveFile = pickle.load(file)
         assert loaded_data.columns_data.x_cols == ['Example Chemical 1']
         assert loaded_data.columns_data.y_cols == ['Example Chemical 2']
     window.close()
+
+def test_loading_columns():
+    window = setup_test_environment_one()
+    file_name = 'data_test.pkl'
+    window.save_button_pressed(file_name=file_name , no_popup=True)
+
+    # Now make sure the the window has all of the nessicary things
+    assert window.pipeline_mother.x_columns.get_cols_as_string_list() == ['Example Chemical 1']
+
+def test_loading_columns():
+    window = setup_test_environment_one()
+    file_name = 'data_test.pkl'
+    window.save_button_pressed(file_name=file_name , no_popup=True)
+
+    # Now make sure the the window has all of the nessicary things
+    assert window.pipeline_mother.x_columns.get_cols_as_string_list() == ['Example Chemical 1']
+
+def test_loading_models():
+    window = setup_test_environment_one()
+    file_name = 'data_test.pkl'
+    window.save_button_pressed(file_name=file_name , no_popup=True)
+    
+    assert window.pipeline_mother.pipelines[0].model_pipe.get_data()[0].sklearn_function == sklearn.linear_model.LinearRegression
+
+
+
+# now think of ways to test loading.
 
