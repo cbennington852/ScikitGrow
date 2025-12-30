@@ -312,6 +312,7 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
             self.x_columns.get_cols_as_string_list(),
             self.y_columns.get_cols_as_string_list()
         )
+    
 
     def closeEvent(self, event):
         event.ignore()

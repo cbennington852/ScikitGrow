@@ -25,7 +25,7 @@ class MainMenu(QMainWindow):
 
     curr_window = None
 
-    def __init__(self ):
+    def __init__(self):
         super().__init__()
         MainMenu.curr_window = self
 
@@ -44,13 +44,10 @@ class MainMenu(QMainWindow):
         self.import_dataset_button = QtW.QPushButton("Import datasets")
         self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
         self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
-
         self.example_datasets_button.clicked.connect(lambda : self.open_main_window_on_sns_dataset(pd.read_csv("example_datasets/test.csv")))
-
         self.my_layout.addWidget(self.title_image)
         self.my_layout.addWidget(self.example_datasets_button)
         self.my_layout.addWidget(self.import_dataset_button)
-
 
 
     def open_main_window_on_sns_dataset(self, dataframe):
@@ -93,9 +90,9 @@ class MainWindow(QMainWindow):
         self.libary = GUILibary(self.dataframe)
         self.dataframeViewer = DataframeViewer(self.dataframe)
         
-        self.pipeline_mommy = PipelineMother()
+        self.pipeline_mother = PipelineMother()
 
-        self.plotter = Plotter(self.pipeline_mommy , self.dataframe)
+        self.plotter = Plotter(self.pipeline_mother , self.dataframe)
         
         self.render_menu_bar()
 
@@ -124,21 +121,38 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea , dock_dataframe)
         self.addDockWidget(Qt.LeftDockWidgetArea ,  dock_libary)
 
-        self.setCentralWidget(self.pipeline_mommy)
+        self.setCentralWidget(self.pipeline_mother)
 
-    def save_button_pressed(self):
+    def save_button_pressed(self , file_name='data.pkl'):
         save_file = SaveFile(
-            pipelines_data=self.pipeline_mommy.get_data(),
+            pipelines_data=self.pipeline_mother.get_data(),
             dataframe=self.dataframe,
-            columns_data=self.pipeline_mommy.get_columns_data()
+            columns_data=self.pipeline_mother.get_columns_data()
         )
-        with open('data.pkl', 'wb') as file:
+        with open(file_name, 'wb') as file:
             # Use 'wb' mode for writing binary
             pickle.dump(save_file, file)
         print(save_file)
 
-    def load_button_pressed(self , file_name='data.pkl'):
-        raise ValueError("Not working yet")
+    def open_on_saved_file(file_name='data.pkl'):
+        # basically open the file and then pass in all of the info for the things.
+        with open(file_name, 'rb') as file:
+            loaded_data = pickle.load(file)
+            if not isinstance(loaded_data , SaveFile):
+                raise SaveFileException("File did not unpickle as a save file type.")
+            
+            # 1. Retrieve the dataframe 
+            df = loaded_data.dataframe
+            if not isinstance(df , pd.DataFrame):
+                raise SaveFileException("Pandas Dataframe could not be loaded.")
+            # 2. Startup a new instance of a main window
+            main_window = MainWindow(df)
+            # 3. load the pipeline data into that main_window
+            main_window.pipeline_mother.load_from_data(loaded_data.pipelines_data)
+            # 4. display the data.
+            print(main_window)
+            return main_window
+        
 
     def render_menu_bar(self):
         menu = self.menuBar()
@@ -158,7 +172,7 @@ class MainWindow(QMainWindow):
 
         # Open action
         open_action = QAction("Open Project" , self)
-        open_action.triggered.connect(self.load_button_pressed)
+        open_action.triggered.connect(self.open_on_saved_file)
         file_menu.addAction(open_action)
 
 def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
@@ -174,31 +188,7 @@ def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
     # Else implied
     raise ValueError("Does not end in a valid file extension format")
 
-def open_on_saved_file(file_handle):
-    # basically open the file and then pass in all of the info for the things.
-    with open('data.pkl', 'rb') as file_handle:
-        loaded_data = pickle.load(file_handle)
-        if not isinstance(loaded_data , SaveFile):
-            raise SaveFileException("File did not unpickle as a save file type.")
-        
-        #   self.pipeline_mommy.load_from_data(save_file.pipelines_data)
-        # TODO:
-        # 1. Retrieve the dataframe 
-        df = loaded_data.dataframe
-        if not isinstance(df , pd.DataFrame):
-            raise SaveFileException("Pandas Dataframe could not be loaded.")
-        # 2. Startup a new instance of a main window
-        main_window = MainWindow(df)
-        # 3. load the pipeline data into that main_window
-        main_window.pipeline_mommy.load_from_data(loaded_data.pipelines_data)
-        # 4. display the data.
-        print(main_window)
-        return main_window
 
-
-
-
-    
 
 
 def open_on_file_handle(file_handle):
