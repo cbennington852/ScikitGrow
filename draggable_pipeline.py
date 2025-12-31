@@ -45,6 +45,8 @@ class GUILibarySubmodule(QtW.QGroupBox):
             # tell previous parent to resize?
             from_parent.my_parent.resize_based_on_children()
             widget.deleteLater()
+        from_parent.repaint()
+
 
 
 class PipelineSection(QtW.QGroupBox):
@@ -113,6 +115,59 @@ class PipelineSection(QtW.QGroupBox):
                 
         else:
             e.ignore()
+
+    def dropEvent(self, e):
+        pos = e.pos()
+        widget = e.source()
+        from_parent = widget.parentWidget()
+        to_parent = self
+        def check_is_correct_type():
+            if not isinstance(widget , Draggable):
+                e.ignore()
+                return
+        # remove the spacer ,and readadd to bottom.
+        def remove_all_spacers():
+            for i in range(0 , self.my_layout.count()):
+                if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
+                    temp_widget = self.my_layout.itemAt(i)
+                    self.my_layout.removeItem(temp_widget)
+                    del temp_widget
+        
+        def if_limit_remove_all_other_widgets():
+            if (self.get_num_models() == self.max_num_models):
+                # Remove one the children from this
+                for child in self.findChildren(QtW.QWidget):
+                    if isinstance(child , Draggable) and child != widget:
+                        child.deleteLater()
+            else:
+                e.accept()
+            
+        check_is_correct_type()
+        remove_all_spacers()
+        if_limit_remove_all_other_widgets()
+        # Handle replacement with parent module. If applicable
+        if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
+            self.my_layout.addWidget(widget.copy_self())
+        else:
+            # accept
+            # Add the dang widget
+            self.my_layout.addWidget(widget)
+            if hasattr(from_parent , 'is_holding'):
+                from_parent.is_holding = False
+        # Accepts
+        e.accept()
+        # update is holding.
+        self.is_holding = True            
+        # tell the parent to resize.
+        self.my_parent.resize_based_on_children()
+        # add space to end of the layout to make it all squished to top.
+        self.my_layout.addStretch()
+        # Remove hovering attribute.
+        self.model_hovering=False        
+        # Re-render the group box
+        self.repaint()
+        # also repaint the parent
+        from_parent.repaint()
 
     def dragLeaveEvent(self, event):
         self.model_hovering = False
@@ -350,54 +405,7 @@ class PipelineSection(QtW.QGroupBox):
         else:
             return super().paintEvent(e)
 
-    def dropEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        from_parent = widget.parentWidget()
-        to_parent = self
-        def check_is_correct_type():
-            if not isinstance(widget , Draggable):
-                e.ignore()
-                return
-        # remove the spacer ,and readadd to bottom.
-        def remove_all_spacers():
-            for i in range(0 , self.my_layout.count()):
-                if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
-                    temp_widget = self.my_layout.itemAt(i)
-                    self.my_layout.removeItem(temp_widget)
-                    del temp_widget
-        
-        def if_limit_remove_all_other_widgets():
-            if (self.get_num_models() == self.max_num_models):
-                # Remove one the children from this
-                for child in self.findChildren(QtW.QWidget):
-                    if isinstance(child , Draggable) and child != widget:
-                        child.deleteLater()
-            else:
-                e.accept()
-            
-        check_is_correct_type()
-        remove_all_spacers()
-        if_limit_remove_all_other_widgets()
-        # Handle replacement with parent module. If applicable
-        if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
-            self.my_layout.addWidget(widget.copy_self())
-        else:
-            # accept
-            # Add the dang widget
-            self.my_layout.addWidget(widget)
-        # Accepts
-        e.accept()
-        # update is holding.
-        self.is_holding = True            
-        # tell the parent to resize.
-        self.my_parent.resize_based_on_children()
-        # add space to end of the layout to make it all squished to top.
-        self.my_layout.addStretch()
-        # Remove hovering attribute.
-        self.model_hovering=False        
-        # Re-render the group box
-        self.repaint()
+   
 
 class PipelineData():
     def __init__(

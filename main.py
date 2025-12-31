@@ -254,7 +254,8 @@ def open_on_file_handle(file_handle):
                         f"{str(e)}" # Main message
                     )
         sys.exit()
-        
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv) # Create the application instance
