@@ -42,6 +42,8 @@ class GUILibarySubmodule(QtW.QGroupBox):
             from_parent.layout().removeWidget(widget)
             if from_parent.is_holding:
                 from_parent.is_holding = False
+            # tell previous parent to resize?
+            from_parent.my_parent.resize_based_on_children()
             widget.deleteLater()
 
 
