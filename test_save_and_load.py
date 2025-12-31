@@ -125,16 +125,6 @@ def test_loading_columns():
     window.save_button_pressed(file_name=file_name , no_popup=True)
     saved_window = MainWindow.open_on_saved_file(file_name)
 
-
-    # Now make sure the the window has all of the nessicary things
-    assert saved_window.pipeline_mother.x_columns.get_cols_as_string_list() == ['Example Chemical 1']
-
-def test_loading_columns():
-    window = setup_test_environment_one()
-    file_name = 'data_test.pkl'
-    window.save_button_pressed(file_name=file_name , no_popup=True)
-    saved_window = MainWindow.open_on_saved_file(file_name)
-
     # Now make sure the the window has all of the nessicary things
     assert saved_window.pipeline_mother.x_columns.get_cols_as_string_list() == ['Example Chemical 1']
 

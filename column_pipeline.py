@@ -5,7 +5,7 @@ from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, Q
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 from colors_and_appearance import AppAppearance
-
+import drag_and_drop_utility as dnd
 
 
 class ColumnsSubmodule(QtW.QWidget):
@@ -34,6 +34,8 @@ class ColumnsSubmodule(QtW.QWidget):
             e.accept()
             from_parent.layout().removeWidget(widget)
             widget.deleteLater()
+            
+        dnd.end_drag_and_drop_event()
 
 class ColumnsSection(QtW.QGroupBox):
     def __init__(self , title, my_parent , max_num_cols = 100, **kwargs):
@@ -230,11 +232,8 @@ class ColumnsSection(QtW.QGroupBox):
             self.my_layout.addWidget(widget)
             
 
-        # tell the parent to resize.
-        self.my_parent.resize_based_on_children()
         # add space to end of the layout to make it all squished to top.
         self.my_layout.addStretch()
         # Remove hovering attribute.
         self.hovering=False        
-        # Re-render the group box
-        self.repaint()
+        dnd.end_drag_and_drop_event(to_parent , from_parent)

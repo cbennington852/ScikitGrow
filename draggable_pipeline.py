@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt, QMimeData
 from column_pipeline import DraggableColumn , ColumnsSection
 from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 from colors_and_appearance import AppAppearance
+import drag_and_drop_utility as dnd
 
 class GUILibarySubmodule(QtW.QGroupBox):
     def __init__(self , sublibary , render_type = "", hex_value = "",  **kwargs):
@@ -40,12 +41,8 @@ class GUILibarySubmodule(QtW.QGroupBox):
         elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , GUILibarySubmodule):
             e.accept()
             from_parent.layout().removeWidget(widget)
-            if from_parent.is_holding:
-                from_parent.is_holding = False
-            # tell previous parent to resize?
-            from_parent.my_parent.resize_based_on_children()
             widget.deleteLater()
-        from_parent.repaint()
+        dnd.end_drag_and_drop_event(to_parent , from_parent)
 
 
 
@@ -69,7 +66,6 @@ class PipelineSection(QtW.QGroupBox):
         self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side - 2 , 0 , 0 , 0)
         self.my_layout.setSpacing(0);  
         self.model_hovering = False
-        self.is_holding = False
         self.setLayout(self.my_layout)
 
     def get_pipeline_objects(self):
@@ -91,10 +87,7 @@ class PipelineSection(QtW.QGroupBox):
         for drag_data in data:
             # Make a new draggable.
             new_drag = Draggable.new_draggable_from_data(drag_data)
-            print("New draggable" , new_drag)
             new_pipe.my_layout.addWidget(new_drag)
-            print(new_drag)
-            # add it to this.
         return new_pipe
 
     def get_data(self) -> list[DraggableData]:
@@ -149,35 +142,19 @@ class PipelineSection(QtW.QGroupBox):
         if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
             self.my_layout.addWidget(widget.copy_self())
         else:
-            # accept
             # Add the dang widget
             self.my_layout.addWidget(widget)
-            if hasattr(from_parent , 'is_holding'):
-                from_parent.is_holding = False
         # Accepts
         e.accept()
-        # update is holding.
-        self.is_holding = True            
-        # tell the parent to resize.
-        self.my_parent.resize_based_on_children()
         # add space to end of the layout to make it all squished to top.
         self.my_layout.addStretch()
         # Remove hovering attribute.
         self.model_hovering=False        
         # Re-render the group box
-        self.repaint()
-        # also repaint the parent
-        from_parent.repaint()
+        dnd.end_drag_and_drop_event(to_parent , from_parent)
 
     def dragLeaveEvent(self, event):
         self.model_hovering = False
-
-        # Check to see if this is empty, and change the is_holding status.
-        self.is_holding = False 
-        for child in self.findChildren(QtW.QWidget):
-            self.is_holding = True
-            break
-
         # Repaint the module
         self.repaint()
         event.accept() # Accept the leave event
@@ -194,7 +171,7 @@ class PipelineSection(QtW.QGroupBox):
     
     def paintEvent(self, e):
         if self.my_title == "Validator":
-            if self.is_holding == True:
+            if dnd.is_holding(self):
                 painter = QPainter(self)
                 painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
                 painter.drawText( 0 , 15 , self.my_title)
@@ -230,7 +207,7 @@ class PipelineSection(QtW.QGroupBox):
                 painter.drawPolygon(pointy_block)
 
         elif self.my_title == "Models":
-            if self.is_holding == True:
+            if dnd.is_holding(self):
                 painter = QPainter(self)
                 painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
                 painter.drawText( 0 , 15 , self.my_title)
