@@ -71,7 +71,7 @@ def test_3d_regression():
 def test_2d_classification():
     res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
         main_dataframe=classifier_dataframe,
-        pipeline_x_values=['sepal_width' ],
+        pipeline_x_values=['sepal_width'],
         pipeline_y_value=['species'],
         curr_pipelines=[
             Pipeline(

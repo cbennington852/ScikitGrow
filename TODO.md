@@ -35,7 +35,11 @@ Whereas a conference is a brisker 5 pages.
 
 ### 11. Add "predict" tab
 
+
 ### 16. On windows there is a weird offset for the layout manager, this is beacuse linux and windows have diffrent left margins and CSS styles. 
 
 ### 17. For preproccessors and colummns, looks funny cus space to right, maybe make a 
 space below instead.
+
+
+### 18. Work on adding some sort of manual predictions interface via the engine results.

@@ -13,17 +13,11 @@ from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
 
 def is_regressor(x):
-    if x in SklearnAcceptableFunctions.REGRESSORS:
-        return True
-    else:
-        return False
+    return x in SklearnAcceptableFunctions.REGRESSORS
+        
 
 def classification_filter(x):
-    try:
-        return sklearn.base.is_classifier(x)
-    except:
-        return False
-
+    return x in SklearnAcceptableFunctions.CLASSIFIERS
 
 # Feature expansion plan ... multiple pipelines
     # SklearnEngine takes in multiple "Pipelines"
@@ -71,9 +65,21 @@ class EngineResults():
     """
     Small class to hold the results from the engine.
     """
-    def __init__(self, visual_plot , accuracy_plot):
+    def __init__(
+            self, 
+            visual_plot ,
+            accuracy_plot , 
+            trained_models : list[Pipeline] , 
+            x_cols : list[str] , 
+            y_col : str
+            ):
         self.visual_plot = visual_plot
         self.accuracy_plot = accuracy_plot
+        self.trained_models = trained_models
+        self.x_cols = x_cols
+        self.y_col = y_col
+
+    
 
 
 MESH_ALPHA=0.7
@@ -114,7 +120,6 @@ class SklearnEngine():
             main_dataframe_copy = main_dataframe.copy(deep=True)
         except Exception as e:
             raise InternalEngineError(f"Failed to deep copy the dataframe : {str(e)}")
-        
         
         
         # Drop NaN
@@ -226,7 +231,10 @@ class SklearnEngine():
         if len(curr_pipelines) == 0:
             return EngineResults(
                 visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipelines , pipeline_x_values , pipeline_y_value),
-                accuracy_plot=None
+                accuracy_plot=None,
+                trained_models=None,
+                x_cols=pipeline_x_values,
+                y_col=pipeline_y_value
             )
 
         # check to make sure cols are from this dataset.
@@ -400,7 +408,10 @@ class SklearnEngine():
                 )
             return EngineResults(
                 visual_plot=visual_plot,
-                accuracy_plot=accuracy_plot
+                accuracy_plot=accuracy_plot,
+                trained_models=curr_pipelines,
+                x_cols=pipeline_x_values,
+                y_col=pipeline_y_value
             )
             
         def accuracy_plot(
@@ -582,7 +593,10 @@ class SklearnEngine():
                 )
             return EngineResults(
                 visual_plot=visual_plot,
-                accuracy_plot=accuracy_plot
+                accuracy_plot=accuracy_plot,
+                trained_models=curr_pipelines,
+                x_cols=pipeline_x_values,
+                y_col=pipeline_y_value
             )
 
 

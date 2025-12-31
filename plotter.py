@@ -15,7 +15,7 @@ import sklearn
 import pandas as pd
 from GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
 import matplotlib.pyplot as plt
-
+from predictor_GUI import PredictionGUI
 
 plt.style.use("seaborn-v0_8-darkgrid")
 
@@ -23,6 +23,8 @@ plt.style.use("seaborn-v0_8-darkgrid")
 
 class ScikitGrowEngineAssemblyError(Exception):
     pass
+
+
 
 class Plotter(QtW.QTabWidget):
     def __init__(self , pipeline_mother : PipelineMother, dataframe : pd.DataFrame , **kwargs):
@@ -45,38 +47,15 @@ class Plotter(QtW.QTabWidget):
         ax2.set_xlabel('X Axis')
         ax2.set_ylabel('Y Axis')
 
-        self.prediction_tab = QtW.QWidget()
-        self.prediction_tab_layout = QtW.QFormLayout()
-        self.prediction_tab.setLayout(self.prediction_tab_layout)
-        
         self.visual_plot = FigureCanvasQTAgg(fig)
         self.accuracy_plot = FigureCanvasQTAgg(fig)
+
+        self.prediction_tab = QWidget()
         
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
         self.addTab(self.prediction_tab , "Manual Predictions")
 
-
-    def render_prediction_tab(self):
-        pass
-        # # Ran during plotting, uses the worker as input.
-        # lst_input_cols = self.worker.x_cols
-        # # Per model
-        #     # 1. Get the number of points for a single prediction.
-        #     # 1.1 create text entry boxes for these.
-        #     # 2. Add some sort of error handling to these.
-        #     # 3. Add a button for calling prediction function. 
-        #     # 4. Add a label that holds the predictions.
-        # lst_tuple_ptr_entry_and_name = []
-        # for input_col_name in lst_input_cols:
-        #     # make a entry
-        #     curr = QtW.QLineEdit()
-        #     curr_label = QtW.QLabel(input_col_name)
-        #     self.prediction_tab_layout.addRow(curr_label,curr)
-        #     lst_tuple_ptr_entry_and_name.append((input_col_name , curr))
-        # print("Below is data to serialise the predictuon tab")
-        # print(f"{lst_tuple_ptr_entry_and_name}")
-        # # 
 
     def handle_thread_crashing(self):
         self.ptr_to_train_models_button.setEnabled(True)
@@ -85,7 +64,6 @@ class Plotter(QtW.QTabWidget):
             self.worker_thread.wait()
         
         
-
     @QtCore.pyqtSlot()
     def plot_pipeline(self):
         self.ptr_to_train_models_button = self.sender()
@@ -193,11 +171,14 @@ class Plotter(QtW.QTabWidget):
             widget.deleteLater()
         self.visual_plot = FigureCanvasQTAgg(self.worker.engine_results.visual_plot)
         self.accuracy_plot = FigureCanvasQTAgg(self.worker.engine_results.accuracy_plot)
+        self.prediction_tab = PredictionGUI(self.worker.engine_results)
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
+        self.addTab(self.prediction_tab , "Manual Predictions")
+
         self.visual_plot.show()
         self.worker.ptr_to_training_button.setEnabled(True)
-        self.render_prediction_tab()
+        # Tell the predictor to re-render
         
 
 

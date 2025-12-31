@@ -162,7 +162,7 @@ def test_saving_and_loading_altered_parameters():
     for name , value in params:
         if name == 'alpha':
             assert value == 69.0
-            break
+            return
     assert False
 
 
