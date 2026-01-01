@@ -19,6 +19,9 @@ class SingleLineParameter(QtW.QLineEdit):
 class IntSingleLine(QtW.QSpinBox):
     def __init__(self , name , value,  **kwargs):
         super().__init__(**kwargs)
+        max_value = 2147483647 # this is the 32-bit int max for signed ints
+        self.setMinimum(-max_value) # Or use a very small number like -1e9
+        self.setMaximum(max_value) 
         self.setValue(value)
 
     def text(self):
@@ -27,6 +30,8 @@ class IntSingleLine(QtW.QSpinBox):
 class FloatSingleLine(QtW.QDoubleSpinBox):
     def __init__(self , name , value,  **kwargs):
         super().__init__(**kwargs)
+        self.setMinimum(float('-inf')) # Or use a very small number like -1e9
+        self.setMaximum(float('inf')) 
         self.setValue(value)
 
     def text(self):
@@ -42,8 +47,11 @@ class BooleanSingleLine(QtW.QCheckBox):
     
 
 BANNED_PARAMETERS = {
+    # Some parameters don't need to be changed.
+    # Example: Verbose, which prints stuff out to the console, can be hidden from the user.
     'n_jobs',
-    'verbose'
+    'verbose',
+    'warm_start'
 }
 
 

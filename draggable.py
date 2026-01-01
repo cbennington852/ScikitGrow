@@ -8,7 +8,7 @@ from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor 
 import PyQt5.QtCore as QCore 
 from colors_and_appearance import AppAppearance
 from draggable_parameter import parameter_filter , BANNED_PARAMETERS
-
+import ast
 
 class DraggableColumn(QPushButton):
     BASE_HEIGHT = 50
@@ -366,6 +366,7 @@ class Draggable(QPushButton):
 class ParameterPopup(QtW.QDialog):
     def __init__(self , draggable_data  : DraggableData , parent : Draggable,  **kwargs):
         super().__init__(**kwargs) 
+        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
         self.my_parent = parent
         self.setWindowTitle(f"{parent.name} hyper parameters")
         self.setGeometry(100, 100, 200, 100)  # x, y, width, height
@@ -392,11 +393,14 @@ class ParameterPopup(QtW.QDialog):
         for parameter_name , q_line_edit in self.all_widgets:
             curr = None
             try:
-                curr = (parameter_name , eval(q_line_edit.text()))
+                curr = (parameter_name , ast.literal_eval(q_line_edit.text()))
             except:
-                curr = (parameter_name , eval(f'\'{q_line_edit.text()}\''))
+                curr = (parameter_name , ast.literal_eval(f'\'{q_line_edit.text()}\''))
             new_parameters.append(curr)
         self.my_parent.data.parameters = new_parameters
         self.accept()
+
+
+
 
 
