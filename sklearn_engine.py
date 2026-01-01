@@ -51,7 +51,11 @@ class Pipeline():
             self.supervised_learning_type = SklearnEngine.REGRESSION
         else:
             raise InternalEngineError(f"Pipeline {name} has neither a regressor or classifier. Crashing")
-            
+
+    def predict(self , x_vals):
+        return self.sklearn_pipeline.predict(x_vals)[0].item()
+
+
 
 class ModelTrainingResults():
     """
@@ -79,7 +83,21 @@ class EngineResults():
         self.x_cols = x_cols
         self.y_col = y_col
 
-    
+    def predict(self , x_values : list , dataframe : pd.DataFrame):
+        if len(self.x_cols) != len(x_values):
+            raise InternalEngineError("Did not provide all of the values. Must provide all values.")
+        print("TODO: later verify that we have right types. Will be tricky for strings...")
+        for k in range(0 , len(self.x_cols)):
+            curr_col_name = self.x_cols[k]
+            curr_x_value = x_values[k]
+
+        # Assemble as dataframe
+        tmp_df = pd.DataFrame([x_values] , columns=self.x_cols)
+        results = {}
+        for pipeline in self.trained_models:
+            results[pipeline] = pipeline.predict(tmp_df)
+        return results
+
 
 
 MESH_ALPHA=0.7

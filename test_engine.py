@@ -5,7 +5,7 @@ import sklearn_engine
 import pandas as pd
 import sklearn
 import seaborn as sns
-from sklearn_engine import Pipeline
+from sklearn_engine import Pipeline , EngineResults
 
 dataframe = pd.read_csv("example_datasets/test.csv")
 classifier_dataframe = sns.load_dataset('iris')
@@ -103,3 +103,44 @@ def test_3d_classification():
         ]
     )
     assert isinstance(res , sklearn_engine.EngineResults)
+
+
+def test_predictions():
+    res : EngineResults = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+        main_dataframe=dataframe,
+        pipeline_x_values=['Example Chemical 2' , 'Example Chemical 3' ],
+        pipeline_y_value=['Example Chemical 1'],
+        curr_pipelines=[
+            Pipeline(
+                sklearn_pipeline=linear_pipe,
+                validator=None
+            ),
+            Pipeline(
+                sklearn_pipeline=tree_pipe_1,
+                validator=None
+            )
+        ]
+    )
+    res_value = res.predict([5.0 , 5.0] , dataframe)
+    print(res_value[res.trained_models[0]])
+    assert round(res_value[res.trained_models[0]] , 3) == round(40.43950829 , 3)
+
+def test_predictions():
+    res : EngineResults = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+        main_dataframe=dataframe,
+        pipeline_x_values=['Example Chemical 2'  ],
+        pipeline_y_value=['Example Chemical 1'],
+        curr_pipelines=[
+            Pipeline(
+                sklearn_pipeline=linear_pipe,
+                validator=None
+            ),
+            Pipeline(
+                sklearn_pipeline=tree_pipe_1,
+                validator=None
+            )
+        ]
+    )
+    res_value = res.predict([5.0] , dataframe)
+    print(res_value[res.trained_models[0]])
+    assert round(res_value[res.trained_models[0]] , 3) == round(38.422 , 3)
