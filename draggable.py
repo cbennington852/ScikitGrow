@@ -7,6 +7,7 @@ import PyQt5.QtGui as PGui
 from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush, QIcon
 import PyQt5.QtCore as QCore 
 from colors_and_appearance import AppAppearance
+from draggable_parameter import parameter_filter
 
 
 class DraggableColumn(QPushButton):
@@ -373,19 +374,18 @@ class ParameterPopup(QtW.QDialog):
         layout = QtW.QFormLayout()
 
         for parameter_name , default_value in draggable_data.parameters:
-            curr = QtW.QLineEdit()
-            curr.setText(str(default_value))
+            curr = parameter_filter(parameter_name , default_value)
             layout.addRow(
                 parameter_name,
                 curr
             )
             self.all_widgets.append((parameter_name , curr))
 
-        close_button = QPushButton("Save")
-        close_button.clicked.connect(self.save_parameters)  # Connect to accept() to close the dialog
-        layout.addWidget(close_button)
-
         self.setLayout(layout)
+
+    def closeEvent(self, a0):
+        self.save_parameters()
+        return super().closeEvent(a0)
     
     def save_parameters(self):
         new_parameters = []

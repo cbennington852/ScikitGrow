@@ -34,7 +34,6 @@ class SklearnAcceptableFunctions():
         ens.GradientBoostingRegressor,
         ens.HistGradientBoostingRegressor,
         ens.RandomForestRegressor,
-        ens.StackingRegressor,
     }
     REGRESSORS_NEURAL_NETWORK = {
         neu.MLPRegressor

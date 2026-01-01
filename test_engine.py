@@ -144,3 +144,5 @@ def test_predictions():
     res_value = res.predict([5.0] , dataframe)
     print(res_value[res.trained_models[0]])
     assert round(res_value[res.trained_models[0]] , 3) == round(38.422 , 3)
+
+    
