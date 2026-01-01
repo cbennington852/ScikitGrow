@@ -7,7 +7,7 @@ import PyQt5.QtGui as PGui
 from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush, QIcon
 import PyQt5.QtCore as QCore 
 from colors_and_appearance import AppAppearance
-from draggable_parameter import parameter_filter
+from draggable_parameter import parameter_filter , BANNED_PARAMETERS
 
 
 class DraggableColumn(QPushButton):

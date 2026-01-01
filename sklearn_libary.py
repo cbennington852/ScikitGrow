@@ -1,4 +1,5 @@
 import sklearn
+from draggable_parameter import BANNED_PARAMETERS
 import inspect
 
 class SubLibary():
@@ -22,9 +23,10 @@ class SubLibary():
         raw = inspect.signature(sklearn_model_function_call).parameters.items()
         full_list = []
         for item in raw:
-            full_list.append(
-                (item[0] , item[1].default)
-            )
+            if item[0] not in BANNED_PARAMETERS:
+                full_list.append(
+                    (item[0] , item[1].default)
+                )
         return full_list
     
 
