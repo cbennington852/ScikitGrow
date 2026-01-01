@@ -62,16 +62,24 @@ class PredictionGUI(QtW.QScrollArea):
 
     def run_all_predictions(self):
         # Get all of the x_values
-        x_values = []
-        for x_col in self.x_cols_ptr_lst:
-            x_values.append(str(x_col.text()))
+        try:
+            x_values = []
+            for x_col in self.x_cols_ptr_lst:
+                x_values.append(str(x_col.text()))
 
-        res = self.engine_results.predict(x_values , self.dataframe)
-        for pipeline_ptr , value in res.items():
-            for gui_pipe in self.pipelines_groupbox_ptr:
-                if pipeline_ptr == gui_pipe.pipeline:
-                    gui_pipe.pred_value.setText(str(value))
-        print(res)
+            res = self.engine_results.predict(x_values , self.dataframe)
+            for pipeline_ptr , value in res.items():
+                for gui_pipe in self.pipelines_groupbox_ptr:
+                    if pipeline_ptr == gui_pipe.pipeline:
+                        gui_pipe.pred_value.setText(str(value))
+            print(res)
+        except Exception as e:
+            QtW.QMessageBox.critical(
+                 None,                        # Parent: Use None if not within a QWidget class
+                 "Engine Prediction Error",            # Title bar text
+                 f"{str(e)}" # Main message
+            )
+            print(e)
 
 class PredictionGUIPipeline(QtW.QGroupBox):
     def __init__(self, pipeline : Pipeline, **kwargs):
