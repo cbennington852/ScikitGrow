@@ -309,6 +309,7 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
 
         mayo.addWidget(self.train_models)
         mayo.addWidget(self.x_columns)
+        #mayo.addStretch(1)
         mayo.addWidget(self.y_columns)
         self.show()
 
@@ -327,7 +328,7 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
     
     def resize_based_on_children(self):
         # get the number of pre-proccessors and their height, default to zero if one or below. 
-        y_col_height = max((self.x_columns.get_num_cols()) * DraggableColumn.BASE_HEIGHT , 0)
+        y_col_height = max((self.x_columns.get_num_cols()-1) * DraggableColumn.BASE_HEIGHT , 0)
         print(f"Suggested y_col_height : {y_col_height}")
         # Resize the pipeline based on the children size n_stuff.
         self.setFixedHeight(ColumnsMDIWindow.BASE_HEIGHT + y_col_height)

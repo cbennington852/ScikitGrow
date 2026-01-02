@@ -29,13 +29,37 @@ Whereas a conference is a brisker 5 pages.
     Fees : ~3,000$
 
 
+# TODO LIST
+Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
 
-### 2. Saving and loading from file.
-    - Columns
 
+### 1. Saving trained pipeline models as python pickle.
 
-### 16. On windows there is a weird offset for the layout manager, this is beacuse linux and windows have diffrent left margins and CSS styles. 
+### 2. Opening files button.
 
-### 17. For columns and pre-processors the section looks funny
-    - This is because of the space to the right of the draggable section. 
-    - We could add an empty section below the column, plus maybe remove the one to the right?
+### 3. Fixing the save and save as button to have it remember the project file location.
+
+### 4. Change Icons for library to match the shape of the thing they contain.
+
+### 5. Update pre-processor to have visual space similar to the columns
+
+### 6. Package for Windows.
+
+### 7. Add documentation for 6 files.
+
+### 8. Package for Linux.
+
+### 9. Package for Max.
+    - testing is not required for this, as I don't own a MAC.
+
+### 10. Add documentation for 6 files.
+
+### 11. One hour of writing unit tests.
+
+### 12. Add documentation for 6 files.  
+
+### 13. One hours of writing unit tests.
+
+### 14. Work on making a Web-landing page! (With download links for this.)
+
+# Poggers! Time to focus on publishing.    

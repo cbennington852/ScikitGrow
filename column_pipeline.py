@@ -2,7 +2,7 @@ from draggable import DraggableColumn
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
-from PyQt5.QtCore import  QPoint
+from PyQt5.QtCore import  QPoint , QRect
 from PyQt5.QtCore import Qt, QMimeData
 from colors_and_appearance import AppAppearance
 import drag_and_drop_utility as dnd
@@ -13,6 +13,7 @@ class ColumnsSubmodule(QtW.QWidget):
         super().__init__(**kwargs)
         self.layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
+        self.setMinimumHeight(250)
         self.lst_cols = lst_cols
         for col in self.lst_cols:
             new_widget = DraggableColumn(col)
@@ -102,6 +103,7 @@ class ColumnsSection(QtW.QGroupBox):
     def paintEvent(self, event):
         painter = QPainter(self)
         
+        print(f"Curr height {self.max_num_cols} ... {self.geometry()}")
 
         painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
         painter.setBrush(QColor(AppAppearance.PIPELINE_BACKGROUND_COLOR))
@@ -117,11 +119,13 @@ class ColumnsSection(QtW.QGroupBox):
 
         #space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
         space_needed_for_mouth = 0
+        num_cols = self.get_num_cols()
         if self.max_num_cols != 1:
-            self.resize(width , height + 10)
-            space_needed_for_mouth = max((self.get_num_cols() + 1) * DraggableColumn.block_height, DraggableColumn.block_height )
+            # add a background space as well
+            painter.drawRect( 0 , 0 , width , num_cols * DraggableColumn.block_height + ColumnsSection.height_between_top_mouth_and_top_bar)
+            space_needed_for_mouth = max((num_cols + 1) * DraggableColumn.block_height, DraggableColumn.block_height )
         else:
-            space_needed_for_mouth = max(self.get_num_cols() * DraggableColumn.block_height, DraggableColumn.block_height )
+            space_needed_for_mouth = max(num_cols * DraggableColumn.block_height, DraggableColumn.block_height )
 
         # add a space that is one draggable high
 
@@ -238,9 +242,10 @@ class ColumnsSection(QtW.QGroupBox):
             # Add the dang widget
             self.my_layout.addWidget(widget)
             
-
+        # Re-center the height
         # add space to end of the layout to make it all squished to top.
-        self.my_layout.addStretch()
+        if self.max_num_cols != 1:
+            self.my_layout.addStretch()
         # Remove hovering attribute.
         self.hovering=False        
         dnd.end_drag_and_drop_event(to_parent , from_parent)

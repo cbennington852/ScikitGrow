@@ -196,6 +196,9 @@ class MainWindow(QMainWindow):
         open_action.triggered.connect(lambda x : ValueError("Not made yet"))
         file_menu.addAction(open_action)
 
+    def open_button_pressed(self):
+        pass
+
 def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
     # NOTE: We can later expand this to work on HTML tables and later SQL databases.
     if file_path.endswith('.csv'):
