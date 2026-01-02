@@ -9,6 +9,7 @@ import PyQt5.QtCore as QCore
 from colors_and_appearance import AppAppearance
 from draggable_parameter import parameter_filter , BANNED_PARAMETERS
 import ast
+import time
 
 class DraggableColumn(QPushButton):
     BASE_HEIGHT = 50
@@ -361,6 +362,9 @@ class Draggable(QPushButton):
         )
         popover.exec()
 
+    def reset_parameters(self):
+        self.data.parameters = SubLibary.get_sklearn_parameters(self.data.sklearn_function)
+
 
 
 class ParameterPopup(QtW.QDialog):
@@ -368,25 +372,43 @@ class ParameterPopup(QtW.QDialog):
         super().__init__(**kwargs) 
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
         self.my_parent = parent
+        self.draggable_data = draggable_data
+        
         self.setWindowTitle(f"{parent.name} hyper parameters")
         self.setGeometry(100, 100, 200, 100)  # x, y, width, height
+
+
+        self.my_layout = QtW.QFormLayout()
+        self.render_layout()
+        self.my_layout.addWidget(self.reset_button)
+        self.setLayout(self.my_layout)
+
+    def render_layout(self):
         self.all_widgets = []
-
-        layout = QtW.QFormLayout()
-
-        for parameter_name , default_value in draggable_data.parameters:
+        for parameter_name , default_value in self.draggable_data.parameters:
             curr = parameter_filter(parameter_name , default_value)
-            layout.addRow(
+            self.my_layout.addRow(
                 parameter_name,
                 curr
             )
             self.all_widgets.append((parameter_name , curr))
-
-        self.setLayout(layout)
-
+        self.reset_button = QtW.QPushButton("Reset Parameters")
+        self.reset_button.clicked.connect(self.reset_parameters)
+        self.my_layout.addWidget(self.reset_button)
+        
+        
     def closeEvent(self, a0):
         self.save_parameters()
         return super().closeEvent(a0)
+    
+    def reset_parameters(self):
+        self.my_parent.reset_parameters()
+        # Remove all things in layout
+        while self.my_layout.rowCount() > 0:
+            self.my_layout.removeRow(0)
+        
+        time.sleep(0.05)
+        self.render_layout()
     
     def save_parameters(self):
         new_parameters = []

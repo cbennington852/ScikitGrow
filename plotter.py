@@ -2,10 +2,11 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetI
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag
+from PyQt5.QtGui import QIcon
 import PyQt5.QtCore as QtCore 
 
 import sys
+import time
 import matplotlib
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
@@ -13,6 +14,7 @@ from matplotlib.figure import Figure
 import sklearn_engine
 import sklearn
 import pandas as pd
+import threading
 from GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
 import matplotlib.pyplot as plt
 from predictor_GUI import PredictionGUI
@@ -27,6 +29,10 @@ class ScikitGrowEngineAssemblyError(Exception):
 
 
 class Plotter(QtW.QTabWidget):
+
+    TIME_DELAY_UNTIL_PROGRESS_WINDOW = 0.7
+
+
     def __init__(self , pipeline_mother : PipelineMother, dataframe : pd.DataFrame , **kwargs):
         super().__init__(**kwargs)
         self.pipeline_mother = pipeline_mother
@@ -58,10 +64,17 @@ class Plotter(QtW.QTabWidget):
 
 
     def handle_thread_crashing(self):
-        self.ptr_to_train_models_button.setEnabled(True)
+        self.do_regardless()
         if hasattr(self , "worker_thread"):
             self.worker_thread.exit()
             self.worker_thread.wait()
+
+    def do_regardless(self):
+        self.ptr_to_train_models_button.setEnabled(True)
+        self.spinner_done = True
+        self.spinner_thread.join()
+        self.worker.ptr_to_training_button.setEnabled(True)
+
         
         
     @QtCore.pyqtSlot()
@@ -134,7 +147,34 @@ class Plotter(QtW.QTabWidget):
             self.worker.finished.connect(self.worker_thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
             self.worker_thread.finished.connect(self.worker_thread.deleteLater)
+            self.spinner_done = False
+            def handle_spinner():
+                start_time = time.time()
+                progress = QtW.QProgressDialog("Training Model...", "Abort Training", 0, 100, self)
+                progress.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
+                progress.setWindowModality(Qt.WindowModality.WindowModal)
+                progress.setRange(0, 0) 
+                prog_window_open = False
+                while self.spinner_done == False:
+                    time.sleep(0.001)
+                    time_elapsed = time.time() - start_time
+                    print(f"Time elapsed ... {time_elapsed}")
+                    # Users found it annoything when small popup for a fast training, only show if takes longer than second
+                    if time_elapsed >= Plotter.TIME_DELAY_UNTIL_PROGRESS_WINDOW and prog_window_open == False:
+                        progress.show()
+                progress.deleteLater()
+                
+
+            self.spinner_thread = threading.Thread(target=handle_spinner)
+            self.spinner_thread.start()
             self.worker_thread.start()
+
+            
+            # executes after, but also during the thing
+            # Executes after? during the thing?
+            # Maybe we make a new thread on the event that this takes more than two seconds? 
+            
+            
         except ScikitGrowEngineAssemblyError as e:
             self.handle_thread_crashing()
             QtW.QMessageBox.critical(
@@ -180,7 +220,8 @@ class Plotter(QtW.QTabWidget):
         self.addTab(self.prediction_tab , "Manual Predictions")
 
         self.visual_plot.show()
-        self.worker.ptr_to_training_button.setEnabled(True)
+        self.do_regardless()
+        
         # Tell the predictor to re-render
         
 
@@ -201,6 +242,7 @@ class PlotterWorker(QtCore.QObject):
 
     @QtCore.pyqtSlot() # What does this do?
     def start_plotting(self):
+
         try:
             self.engine_results = sklearn_engine.SklearnEngine.main_sklearn_pipe(
                 main_dataframe=self.dataframe,

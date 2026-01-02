@@ -39,3 +39,5 @@ Whereas a conference is a brisker 5 pages.
 ### 17. For preproccessors and colummns, looks funny cus space to right, maybe make a 
 space below instead.
 
+### 18. parameters
+add a reset button
