@@ -35,8 +35,7 @@ Below is a burn-down chart, I am going to stop adding things to the todo list, a
 ### 0. Update appearance of sklearn-draggable to look more clickable.
 
 ### 1. Saving trained pipeline models as python pickle.
-
-### 3. Fixing the save and save as button to have it remember the project file location.
+    - We could also have some sort of "method" to open saved pickles as software. 
 
 ### 4. Change Icons for library to match the shape of the thing they contain.
 

@@ -384,6 +384,8 @@ class ParameterPopup(QtW.QDialog):
         self.setLayout(self.my_layout)
 
     def render_layout(self):
+        self.reset_button = QtW.QPushButton("Reset Parameters")
+        self.reset_button.clicked.connect(self.reset_parameters)
         self.all_widgets = []
         self.my_layout.addWidget(self.reset_button)
         for parameter_name , default_value in self.draggable_data.parameters:
@@ -393,8 +395,7 @@ class ParameterPopup(QtW.QDialog):
                 curr
             )
             self.all_widgets.append((parameter_name , curr))
-        self.reset_button = QtW.QPushButton("Reset Parameters")
-        self.reset_button.clicked.connect(self.reset_parameters)
+        
         
         
     def closeEvent(self, a0):

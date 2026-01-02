@@ -39,15 +39,7 @@ class GUILibary(QtW.QTabWidget):
                 self.addTab(scroll_regressor , name)
             self.curr_index += 1
 
-        ########################################################
-        # COLOR PALETTES
-        ########################################################
-        LINEAR_COLOR = AppAppearance.LINEAR_COLOR
-        ENSEMBLE_COLOR = AppAppearance.ENSEMBLE_COLOR
-        TREE_COLOR = AppAppearance.TREE_COLOR
-        NEURAL_COLOR = AppAppearance.NEURAL_COLOR
-        PREPROCESSOR_COLOR = AppAppearance.PREPROCESSOR_COLOR
-        VALIDATOR_COLOR = AppAppearance.VALIDATOR_COLOR
+
 
         ########################################################
         # REGRESSORS
@@ -64,7 +56,7 @@ class GUILibary(QtW.QTabWidget):
                 "Linear Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=LINEAR_COLOR
+            hex_value=AppAppearance.REGRESSOR_LINEAR_COLOR
         ) 
         lin_ens = GUILibarySubmodule(
             sublibary=SubLibary(
@@ -72,7 +64,7 @@ class GUILibary(QtW.QTabWidget):
                 "Ensemble Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=ENSEMBLE_COLOR
+            hex_value=AppAppearance.REGRESSOR_ENSEMBLE_COLOR
         ) 
         lin_neu = GUILibarySubmodule(
             sublibary=SubLibary(
@@ -80,7 +72,7 @@ class GUILibary(QtW.QTabWidget):
                 "Neural Network Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=NEURAL_COLOR
+            hex_value=AppAppearance.REGRESSOR_NEURAL_COLOR
         ) 
         lin_tre = GUILibarySubmodule(
             sublibary=SubLibary(
@@ -88,7 +80,7 @@ class GUILibary(QtW.QTabWidget):
                 "Tree Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=TREE_COLOR
+            hex_value=AppAppearance.REGRESSOR_TREE_COLOR
         ) 
         regressor_layout.addWidget(lin_reg)
         regressor_layout.addWidget(lin_ens)
@@ -108,7 +100,7 @@ class GUILibary(QtW.QTabWidget):
                 "Linear Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=LINEAR_COLOR
+            hex_value=AppAppearance.CLASSIFIER_LINEAR_COLOR
         ) 
         cla_ens = GUILibarySubmodule(
             sublibary=SubLibary(
@@ -116,7 +108,7 @@ class GUILibary(QtW.QTabWidget):
                 "Ensemble Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=ENSEMBLE_COLOR
+            hex_value=AppAppearance.CLASSIFIER_ENSEMBLE_COLOR
         ) 
         cla_neu = GUILibarySubmodule(
             sublibary=SubLibary(
@@ -124,7 +116,7 @@ class GUILibary(QtW.QTabWidget):
                 "Neural Network Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=NEURAL_COLOR
+            hex_value=AppAppearance.CLASSIFIER_NEURAL_COLOR
         ) 
         cla_tre = GUILibarySubmodule(
             sublibary=SubLibary(
@@ -132,7 +124,7 @@ class GUILibary(QtW.QTabWidget):
                 "Tree Models"
             ),
             render_type=Draggable.BUBBLE,
-            hex_value=TREE_COLOR
+            hex_value=AppAppearance.CLASSIFIER_TREE_COLOR
         ) 
         classifier_layout.addWidget(cla_reg)
         classifier_layout.addWidget(cla_ens)
@@ -152,7 +144,7 @@ class GUILibary(QtW.QTabWidget):
                 ""
             ),
             render_type=Draggable.INTERLOCK_RIGHT,
-            hex_value=PREPROCESSOR_COLOR
+            hex_value=AppAppearance.PREPROCESSOR_COLOR
         ) 
         preproccessor_layout.addWidget(pre_sub_module)
 
@@ -170,7 +162,7 @@ class GUILibary(QtW.QTabWidget):
                 ""
             ),
             render_type=Draggable.POINTY,
-            hex_value=VALIDATOR_COLOR
+            hex_value=AppAppearance.VALIDATOR_COLOR
         ) 
         validator_layout.addWidget(vali_submodule)
 
