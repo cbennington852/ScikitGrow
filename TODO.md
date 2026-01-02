@@ -36,8 +36,6 @@ Below is a burn-down chart, I am going to stop adding things to the todo list, a
 
 ### 1. Saving trained pipeline models as python pickle.
 
-### 2. Opening files button.
-
 ### 3. Fixing the save and save as button to have it remember the project file location.
 
 ### 4. Change Icons for library to match the shape of the thing they contain.

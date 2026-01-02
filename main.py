@@ -25,7 +25,7 @@ class MainMenu(QMainWindow):
 
     curr_window = None
 
-    def __init__(self):
+    def __init__(self ):
         super().__init__()
         MainMenu.curr_window = self
 
@@ -77,9 +77,14 @@ class MainWindow(QMainWindow):
     BASE_WINDOW_WIDTH = 1200
     BASE_WINDOW_HEIGHT = 800
 
-    def __init__(self , dataframe ):
+    def __init__(self , dataframe , file_path = None):
         super().__init__()
-        self.setWindowTitle("SciKit Grow")
+        if file_path is not None:
+            self.setWindowTitle(f"{file_path}")
+        else:
+            self.setWindowTitle("SciKit Grow")
+        self.file_path = file_path
+
         self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
         # start a parsel. 
         # load dataframe 
@@ -123,19 +128,20 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.pipeline_mother)
 
-    def save_button_pressed(self , file_name='data_2.pkl' , no_popup=False):
+    def save_function(self , file_name='data_2.pkl' , no_popup=False):
         print(f"Dataframe {self.dataframe}")
         print(f"file_name : {file_name}")
         if not no_popup:
             file_path, _ = QtW.QFileDialog.getSaveFileName(
                 None, "Save Project", file_name, "Pickle Files (*.pkl);;All Files (*)"
             )
+            if not file_path.endswith('.pkl'):
+                file_path += '.pkl'
         else:
-            #this is nessicay to prevent race conditions on linux
             file_path = file_name
         if file_path:
             try:
-                # Prepare your data object
+                # Prepare the data object
                 save_file = SaveFile(
                     pipelines_data=self.pipeline_mother.get_data(),
                     dataframe=self.dataframe,
@@ -146,6 +152,10 @@ class MainWindow(QMainWindow):
                 # This TRUNCATES the file automatically (replaces existing content).
                 with open(file_path, 'wb') as f:
                     pickle.dump(save_file, f)
+                
+                self.file_path = file_path
+
+                self.setWindowTitle(self.file_path)
                 
                 print(f"Saved successfully to: {file_path}")
             except OSError as e:
@@ -166,7 +176,7 @@ class MainWindow(QMainWindow):
             if not isinstance(df , pd.DataFrame):
                 raise SaveFileException("Pandas Dataframe could not be loaded.")
             # 2. Startup a new instance of a main window
-            main_window = MainWindow(df)
+            main_window = MainWindow(df , file_name)
             # 3. load the pipeline data into that main_window
             main_window.pipeline_mother.load_from_data(loaded_data.pipelines_data , loaded_data.columns_data)
             # 4. display the data.
@@ -193,11 +203,30 @@ class MainWindow(QMainWindow):
 
         # Open action
         open_action = QAction("Open Project" , self)
-        open_action.triggered.connect(lambda x : ValueError("Not made yet"))
+        open_action.triggered.connect(self.open_button_pressed)
         file_menu.addAction(open_action)
 
+    def save_button_pressed(self):
+        if self.file_path is not None:
+            try: 
+                self.save_function(
+                    file_name=self.file_path,
+                    no_popup=True
+                )
+            except:
+                self.save_as_button_pressed()
+        else:
+            self.save_as_button_pressed()
+
+    def save_as_button_pressed(self):
+        self.save_function()
+
     def open_button_pressed(self):
-        pass
+        file_path, _ = QtW.QFileDialog.getOpenFileName(
+                None, "Open Project",None ,"All Files (*.pkl *.csv *.xls);; Pickle Files (*.pkl);; CSV Files (*.csv);; Excel Files (*.xls) ;; "
+            )
+        if file_path:
+            open_on_file_handle(file_path)
 
 def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
     # NOTE: We can later expand this to work on HTML tables and later SQL databases.
@@ -242,21 +271,18 @@ def open_on_file_handle(file_handle):
                         "Internal Error opening file",            # Title bar text
                         f"{str(e)}" # Main message
                     )
-                    sys.exit()
-            except Exception:
+            except Exception as e:
                 QtW.QMessageBox.critical(
                         None,                        # Parent: Use None if not within a QWidget class
                         "File type not supported",            # Title bar text
                         f"{str(e)}" # Main message
                     )
-                sys.exit()
     else:
         QtW.QMessageBox.critical(
                         None,                        # Parent: Use None if not within a QWidget class
                         "Error opening file. File does not exist.",            # Title bar text
-                        f"{str(e)}" # Main message
+                        f"File {file_handle} was not found." # Main message
                     )
-        sys.exit()
 
 
 
