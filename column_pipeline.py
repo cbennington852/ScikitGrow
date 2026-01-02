@@ -116,7 +116,13 @@ class ColumnsSection(QtW.QGroupBox):
         height = self.height()
 
         #space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
-        space_needed_for_mouth = max(self.get_num_cols() * DraggableColumn.block_height, DraggableColumn.block_height )
+        space_needed_for_mouth = 0
+        if self.max_num_cols != 1:
+            self.resize(width , height + 10)
+            space_needed_for_mouth = max((self.get_num_cols() + 1) * DraggableColumn.block_height, DraggableColumn.block_height )
+        else:
+            space_needed_for_mouth = max(self.get_num_cols() * DraggableColumn.block_height, DraggableColumn.block_height )
+
         # add a space that is one draggable high
 
         # where to start the bevel from the left. 
