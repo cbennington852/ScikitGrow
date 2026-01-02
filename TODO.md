@@ -36,8 +36,6 @@ Whereas a conference is a brisker 5 pages.
 
 ### 16. On windows there is a weird offset for the layout manager, this is beacuse linux and windows have diffrent left margins and CSS styles. 
 
-### 17. For preproccessors and colummns, looks funny cus space to right, maybe make a 
-space below instead.
-
-### 18. parameters
-add a reset button
+### 17. For columns and pre-processors the section looks funny
+    - This is because of the space to the right of the draggable section. 
+    - We could add an empty section below the column, plus maybe remove the one to the right?

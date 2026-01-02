@@ -35,7 +35,7 @@ class ColumnsSubmodule(QtW.QWidget):
             from_parent.layout().removeWidget(widget)
             widget.deleteLater()
             
-        dnd.end_drag_and_drop_event()
+        dnd.end_drag_and_drop_event(to_parent , from_parent)
 
 class ColumnsSection(QtW.QGroupBox):
     def __init__(self , title, my_parent , max_num_cols = 100, **kwargs):
@@ -116,7 +116,8 @@ class ColumnsSection(QtW.QGroupBox):
         height = self.height()
 
         #space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
-        space_needed_for_mouth = max(self.get_num_cols() * DraggableColumn.block_height , DraggableColumn.block_height )
+        space_needed_for_mouth = max(self.get_num_cols() * DraggableColumn.block_height, DraggableColumn.block_height )
+        # add a space that is one draggable high
 
         # where to start the bevel from the left. 
         holder_block = QPolygon([
