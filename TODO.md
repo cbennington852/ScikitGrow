@@ -32,6 +32,7 @@ Whereas a conference is a brisker 5 pages.
 # TODO LIST
 Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
 
+### 0. Update appearance of sklearn-draggable to look more clickable.
 
 ### 1. Saving trained pipeline models as python pickle.
 
