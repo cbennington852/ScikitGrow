@@ -37,8 +37,6 @@ Below is a burn-down chart, I am going to stop adding things to the todo list, a
 ### 1. Saving trained pipeline models as python pickle.
     - We could also have some sort of "method" to open saved pickles as software. 
 
-### 4. Change Icons for library to match the shape of the thing they contain.
-
 ### 5. Update pre-processor to have visual space similar to the columns
 
 ### 6. Package for Windows.
@@ -59,5 +57,7 @@ Below is a burn-down chart, I am going to stop adding things to the todo list, a
 ### 13. One hours of writing unit tests.
 
 ### 14. Work on making a Web-landing page! (With download links for this.)
+
+### 15. Update splash page to look nicer.
 
 # Poggers! Time to focus on publishing.    
