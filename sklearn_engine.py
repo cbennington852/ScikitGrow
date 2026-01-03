@@ -83,7 +83,7 @@ class EngineResults():
         self.x_cols = x_cols
         self.y_col = y_col
 
-    def predict(self , x_values : list , dataframe : pd.DataFrame):
+    def predict(self , x_values : list ):
         if len(self.x_cols) != len(x_values):
             raise InternalEngineError("Did not provide all of the values. Must provide all values.")
         print("TODO: later verify that we have right types. Will be tricky for strings...")

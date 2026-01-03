@@ -212,7 +212,7 @@ class Plotter(QtW.QTabWidget):
         self.visual_plot = FigureCanvasQTAgg(self.worker.engine_results.visual_plot)
         self.accuracy_plot = FigureCanvasQTAgg(self.worker.engine_results.accuracy_plot)
         try:
-            self.prediction_tab = PredictionGUI(self.worker.engine_results , self.dataframe)
+            self.prediction_tab = PredictionGUI(self.worker.engine_results)
         except:
             self.prediction_tab = QtW.QWidget()
         self.addTab(self.visual_plot , "Visualization Plot")

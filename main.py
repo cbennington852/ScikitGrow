@@ -18,8 +18,9 @@ import pickle
 import traceback
 import time
 import pandas as pd
+from predictor_GUI import PredictionGUI
 
-
+windows = []
 
 class MainMenu(QMainWindow):
 
@@ -223,7 +224,7 @@ class MainWindow(QMainWindow):
 
     def open_button_pressed(self):
         file_path, _ = QtW.QFileDialog.getOpenFileName(
-                None, "Open Project",None ,"All Files (*.pkl *.csv *.xls);; Pickle Files (*.pkl);; CSV Files (*.csv);; Excel Files (*.xls) ;; "
+                None, "Open Project",None ,f"All Files (*.pkl *.csv *.xls *{PredictionGUI.model_save_extension});; Pickle Files (*.pkl);; CSV Files (*.csv);; Excel Files (*.xls);; Scikit Grow Pipeline File (*{PredictionGUI.model_save_extension});; "
             )
         if file_path:
             open_on_file_handle(file_path)
@@ -243,6 +244,7 @@ def filter_command_line_argument_return_dataframe(file_path) -> pd.DataFrame:
 
 
 def open_on_file_handle(file_handle):
+    print("Attempted open on file handle" , file_handle)
     if os.path.exists(file_handle):
         # parse command line argument
         if file_handle.endswith('.pkl'):
@@ -259,6 +261,27 @@ def open_on_file_handle(file_handle):
                         "Error opening Save file",            # Title bar text
                         f"{str(e)}" # Main message
                     )
+        # This is exported / saved models / pipelines
+        elif file_handle.endswith(PredictionGUI.model_save_extension):
+            try:
+                with open(file_handle, 'rb') as file:
+                    loaded_data = pickle.load(file)
+                    print("Opened and loaded pickle")
+                    model_pred = PredictionGUI(loaded_data , True)
+                    new_win = QMainWindow()
+                    new_win.setWindowIcon(QIcon(":images/Mini_Logo_Alantis_2_Box.svg"))
+                    new_win.setWindowTitle("Scikit Grow Pipeline File")
+                    new_win.setCentralWidget(model_pred)
+                    new_win.show()
+                    windows.append(new_win)
+                    print("new_win" , new_win)
+            except Exception as e:
+                    traceback.print_exc()
+                    QtW.QMessageBox.critical(
+                            None,                        # Parent: Use None if not within a QWidget class
+                            "Error opening saved model file",            # Title bar text
+                            f"{str(e)}" # Main message
+                        )
         else:
             try:
                 df = filter_command_line_argument_return_dataframe(file_handle)

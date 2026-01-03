@@ -5,15 +5,15 @@ from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QDrag
 import PyQt5.QtCore as QtCore 
 import pandas as pd
+import pickle
 from sklearn_engine import EngineResults , Pipeline
 
 
 class PredictionGUI(QtW.QScrollArea):
-    def __init__(self, engine_results : EngineResults, dataframe : pd.DataFrame,  **kwargs):
+    def __init__(self, engine_results : EngineResults, hide_export_features = False, **kwargs):
         super().__init__(**kwargs)
 
         self.engine_results = engine_results
-        self.dataframe = dataframe
         # Setup layout
         self.main = QtW.QWidget()
         self.my_layout = QtW.QVBoxLayout()
@@ -52,13 +52,44 @@ class PredictionGUI(QtW.QScrollArea):
             # NOTE : the backend for this will be handled by the 
         # 4. We could also try having it be on type.
         self.predict_button = QtW.QPushButton("Predict")
+        self.export_as_software_button = QtW.QPushButton("Export as software")
+        self.export_as_software_button.clicked.connect(self.export_as_software_button_clicked)
         self.predict_button.clicked.connect(self.run_all_predictions)
 
         # Assemble page
         self.my_layout.addWidget(x_cols_box)
         self.my_layout.addWidget(self.predict_button)
         self.my_layout.addWidget(pipeline_holder)
+        if hide_export_features == False:
+            self.my_layout.addWidget(self.export_as_software_button)
         self.setWidget(self.main)
+
+    model_save_extension = '.skgp'
+
+    def export_as_software_button_clicked(self):
+        
+        # 1. Open a file dialog
+        file_path, _ = QtW.QFileDialog.getSaveFileName(
+                None, "Save Project", "", f"Scikit Grow Pipeline File (*{PredictionGUI.model_save_extension});;"
+            )
+        try:
+            self.export_as_software(file_path)
+        except Exception as e:
+            QtW.QMessageBox.critical(
+                        None,                        # Parent: Use None if not within a QWidget class
+                        "Error Saving model file",            # Title bar text
+                        f"{str(e)}" # Main message
+                    )
+
+        
+
+    def export_as_software(self , file_name : str):
+        # 2. Save the Engine Results as a pickled file with special file extension.
+        if not file_name.endswith(PredictionGUI.model_save_extension):
+            file_name += PredictionGUI.model_save_extension
+
+        with open(file_name, 'wb') as f:
+            pickle.dump(self.engine_results, f)
 
     def run_all_predictions(self):
         # Get all of the x_values
@@ -67,7 +98,7 @@ class PredictionGUI(QtW.QScrollArea):
             for x_col in self.x_cols_ptr_lst:
                 x_values.append(str(x_col.text()))
 
-            res = self.engine_results.predict(x_values , self.dataframe)
+            res = self.engine_results.predict(x_values )
             for pipeline_ptr , value in res.items():
                 for gui_pipe in self.pipelines_groupbox_ptr:
                     if pipeline_ptr == gui_pipe.pipeline:
@@ -87,5 +118,5 @@ class PredictionGUIPipeline(QtW.QGroupBox):
         self.pipeline = pipeline
         self.my_layout = QtW.QVBoxLayout()
         self.setLayout(self.my_layout)
-        self.pred_value = QtW.QLabel("Exmaple prediction")
+        self.pred_value = QtW.QLabel("")
         self.my_layout.addWidget(self.pred_value)
