@@ -5,7 +5,7 @@ from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 import PyQt5.QtGui as PGui
 from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush, QIcon
-import PyQt5.QtCore as QCore 
+import PyQt5.QtCore as QtCore 
 from colors_and_appearance import AppAppearance
 from draggable_parameter import parameter_filter , BANNED_PARAMETERS
 import ast
@@ -70,7 +70,7 @@ class DraggableColumn(QPushButton):
         super(DraggableColumn, self).mousePressEvent(event)
 
     # Paint event options.
-    left_of_bevel_width = 20
+    left_of_bevel_width = 30
     bevel_depth = 10
     bevel_width = 20
     bevel_slant_width = 10
@@ -152,6 +152,7 @@ class Draggable(QPushButton):
         self.kwargs = kwargs
         self.name = name
         self.render_type = render_type
+        self.hovering = False
         self.hex_color = hex_color
         self.setFlat(True) 
         # calculate the minmum width from the text and then set it? 
@@ -189,15 +190,18 @@ class Draggable(QPushButton):
     bevel_depth = 10
     bevel_width = 20
     bevel_slant_width = 10
-    left_of_bevel_width  = 20
+    left_of_bevel_width  = 40
 
 
     def paintEvent(self, event):
-        if self.render_type == Draggable.POINTY:
-            painter = QPainter(self)
-            painter.setPen(QColor(self.hex_color))
-            painter.setBrush(QColor(self.hex_color))
+        painter = QPainter(self)
+        if self.hovering:
+            painter.setPen(QPen(QColor(AppAppearance.DRAGGABLE_HOVER_COLOR) , 3 , QtCore.Qt.SolidLine))
 
+        else:
+            painter.setPen(QColor(self.hex_color))
+        painter.setBrush(QColor(self.hex_color))
+        if self.render_type == Draggable.POINTY:
             # tunable parameters
             height_block = 40
             width_center_block = self.label_inferred_width + 10
@@ -219,10 +223,6 @@ class Draggable(QPushButton):
             painter.drawText(width_triangle + 5 , start_y_for_text, f"{self.name}")
 
         elif self.render_type == Draggable.BUBBLE:
-            painter = QPainter(self)
-            painter.setPen(QColor(self.hex_color))
-            painter.setBrush(QColor(self.hex_color))
-
             # tunable parameters
             height_block = 40
             width_center_block = self.label_inferred_width + 10
@@ -241,20 +241,28 @@ class Draggable(QPushButton):
 
             painter.setPen(QColor(Qt.white))
             start_y_for_text = int(self.size().height() / 2) + 5
-            painter.drawText(width_triangle + 5 , start_y_for_text, f"{self.name}")
+            painter.drawText(width_triangle + 15 , start_y_for_text, f"{self.name}")
+            
+            if self.hovering:
+                icon_side_size = 30
+                painter.drawPixmap(
+                    5, # x
+                    int((self.height()/2)-(icon_side_size/2)-5), # y
+                    icon_side_size, # width
+                    icon_side_size, # height
+                    QPixmap(":images/popup.png")
+                )
+
+
 
         elif self.render_type == Draggable.INTERLOCK_RIGHT:
 
             opt = QtW.QStyleOptionButton()
             self.initStyleOption(opt)
             rect = self.rect()
-            painter = QPainter(self)
             self.style().drawControl(QtW.QStyle.CE_PushButtonBevel, opt, painter, self)
             if opt.state & QtW.QStyle.State_Sunken:
                 rect.adjust(2,2,2,2)
-            
-            painter.setPen(QColor(AppAppearance.PREPROCESSOR_BORDER_COLOR))
-            painter.setBrush(QColor(self.hex_color))
 
             # Top level input Calculations
             starting_x = 0
@@ -304,9 +312,22 @@ class Draggable(QPushButton):
             painter.drawPolygon(block_with_bevel)
             painter.setPen(QColor(Qt.white))
             start_y_for_text = int(self.size().height() / 2) + 5
-            painter.drawText(15 , start_y_for_text, f"{self.name}")
+            painter.drawText(Draggable.left_of_bevel_width , start_y_for_text, f"{self.name}")
+
+            if self.hovering:
+                icon_side_size = 30
+                painter.drawPixmap(
+                    5, # x
+                    int((self.height()/2)-(icon_side_size/2)-5), # y
+                    icon_side_size, # width
+                    icon_side_size, # height
+                    QPixmap(":images/popup.png")
+                )
+            
         else:
             return super().paintEvent(event)
+        
+        # add a drop-down like arrow. 
             
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -317,6 +338,7 @@ class Draggable(QPushButton):
         if e.buttons() == Qt.LeftButton:
             drag = QDrag(self)
             mime = QMimeData()
+            self.hovering=False
             # Render this while dragging
             pixmap = QPixmap(self.size())
             # Tell the button to drag in the center.
@@ -327,6 +349,17 @@ class Draggable(QPushButton):
 
             drag.setMimeData(mime)
             drag.exec_(Qt.MoveAction)
+
+    def enterEvent(self, a0):
+        self.hovering = True
+        self.repaint()
+        return super().enterEvent(a0)
+    
+    def leaveEvent(self, a0):
+        self.hovering = False
+        self.repaint()
+        return super().leaveEvent(a0)
+    
 
     def copy_self(self):
         return Draggable(

@@ -32,8 +32,6 @@ Whereas a conference is a brisker 5 pages.
 # TODO LIST
 Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
 
-### 0. Update appearance of sklearn-draggable to look more clickable.
-
 ### 5. Update pre-processor to have visual space similar to the columns
 
 .... This Packaging should be done thought fbs ... https://www.pythonguis.com/tutorials/packaging-pyqt5-apps-fbs/
