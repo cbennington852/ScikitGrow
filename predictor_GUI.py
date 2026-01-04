@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetI
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag
+from PyQt5.QtGui import QDrag , QIcon
 import PyQt5.QtCore as QtCore 
 import pandas as pd
 import pickle
@@ -51,10 +51,31 @@ class PredictionGUI(QtW.QScrollArea):
         # 4. Add and connect a button to get each prediction.
             # NOTE : the backend for this will be handled by the 
         # 4. We could also try having it be on type.
-        self.predict_button = QtW.QPushButton("Predict")
-        self.export_as_software_button = QtW.QPushButton("Export as software")
-        self.export_as_software_button.clicked.connect(self.export_as_software_button_clicked)
+
+        self.predict_button = QPushButton("Predict")
         self.predict_button.clicked.connect(self.run_all_predictions)
+
+        self.export_as_software_button = QtW.QToolButton(self.main)
+        self.export_as_software_button.setIcon(QIcon(":images/export_icon.svg"))
+        self.export_as_software_button.setText("& Export")
+        self.export_as_software_button.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        self.export_as_software_button.setPopupMode(QtW.QToolButton.InstantPopup)
+        self.export_as_software_button.setMenu(QtW.QMenu(self.export_as_software_button))
+
+
+        export_as_software_action = QtW.QAction("Export as software" , self.main)
+        export_as_software_action.triggered.connect(lambda x : self.export_function_button_clicked(self.export_as_software , f"Scikit Grow Pipeline File (*{PredictionGUI.model_save_extension});;"))
+        self.export_as_software_button.menu().addAction(export_as_software_action)
+
+        export_as_pickle_action = QtW.QAction("Export as python pickle" , self.main)
+        export_as_pickle_action.triggered.connect(lambda x : self.export_function_button_clicked(self.export_as_pickle , "Pickle  (*.pickle);;"))
+        self.export_as_software_button.menu().addAction(export_as_pickle_action)
+
+
+        # self.predict_button = QtW.QPushButton("Predict")
+        # self.export_as_software_button = QtW.QPushButton("Export as software")
+        # self.export_as_software_button.clicked.connect(self.export_as_software_button_clicked)
+        # self.predict_button.clicked.connect(self.run_all_predictions)
 
         # Assemble page
         self.my_layout.addWidget(x_cols_box)
@@ -66,18 +87,29 @@ class PredictionGUI(QtW.QScrollArea):
 
     model_save_extension = '.skgp'
 
-    def export_as_software_button_clicked(self):
+    def export_as_pickle(self):
+        if not file_name.endswith('.pickle'):
+            file_name += '.pickle'
+
+        with open(file_name, 'wb') as f:
+            pickle.dump(self.engine_results, f)
+
+
+
+    def export_function_button_clicked(self , function , file_type_string):
         
         # 1. Open a file dialog
         file_path, _ = QtW.QFileDialog.getSaveFileName(
-                None, "Save Project", "", f"Scikit Grow Pipeline File (*{PredictionGUI.model_save_extension});;"
+                None, "Save Project", "",file_type_string 
             )
+        if not file_path:
+            return
         try:
-            self.export_as_software(file_path)
+            function(file_path)
         except Exception as e:
             QtW.QMessageBox.critical(
                         None,                        # Parent: Use None if not within a QWidget class
-                        "Error Saving model file",            # Title bar text
+                        "Error Saving file",            # Title bar text
                         f"{str(e)}" # Main message
                     )
 

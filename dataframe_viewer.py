@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 import PyQt5.QtWidgets as QtW
 
+
 class DataframeViewer(QtW.QTableView):
     def __init__(self, df, **kwargs):
         super().__init__(**kwargs)
@@ -24,6 +25,9 @@ class PandasModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         self._dataframe = dataframe
 
+    def flags(self, index):
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+
     def rowCount(self, parent=QModelIndex()) -> int:
         """ Override method from QAbstractTableModel
 
@@ -42,7 +46,24 @@ class PandasModel(QAbstractTableModel):
         if parent == QModelIndex():
             return len(self._dataframe.columns)
         return 0
+    
+    def setData(self, index, value, role):
+        """This allows us to edit the pandas dataframe
 
+        Return true, to say is was edited.
+        """
+        try:
+            if role == Qt.EditRole:
+                new_type = self._dataframe.iloc[index.row(),index.column()].dtype
+                print("New type" , new_type)
+                new_value = new_type.type(value)
+                self._dataframe.iloc[index.row(),index.column()] = new_value
+                return True
+        except Exception as e:
+            print(str(e))
+            return False
+        
+        
     def data(self, index: QModelIndex, role=Qt.ItemDataRole):
         """Override method from QAbstractTableModel
 

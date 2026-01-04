@@ -33,14 +33,6 @@ Whereas a conference is a brisker 5 pages.
 Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
 
 ### 0. Update appearance of sklearn-draggable to look more clickable.
-    - could also be interprected as having a popover style clickable button.
-    - https://stackoverflow.com/questions/9076332/qt-pyqt-how-do-i-create-a-drop-down-widget-such-as-a-qlabel-qtextbrowser-etc
-
-### 1. Saving trained pipeline models as python pickle.
-    - We could also have some sort of "method" to open saved pickles as software. 
-        - this could be a special file type, one that only contains the saved models, and can only be opened by this application.
-    - Also the ability to export chart plots. 
-    - Also export saved charts. 
 
 ### 5. Update pre-processor to have visual space similar to the columns
 
