@@ -5,7 +5,11 @@ from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QDrag , QIcon
 import PyQt5.QtCore as QtCore 
 import pandas as pd
+import matplotlib.pyplot as plt
 import pickle
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
+
 from sklearn_engine import EngineResults , Pipeline
 
 class DescriptorStatisticsGUI(QtW.QScrollArea):
@@ -23,20 +27,25 @@ class DescriptorStatisticsGUI(QtW.QScrollArea):
 
         for col in engine_results.x_cols:
             print("x_col"  , col)
+            try:
+                new_col = ColumnDescriptor(
+                    column_name=col , 
+                    dataframe=self.dataframe
+                    )
+                self.cols.append(new_col)
+                self.main_lay.addWidget(new_col)
+            except Exception as e:
+                print(str(e))
+        print("y_col" , self.engine_results.y_col)
+        try:
             new_col = ColumnDescriptor(
-                column_name=col , 
+                column_name=self.engine_results.y_col[0] ,
                 dataframe=self.dataframe
                 )
             self.cols.append(new_col)
             self.main_lay.addWidget(new_col)
-        print("y_col" , self.engine_results.y_col)
-        new_col = ColumnDescriptor(
-            column_name=self.engine_results.y_col[0] ,
-            dataframe=self.dataframe
-            )
-        self.cols.append(new_col)
-        self.main_lay.addWidget(new_col)
-
+        except Exception as e:
+            print(str(e))
 
         self.setWidget(self.main)
 
@@ -67,9 +76,9 @@ class ColumnDescriptor(QtW.QGroupBox):
 
 
     def render_left(self):
-        left = QtW.QWidget()
+        self.left = QtW.QWidget()
         main_lay = QtW.QFormLayout()
-        left.setLayout(main_lay)
+        self.left.setLayout(main_lay)
 
         def render_function_result( name , value):
             new_label = QtW.QLabel(str(name))
@@ -94,12 +103,19 @@ class ColumnDescriptor(QtW.QGroupBox):
         render_function_result("25th Quantile" , col.quantile(0.25))
 
 
-
-
-
-        self.main_layout.addWidget(left)
+        self.main_layout.addWidget(self.left)
 
 
     def render_right(self):
-        pass
+        col = self.dataframe[self.column_name]
+        fig, axs = plt.subplots(figsize=(4 ,4))
+        axs.hist(col)
+        axs.set_xlabel("Frequency")
+        axs.set_ylabel(self.column_name)
+
+        self.chart = FigureCanvasQTAgg(fig)
+        # get length of other one
+        height = self.left.height()
+        self.chart.setMaximumHeight(height)
+        self.main_layout.addWidget(self.chart)
         
