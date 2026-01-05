@@ -28,16 +28,22 @@ Whereas a conference is a brisker 5 pages.
 - interactive learning environments
     Fees : ~3,000$
 
+# For Real TODO list
+### 147. Consider moving the model training result values to their own section.
+    - This could be a groupbox, maybe below the chart? Maybe each model gets it's own groupbox.
+
+### 146. Improove main menu.
+
+### 147. Add basic data cleaning?
+
+## 148. See what encoders do, and make sure they are in right area.
+
 
 # TODO LIST
 Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
 ### 4. Making accuracy plot look nicer.
 
-# 145. Add a basic statistic section to tabs
-    - max
-    - min
-    - bar chart
-    - median and avg
+
 
 ### 5. Update pre-processor to have visual space similar to the columns
 

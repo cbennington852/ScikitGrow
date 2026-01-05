@@ -1,7 +1,6 @@
 import sys
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QAction
-from layout_colorwidget import Color
 from GUI_libary_and_pipeline_mother import PipelineMother , GUILibary
 from sklearn_libary import SubLibary 
 from dataframe_viewer import DataframeViewer
@@ -45,7 +44,7 @@ class MainMenu(QMainWindow):
         self.import_dataset_button = QtW.QPushButton("Import datasets")
         self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
         self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
-        self.example_datasets_button.clicked.connect(lambda : self.open_main_window_on_sns_dataset(pd.read_csv("example_datasets/test.csv")))
+        self.example_datasets_button.clicked.connect(lambda : self.open_main_window_on_sns_dataset(sns.load_dataset('iris')))
         self.my_layout.addWidget(self.title_image)
         self.my_layout.addWidget(self.example_datasets_button)
         self.my_layout.addWidget(self.import_dataset_button)

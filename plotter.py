@@ -19,7 +19,7 @@ import threading
 from GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
 import matplotlib.pyplot as plt
 from predictor_GUI import PredictionGUI
-from descriptor_statistics_GUI import DescriptorStatisticsGUI
+from descriptor_statistics_GUI import DescriptorStatisticsGUI , ColumnDescriptor
 
 plt.style.use("seaborn-v0_8-darkgrid")
 
@@ -208,15 +208,45 @@ class Plotter(QtW.QTabWidget):
                 f"{title}",            # Title bar text
                 f"{message}" # Main message
             )
-        
+
+    def resolve_accuracy(self , engine_results):
+        # scroller
+        scroller = QtW.QScrollArea()
+        # Main area
+        main_area = QtW.QWidget()
+        main_layout = QtW.QVBoxLayout()
+        main_area.setLayout(main_layout)
+        # The plot.
+        # The stats section
+        stats_box = QtW.QGroupBox("Relevant Statistics")
+        stats_layout = QtW.QVBoxLayout()
+        stats_box.setLayout(stats_layout)
+        for pipeline in engine_results.trained_models:
+            pipeline_group_box = QtW.QGroupBox()
+            pipeline_group_box.setTitle(f"{pipeline.name}")
+            pipeline_group_box_lay = QtW.QFormLayout()
+            pipeline_group_box.setLayout(pipeline_group_box_lay)
+            for stat_name , value in pipeline.model_results.relevant_statistical_results:
+                print(f"stat: {stat_name} , Val:{value}")
+                pipeline_group_box_lay.addRow(QtW.QLabel(stat_name) , QtW.QLabel(str(round(value , ColumnDescriptor.digit_rounding))))
+            stats_layout.addWidget(pipeline_group_box)
+
+        main_layout.addWidget(FigureCanvasQTAgg(engine_results.accuracy_plot))
+        main_layout.addWidget(stats_box)
+        scroller.setWidget(main_area)
+        return scroller
+
+
     
     @QtCore.pyqtSlot()
     def plotting_finished(self):
         for i in range(0 , self.count()):
             widget = self.widget(i)
             widget.deleteLater()
+        for model in self.worker.engine_results.trained_models:
+            print("Received Accuracy Parameters" , model.model_results.relevant_statistical_results)
         self.visual_plot = FigureCanvasQTAgg(self.worker.engine_results.visual_plot)
-        self.accuracy_plot = FigureCanvasQTAgg(self.worker.engine_results.accuracy_plot)
+        self.accuracy_plot = self.resolve_accuracy(self.worker.engine_results)
         try:
             self.prediction_tab = PredictionGUI(self.worker.engine_results)
         except Exception as e:

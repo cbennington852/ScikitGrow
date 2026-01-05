@@ -53,12 +53,13 @@ class DescriptorStatisticsGUI(QtW.QScrollArea):
 
 
 class ColumnDescriptor(QtW.QGroupBox):
+    digit_rounding = 5
+
     def __init__(self , dataframe : pd.DataFrame , column_name : str, **kwargs):
         super().__init__(**kwargs)
         self.setTitle(column_name)
         self.dataframe = dataframe
         self.column_name = column_name
-        self.digit_rounding = 5
 
         """
         Two sections L | R
@@ -82,7 +83,7 @@ class ColumnDescriptor(QtW.QGroupBox):
 
         def render_function_result( name , value):
             new_label = QtW.QLabel(str(name))
-            new_value = QtW.QLabel(str(round(value , self.digit_rounding)))
+            new_value = QtW.QLabel(str(round(value , ColumnDescriptor.digit_rounding)))
             main_lay.addRow(new_label , new_value)
 
         def add_space():
@@ -110,8 +111,8 @@ class ColumnDescriptor(QtW.QGroupBox):
         col = self.dataframe[self.column_name]
         fig, axs = plt.subplots(figsize=(4 ,4))
         axs.hist(col)
-        axs.set_xlabel("Frequency")
-        axs.set_ylabel(self.column_name)
+        axs.set_ylabel("Frequency")
+        axs.set_xlabel(f"{self.column_name} values")
 
         self.chart = FigureCanvasQTAgg(fig)
         # get length of other one

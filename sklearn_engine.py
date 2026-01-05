@@ -57,13 +57,22 @@ class Pipeline():
 
 
 
+# We should refactor. Each plot should be associated with each model. Similarly, relevant stats should alsos be with model.
+
 class ModelTrainingResults():
     """
     Small class to hold the results from training the model.
     """
-    def __init__(self , y_predictions , trained_model):
+    def __init__(self , 
+    y_predictions , 
+    trained_model,
+    relevant_statistical_results : list[(str , float)] # can also be an int
+    ):
         self.y_predictions = y_predictions
         self.trained_model = trained_model
+        self.relevant_statistical_results = relevant_statistical_results
+
+    
 
 class EngineResults():
     """
@@ -71,17 +80,19 @@ class EngineResults():
     """
     def __init__(
             self, 
-            visual_plot ,
-            accuracy_plot , 
+            visual_plot : list[plt.Figure],
+            accuracy_plot : list[plt.Figure], 
             trained_models : list[Pipeline] , 
             x_cols : list[str] , 
-            y_col : str
+            y_col : str,
+            
             ):
         self.visual_plot = visual_plot
         self.accuracy_plot = accuracy_plot
         self.trained_models = trained_models
         self.x_cols = x_cols
         self.y_col = y_col
+
 
     def predict(self , x_values : list ):
         if len(self.x_cols) != len(x_values):
@@ -308,24 +319,49 @@ class SklearnEngine():
         """
         results = {}
         def train_single_model(curr : Pipeline):
-                curr.sklearn_pipeline.fit(x , y)
-                # Apply the user specified validator
-                if (curr.validator is not None):
-                    y_preds = SklearnEngine.k_fold_general_threads(
-                        model=curr_pipeline,
-                        kf=curr.validator,
-                        X=x,
-                        y=y
-                    )
-                else:
-                    y_preds = curr.sklearn_pipeline.predict(x)
-                results[curr] = (
-                    ModelTrainingResults(
-                        y_predictions=y_preds,
-                        trained_model=curr.sklearn_pipeline
-                    )
+            statistics_list = []
+            curr.sklearn_pipeline.fit(x , y)
+            # Apply the user specified validator and preform predictions.
+            if (curr.validator is not None):
+                y_preds = SklearnEngine.k_fold_general_threads(
+                    model=curr_pipeline,
+                    kf=curr.validator,
+                    X=x,
+                    y=y
                 )
-            
+            else:
+                y_preds = curr.sklearn_pipeline.predict(x)
+
+            def try_statistic(name , function):
+                try:
+                    statistics_list.append((name, function(y, y_preds)))
+                except:
+                    pass
+
+
+            # Based on the current type, gather relevant statistics. 
+            if curr.supervised_learning_type == SklearnEngine.CLASSIFICATION:
+                pass
+                try_statistic("Average Precision" , sklearn.metrics.average_precision_score)
+                try_statistic("F1 score" , sklearn.metrics.f1_score)
+                try_statistic("Recall score" , sklearn.metrics.recall_score)
+                try_statistic("Accuracy" , sklearn.metrics.accuracy_score)
+            elif curr.supervised_learning_type == SklearnEngine.REGRESSION:
+                try_statistic("Mean Squared Error" , sklearn.metrics.mean_squared_error)
+                try_statistic("Explained Variance" , sklearn.metrics.explained_variance_score)
+                try_statistic("R\u00B2" , sklearn.metrics.r2_score)
+            else:
+                raise InternalEngineError("Neither classification or regression.")
+
+            # Return the results
+            results[curr] = (
+                ModelTrainingResults(
+                    y_predictions=y_preds,
+                    trained_model=curr.sklearn_pipeline,
+                    relevant_statistical_results=statistics_list
+                )
+            )
+        
                 
             
         threads = []
@@ -351,6 +387,9 @@ class SklearnEngine():
     # Plotter Filter
     # Classifier Plotter Filter
     # Regression Plotter Filter
+
+    # We could also have for each (Visual and accuracy) it can return multiple charts. 
+    # Maybe instead we have it return a list of axes, and then let the renderer figure out what to do. 
 
     def get_scatter_alpha_value(number_data_points , minimum_alpha_value=0.1 , factor=3000):
         """Calculates the alpha value based on the number of data points in a dataset
@@ -735,16 +774,7 @@ class SklearnEngine():
                     f"\n{curr_pipelines[i].name}"
                     f"\nPredicted vs. Actual Values"
                 )
-                rmse_str = f"RMSE : {sklearn.metrics.mean_squared_error(y, y_predictions):.2f}"
-                varience_str = f"Explained Variance : {sklearn.metrics.explained_variance_score(y, y_predictions):.2f}" 
-                r2_str = f"r2 : {sklearn.metrics.r2_score(y, y_predictions):.2f}"
-                props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-                axs[i].text(0.05, 0.95, rmse_str, transform=axs[i].transAxes, fontsize=14,
-                    verticalalignment='top', bbox=props)
-                axs[i].text(0.05, 0.85, varience_str, transform=axs[i].transAxes, fontsize=14,
-                    verticalalignment='top', bbox=props)
-                axs[i].text(0.05, 0.75, r2_str, transform=axs[i].transAxes, fontsize=14,
-                    verticalalignment='top', bbox=props)
+                
                 axs[i].set_title(textstr)
             return fig
     

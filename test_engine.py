@@ -141,8 +141,26 @@ def test_predictions():
             )
         ]
     )
-    res_value = res.predict([5.0] , dataframe)
+    res_value = res.predict([5.0])
     print(res_value[res.trained_models[0]])
     assert round(res_value[res.trained_models[0]] , 3) == round(38.422 , 3)
 
     
+
+def test_metrics():
+    res : EngineResults = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+        main_dataframe=dataframe,
+        pipeline_x_values=['Example Chemical 2'  ],
+        pipeline_y_value=['Example Chemical 1'],
+        curr_pipelines=[
+            Pipeline(
+                sklearn_pipeline=linear_pipe,
+                validator=None
+            ),
+            Pipeline(
+                sklearn_pipeline=tree_pipe_1,
+                validator=None
+            )
+        ]
+    )
+    assert len(res.trained_models[0].model_results.relevant_statistical_results) != 0
