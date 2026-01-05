@@ -32,21 +32,23 @@ classifier_2 =  sklearn.pipeline.Pipeline([
     ))
 ])
 
-# res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
-#     main_dataframe=dataframe,
-#     pipeline_x_values=['Example Chemical 2'  ],
-#     pipeline_y_value=['Example Chemical 1'],
-#     curr_pipelines=[
-#         Pipeline(
-#             sklearn_pipeline=linear_pipe,
-#             validator=None
-#         ),
-#         Pipeline(
-#             sklearn_pipeline=tree_pipe_1,
-#             validator=None
-#         )
-#     ]
-# )
+res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+    main_dataframe=dataframe,
+    pipeline_x_values=['Example Chemical 2'  ],
+    pipeline_y_value=['Example Chemical 1'],
+    curr_pipelines=[
+        Pipeline(
+            sklearn_pipeline=linear_pipe,
+            validator=None
+        ),
+        Pipeline(
+            sklearn_pipeline=tree_pipe_1,
+            validator=None
+        )
+    ]
+)
+
+plt.show()
 
 # res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
 #     main_dataframe=dataframe_classifier,
@@ -64,16 +66,16 @@ classifier_2 =  sklearn.pipeline.Pipeline([
 #     ]
 # )
 
-res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
-    main_dataframe=dataframe_classifier,
-    pipeline_x_values=['petal_width' , 'sepal_length' ],
-    pipeline_y_value=['species'],
-    curr_pipelines=[
+# res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+#     main_dataframe=dataframe_classifier,
+#     pipeline_x_values=['petal_width' , 'sepal_length' ],
+#     pipeline_y_value=['species'],
+#     curr_pipelines=[
         
-    ]
-)
+#     ]
+# )
 
-plt.show()
+# plt.show()
 
 
 # Regression 2d

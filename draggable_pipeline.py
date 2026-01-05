@@ -270,42 +270,44 @@ class PipelineSection(QtW.QGroupBox):
             space_needed_for_mouth = max(self.get_num_models() * DraggableColumn.block_height , DraggableColumn.block_height)
 
             second_bevel_x_offset = 40 + space_in_between_two_bevels
+            test_offset = 10
             # where to start the bevel from the left. 
             holder_block = QPolygon([
                     QPoint( 0 , 0),             # Left Top corner
                     QPoint(width , 0),          # Right Top corner
                     QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar),
 
-                    QPoint(second_bevel_x_offset + ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
+                    QPoint(test_offset+ second_bevel_x_offset + ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
                     # Bottom right of bevel
                     QPoint(
-                        second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
                         ),
                     # Bottom left of bevel
                     QPoint(
-                        second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
                         ),
                     QPoint(
-                        second_bevel_x_offset + ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar 
                         ),
 
                     # right top of mouth
-                    QPoint(ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
+                    QPoint(
+                        test_offset+ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
                     # Bottom right of bevel
                     QPoint(
-                        ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
                         ),
                     # Bottom left of bevel
                     QPoint(
-                        ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
                         ),
                     QPoint(
-                        ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar 
                         ),
 
@@ -315,38 +317,38 @@ class PipelineSection(QtW.QGroupBox):
                     QPoint(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
 
                     QPoint(
-                        ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
                         ),
                     QPoint(
-                        ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
                         ),
                     QPoint(
-                        ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
                         ),
                     QPoint(
-                        ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
                         ), # right start bevel.
 
 
                     QPoint(
-                        second_bevel_x_offset + ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
                         ),
                     QPoint(
-                        second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
                         ),
                     # Bottom right of bevel
                     QPoint(
-                        second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
+                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
                         ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
                         ),
                     # Bottom left of bevel
-                    QPoint(second_bevel_x_offset + ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
+                    QPoint(test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
                            ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth), # right start bevel.
                     
                     

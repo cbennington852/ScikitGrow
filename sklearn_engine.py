@@ -728,16 +728,23 @@ class SklearnEngine():
                 axs[i].scatter(y, y_predictions, alpha=SklearnEngine.get_scatter_alpha_value(len(x)), edgecolor='k', label='Predicted Points')
                 axs[i].plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2, label='Prefect Prediction')
                 axs[i].set_xlabel("Actual Values")
-                axs[i].set_ylabel(f"")
+                axs[i].set_ylabel("Predicted values")
                 axs[i].legend()
                 axs[i].grid(True)
                 textstr = (
                     f"\n{curr_pipelines[i].name}"
                     f"\nPredicted vs. Actual Values"
-                    f"\nRMSE                : {sklearn.metrics.mean_squared_error(y, y_predictions):.2f}" + 
-                    f"\nExplained Variance  : {sklearn.metrics.explained_variance_score(y, y_predictions):.2f}" + 
-                    f"\nr2                  : {sklearn.metrics.r2_score(y, y_predictions):.2f}"
                 )
+                rmse_str = f"RMSE : {sklearn.metrics.mean_squared_error(y, y_predictions):.2f}"
+                varience_str = f"Explained Variance : {sklearn.metrics.explained_variance_score(y, y_predictions):.2f}" 
+                r2_str = f"r2 : {sklearn.metrics.r2_score(y, y_predictions):.2f}"
+                props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+                axs[i].text(0.05, 0.95, rmse_str, transform=axs[i].transAxes, fontsize=14,
+                    verticalalignment='top', bbox=props)
+                axs[i].text(0.05, 0.85, varience_str, transform=axs[i].transAxes, fontsize=14,
+                    verticalalignment='top', bbox=props)
+                axs[i].text(0.05, 0.75, r2_str, transform=axs[i].transAxes, fontsize=14,
+                    verticalalignment='top', bbox=props)
                 axs[i].set_title(textstr)
             return fig
     

@@ -19,6 +19,7 @@ class DraggableColumn(QPushButton):
         self.kwargs = kwargs
         self.name = name
         self.setFlat(True)
+        self.hovering = False
         self.setStyleSheet("""  
             QPushButton {
                 background-color: rgba(0, 0, 0, 0);
@@ -35,7 +36,6 @@ class DraggableColumn(QPushButton):
         temp_label = QtW.QLabel(name)
         temp_label.adjustSize()
         required_text_width = temp_label.width()
-        print(temp_label.width())
         self.label_inferred_width = temp_label.width()
         self.setMaximumWidth(required_text_width + 60)
         self.setFixedHeight(DraggableColumn.BASE_HEIGHT)
@@ -78,6 +78,17 @@ class DraggableColumn(QPushButton):
     starting_x = 0
     starting_y = 0
 
+    def enterEvent(self, a0):
+        self.hovering = True
+        self.repaint()
+        return super().enterEvent(a0)
+    
+    def leaveEvent(self, a0):
+        self.hovering = False
+        self.repaint()
+        return super().leaveEvent(a0)
+    
+
 
     def paintEvent(self, event):
         opt = QtW.QStyleOptionButton()
@@ -93,8 +104,11 @@ class DraggableColumn(QPushButton):
             rect.adjust(2,2,2,2)
         
 
-        painter.setPen(QColor(AppAppearance.DRAGGABLE_COLOMN_BORDER_COLOR))
         painter.setBrush(QColor(AppAppearance.DRAGGABLE_COLUMN_COLOR))
+        if self.hovering:
+            painter.setPen(QPen(QColor(AppAppearance.DRAGGABLE_HOVER_COLOR) , 3 , QtCore.Qt.SolidLine))
+        else:
+            painter.setPen(QColor(AppAppearance.DRAGGABLE_COLOMN_BORDER_COLOR))
 
         # Top level input Calculations
         right_of_bevel_width  = self.label_inferred_width - DraggableColumn.left_of_bevel_width + 10
@@ -159,9 +173,8 @@ class Draggable(QPushButton):
         temp_label = QtW.QLabel(name)
         temp_label.adjustSize()
         required_text_width = temp_label.width()
-        print(temp_label.width())
         self.label_inferred_width = temp_label.width()
-        self.setMaximumWidth(required_text_width + 60)
+        self.setMaximumWidth(required_text_width + 80)
         self.setFixedHeight(Draggable.BASE_HEIGHT)
         self.data = DraggableData(
             sklearn_function=sklearn_function,
@@ -204,7 +217,7 @@ class Draggable(QPushButton):
         if self.render_type == Draggable.POINTY:
             # tunable parameters
             height_block = 40
-            width_center_block = self.label_inferred_width + 10
+            width_center_block = self.label_inferred_width + 35
             width_triangle = Draggable.POINTY_TRIANGLE_WIDTH
             triangle_mid_y_axis = int(height_block / 2)
             
@@ -220,7 +233,18 @@ class Draggable(QPushButton):
             painter.drawPolygon(pointy_block)
             painter.setPen(QColor(Qt.white))
             start_y_for_text = int(self.size().height() / 2) + 5
-            painter.drawText(width_triangle + 5 , start_y_for_text, f"{self.name}")
+
+            if self.hovering:
+                icon_side_size = 30
+                painter.drawPixmap(
+                    15, # x
+                    int((self.height()/2)-(icon_side_size/2)-5), # y
+                    icon_side_size, # width
+                    icon_side_size, # height
+                    QPixmap(":images/popup.png")
+                )
+
+            painter.drawText(width_triangle + 25 , start_y_for_text, f"{self.name}")
 
         elif self.render_type == Draggable.BUBBLE:
             # tunable parameters
@@ -267,7 +291,7 @@ class Draggable(QPushButton):
             # Top level input Calculations
             starting_x = 0
             starting_y = 0
-            right_of_bevel_width = max(self.label_inferred_width - Draggable.left_of_bevel_width + 5,120)
+            right_of_bevel_width = max(self.label_inferred_width - Draggable.left_of_bevel_width + 5,200)
             
             top_of_left_bevel_x = starting_x + Draggable.left_of_bevel_width 
             bottom_right_of_top_bevel_x = top_of_left_bevel_x + Draggable.bevel_slant_width + Draggable.bevel_width

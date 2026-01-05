@@ -31,6 +31,13 @@ Whereas a conference is a brisker 5 pages.
 
 # TODO LIST
 Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
+### 4. Making accuracy plot look nicer.
+
+# 145. Add a basic statistic section to tabs
+    - max
+    - min
+    - bar chart
+    - median and avg
 
 ### 5. Update pre-processor to have visual space similar to the columns
 

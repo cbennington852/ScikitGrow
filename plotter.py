@@ -8,6 +8,7 @@ import PyQt5.QtCore as QtCore
 import sys
 import time
 import matplotlib
+import traceback
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
@@ -18,6 +19,7 @@ import threading
 from GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
 import matplotlib.pyplot as plt
 from predictor_GUI import PredictionGUI
+from descriptor_statistics_GUI import DescriptorStatisticsGUI
 
 plt.style.use("seaborn-v0_8-darkgrid")
 
@@ -57,10 +59,12 @@ class Plotter(QtW.QTabWidget):
         self.accuracy_plot = FigureCanvasQTAgg(fig)
 
         self.prediction_tab = QWidget()
+        self.descriptive_statistics = QWidget()
         
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
         self.addTab(self.prediction_tab , "Manual Predictions")
+        self.addTab(self.prediction_tab , "Descriptive Statistics")
 
 
     def handle_thread_crashing(self):
@@ -72,8 +76,10 @@ class Plotter(QtW.QTabWidget):
     def do_regardless(self):
         self.ptr_to_train_models_button.setEnabled(True)
         self.spinner_done = True
-        self.spinner_thread.join()
-        self.worker.ptr_to_training_button.setEnabled(True)
+        if hasattr(self , 'spinner_thread'):
+            self.spinner_thread.join()
+        if hasattr(self , 'worker'):
+            self.worker.ptr_to_training_button.setEnabled(True)
 
         
         
@@ -213,11 +219,20 @@ class Plotter(QtW.QTabWidget):
         self.accuracy_plot = FigureCanvasQTAgg(self.worker.engine_results.accuracy_plot)
         try:
             self.prediction_tab = PredictionGUI(self.worker.engine_results)
-        except:
+        except Exception as e:
+            print("ERROR PREDICTION GUI" , str(e))
             self.prediction_tab = QtW.QWidget()
+        try: 
+            self.descriptive_statistics = DescriptorStatisticsGUI(self.worker.engine_results , self.dataframe)
+            print("HIIIII" , self.descriptive_statistics)
+        except Exception as e:
+            traceback.print_exception(e)
+            print("ERROR DESCRIPTOR STATS" , str(e))
+            self.descriptive_statistics = QtW.QWidget()
         self.addTab(self.visual_plot , "Visualization Plot")
         self.addTab(self.accuracy_plot , "Accuracy")
         self.addTab(self.prediction_tab , "Manual Predictions")
+        self.addTab(self.descriptive_statistics , "Descriptive Statistics")
 
         self.visual_plot.show()
         self.do_regardless()
