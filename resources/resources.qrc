@@ -1,5 +1,10 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
+    <qresource prefix="/example_datasets">
+        <file>random_data.csv</file>
+        <file>random_data.csv</file>
+
+    </qresource>
     <qresource prefix="/images">
         <file>base_scratch_block_pink.svg</file>
         <file>base_scratch_block_pink_arrow.svg</file>
