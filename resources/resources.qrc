@@ -1,9 +1,12 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource prefix="/example_datasets">
+        <file>car_crashes.csv</file>
+        <file>diamonds.csv</file>
+        <file>iris.csv</file>
         <file>random_data.csv</file>
-        <file>random_data.csv</file>
-
+        <file>tips.csv</file>
+        <file>wine.csv</file>
     </qresource>
     <qresource prefix="/images">
         <file>base_scratch_block_pink.svg</file>

@@ -25,6 +25,30 @@ class MainMenu(QMainWindow):
 
     curr_window = None
 
+    def render_initial_screen(self):
+        # Set up basic ptrs
+        my_layout = QtW.QVBoxLayout()
+        main_box = QtW.QWidget()
+        main_box.setLayout(my_layout)
+
+        # add the example datasets button
+        self.example_datasets_button = QtW.QPushButton("Example datasets")
+        self.import_dataset_button = QtW.QPushButton("Import datasets")
+        self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
+        self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
+        self.example_datasets_button.clicked.connect(lambda : self.slides.setCurrentIndex(1))
+        my_layout.addWidget(self.title_image)
+        my_layout.addWidget(self.example_datasets_button)
+        my_layout.addWidget(self.import_dataset_button)
+
+    def render_example_datasets_screen(self):
+        main_box = QtW.QWidget() # self.open_main_window_on_sns_dataset(sns.load_dataset('iris')
+        main_layout = QtW.QGridLayout()
+        main_box.setLayout(main_layout)
+
+        # Render all of the 
+        
+
     def __init__(self ):
         super().__init__()
         MainMenu.curr_window = self
@@ -33,22 +57,15 @@ class MainMenu(QMainWindow):
         self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
-        # Set up basic ptrs
-        self.my_layout = QtW.QVBoxLayout()
-        self.main = QtW.QWidget()
-        self.main.setLayout(self.my_layout)
-        self.setCentralWidget(self.main)
+        self.slides = QtW.QStackedWidget()
 
-        # add the example datasets button
-        self.example_datasets_button = QtW.QPushButton("Example datasets")
-        self.import_dataset_button = QtW.QPushButton("Import datasets")
-        self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
-        self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
-        self.example_datasets_button.clicked.connect(lambda : self.open_main_window_on_sns_dataset(sns.load_dataset('iris')))
-        self.my_layout.addWidget(self.title_image)
-        self.my_layout.addWidget(self.example_datasets_button)
-        self.my_layout.addWidget(self.import_dataset_button)
+        # Causes Seg fault
+        #self.slides.addWidget(self.render_initial_screen()) # Inital 0
+        #self.slides.addWidget(self.render_example_datasets_screen()) # Datasets 1
 
+        self.setCentralWidget(self.slides)
+
+      
 
     def open_main_window_on_sns_dataset(self, dataframe):
         splash = QtW.QSplashScreen(pixmap)

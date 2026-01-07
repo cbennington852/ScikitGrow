@@ -273,6 +273,10 @@ class SklearnEngine():
         for y_col in pipeline_y_value:
             if y_col not in lst_cols:
                 raise ValueError(f"Error: {y_col} is not in the dataset")
+            
+    def train_with_validator(model , kf, X , y):
+        y_pred = sklearn.model_selection.cross_val_predict(model, X, y, cv=kf)
+        return y_pred
 
     def k_fold_general_threads(model , kf , X , y):
         def train_indexes(train_index , test_index):
@@ -323,8 +327,15 @@ class SklearnEngine():
             curr.sklearn_pipeline.fit(x , y)
             # Apply the user specified validator and preform predictions.
             if (curr.validator is not None):
-                y_preds = SklearnEngine.k_fold_general_threads(
-                    model=curr_pipeline,
+                # y_preds = SklearnEngine.k_fold_general_threads(
+                #     model=curr_pipeline,
+                #     kf=curr.validator,
+                #     X=x,
+                #     y=y
+                # )
+                print("type " , type(curr.sklearn_pipeline))
+                y_preds = SklearnEngine.train_with_validator(
+                    model=curr.sklearn_pipeline,
                     kf=curr.validator,
                     X=x,
                     y=y
