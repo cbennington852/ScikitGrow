@@ -18,7 +18,6 @@ import traceback
 import time
 import qdarktheme
 import pandas as pd
-from example_dataset_button import ExampleDatasetButton
 from predictor_GUI import PredictionGUI
 
 windows = []
@@ -44,31 +43,34 @@ class MainMenu(QMainWindow):
 
         return main_box
 
+
     def render_example_datasets_screen(self):
-        main_box = QtW.QWidget() # self.open_main_window_on_sns_dataset(sns.load_dataset('iris')
+         # self.open_main_window_on_dataset(sns.load_dataset('iris')
         self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
-        main_layout = QtW.QGridLayout()
-        main_box.setLayout(main_layout)
+
+
+        example_datasets = [
+            "car_crashes",
+            "diamonds",
+            "iris",
+            "random_data",
+            "tips",
+            "wine",
+        ]
+
+        def open_on_dataset(dataset_name):
+            file = QFile(f":/example_datasets/{example_datasets[dataset_name.column()]}.csv")
+            if file.open(QIODevice.ReadOnly):
+                df = pd.read_csv(file)
+                curr = MainMenu.open_main_window_on_dataset(df)
+                curr.show()
+                windows.append(curr)
 
         # Render all of the example datasets.
-        main_layout.addWidget(
-            ExampleDatasetButton("Iris Measurements" , "A popular introductory dataset based on the measurements of flowers." , QPixmap(":images/Mini_Logo_Alantis_Learn_book.svg")),
-            0,
-            0
-        )
-        main_layout.addWidget(
-            ExampleDatasetButton("Tips" , "A dataset based on restaurant receipts, amount paid, and tips. " , QPixmap(":images/Mini_Logo_Alantis_Learn_book.svg")),
-            1,
-            0
-        )
-        main_layout.addWidget(
-            ExampleDatasetButton("Diamonds" , "A dataset that contains diamond measurements, and the price of those diamonds. " , QPixmap(":images/Mini_Logo_Alantis_Learn_book.svg")),
-            0,
-            1
-        )
-
-
-        return main_box
+        list_widget = QListWidget()
+        list_widget.addItems(example_datasets)
+        list_widget.clicked.connect(open_on_dataset)
+        return list_widget
 
     def __init__(self ):
         super().__init__()
@@ -89,7 +91,7 @@ class MainMenu(QMainWindow):
 
       
 
-    def open_main_window_on_sns_dataset(dataframe):
+    def open_main_window_on_dataset(dataframe):
         splash = QtW.QSplashScreen(pixmap)
         splash.show()
         my_window = MainWindow(dataframe) # Create an instance of our custom window
@@ -322,7 +324,7 @@ def open_on_file_handle(file_handle):
             try:
                 df = filter_command_line_argument_return_dataframe(file_handle)
                 try:
-                    main_window = MainMenu.open_main_window_on_sns_dataset(df)
+                    main_window = MainMenu.open_main_window_on_dataset(df)
                     main_window.show()
                     windows.append(main_window)
                 except Exception as e:
