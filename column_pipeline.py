@@ -14,6 +14,7 @@ class ColumnsSubmodule(QtW.QWidget):
         self.layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
         self.setMinimumHeight(250)
+        
         self.lst_cols = lst_cols
         for col in self.lst_cols:
             new_widget = DraggableColumn(col)
@@ -47,9 +48,14 @@ class ColumnsSection(QtW.QGroupBox):
         self.resize(200 , 90)
         self.hovering = False
         self.setAcceptDrops(True)
+        self.setContentsMargins(
+            10 , # left
+            60, # top
+            0, # right
+            0, # bottom
+        )
         self.my_layout = QVBoxLayout()
         self.setStyleSheet("")
-        self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side - 2 , 0 , 0 , 0)
         self.my_layout.setSpacing(0);  
         self.setLayout(self.my_layout)
         self.setTitle(self.my_title)
@@ -88,6 +94,10 @@ class ColumnsSection(QtW.QGroupBox):
     def get_cols_as_string_list(self) -> list[str]:
         return [drag_col.name for drag_col in self.get_cols()]
     
+    # re-doing the layout events
+    def resizeEvent(self, a0):
+        return super().resizeEvent(a0)
+    
     def get_cols(self) -> list[DraggableColumn]:
         res_cols = []
         for child in self.findChildren(QtW.QWidget):
@@ -122,7 +132,7 @@ class ColumnsSection(QtW.QGroupBox):
         num_cols = self.get_num_cols()
         if self.max_num_cols != 1:
             # add a background space as well
-            painter.drawRect( 0 , 0 , width , num_cols * DraggableColumn.block_height + ColumnsSection.height_between_top_mouth_and_top_bar)
+            painter.drawRect( 0 , 0 , width , num_cols * DraggableColumn.block_height )
             space_needed_for_mouth = max((num_cols + 1) * DraggableColumn.block_height, DraggableColumn.block_height )
         else:
             space_needed_for_mouth = max(num_cols * DraggableColumn.block_height, DraggableColumn.block_height )
@@ -193,9 +203,13 @@ class ColumnsSection(QtW.QGroupBox):
             if isinstance(self.my_layout.itemAt(i) , QtW.QWidgetItem):
                 temp_widget = self.my_layout.itemAt(i).widget()
                 lst_of_children.append(temp_widget)
-        # 5.2 If more than one, move the bottoms inside of the ones on top of it.
-        if len(lst_of_children) > 1:
+        # 5.2 Position the first child correctly. 
+        if len(lst_of_children) >= 1:
+
             first_child = lst_of_children[0]
+            first_child.move(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar)
+
+        # 5.3 If more than one, move the bottoms inside of the ones on top of it.
             for i in range(1 , len(lst_of_children)):
                 tmp  = lst_of_children[i]
                 new_x = first_child.geometry().topLeft().x()

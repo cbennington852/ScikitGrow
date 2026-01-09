@@ -189,6 +189,7 @@ class GUILibary(QtW.QTabWidget):
 class PipelineMDIArea(QtW.QMdiArea):
     def __init__(self, parent):
         super().__init__(parent)
+        self.setBackground(QColor(AppAppearance.MDI_AREA_COLOR))
         self.setAcceptDrops(True)
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
         my_layout = QtW.QVBoxLayout()

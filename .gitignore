@@ -1,2 +1,7 @@
 /myvenv
 myenv
+python_gui_scikit/myenv
+/myenv
+/__pycache__
+/.pytest_cache
+/python_gui_scikit/myenv

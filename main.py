@@ -16,6 +16,7 @@ import os
 import pickle
 import traceback
 import time
+import qdarktheme
 import pandas as pd
 from example_dataset_button import ExampleDatasetButton
 from predictor_GUI import PredictionGUI
@@ -88,13 +89,12 @@ class MainMenu(QMainWindow):
 
       
 
-    def open_main_window_on_sns_dataset(self, dataframe):
+    def open_main_window_on_sns_dataset(dataframe):
         splash = QtW.QSplashScreen(pixmap)
         splash.show()
-        self.my_window = MainWindow(dataframe) # Create an instance of our custom window
-        self.my_window.show()
-        self.hide()
-        splash.finish(self.my_window)
+        my_window = MainWindow(dataframe) # Create an instance of our custom window
+        splash.finish(my_window)
+        return my_window
 
     def import_datasets_clicked(self):
         fileName, _ = QtW.QFileDialog.getOpenFileName(self, "Open File", "",
@@ -287,10 +287,9 @@ def open_on_file_handle(file_handle):
         if file_handle.endswith('.pkl'):
             try:
                 # Make a splash 
-                splash_screen = MainMenu()
-                splash_screen.main_window = MainWindow.open_on_saved_file(file_handle)
-                splash_screen.main_window.show()
-                splash_screen.hide()
+                main_window = MainWindow.open_on_saved_file(file_handle)
+                main_window.show()
+                windows.append(main_window)
             except Exception as e:
                 traceback.print_exc()
                 QtW.QMessageBox.critical(
@@ -322,9 +321,10 @@ def open_on_file_handle(file_handle):
         else:
             try:
                 df = filter_command_line_argument_return_dataframe(file_handle)
-                main_menu = MainMenu()
                 try:
-                    main_menu.open_main_window_on_sns_dataset(df)
+                    main_window = MainMenu.open_main_window_on_sns_dataset(df)
+                    main_window.show()
+                    windows.append(main_window)
                 except Exception as e:
                     QtW.QMessageBox.critical(
                         None,                        # Parent: Use None if not within a QWidget class
@@ -347,9 +347,14 @@ def open_on_file_handle(file_handle):
 
 
 if __name__ == "__main__":
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
     app = QApplication(sys.argv) # Create the application instance
     pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
     # Below handles the opening of a main menu bar, 
+    stylesheet = qdarktheme.load_stylesheet(theme='light') 
+    app.setStyleSheet(stylesheet)
     if len(sys.argv) > 1:
         open_on_file_handle(sys.argv[1])
     else:

@@ -1,0 +1,1 @@
+cloc . --exclude-dir=myenv --not-match-f="image_resources.py" --exclude-lang=CSV

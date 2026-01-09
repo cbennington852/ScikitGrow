@@ -63,7 +63,7 @@ class PipelineSection(QtW.QGroupBox):
         self.setAcceptDrops(True)
         self.setMinimumHeight(PipelineSection.BASE_MINIMUM_HEIGHT)
         self.my_layout = QVBoxLayout()
-        self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side - 2 , 0 , 0 , 0)
+        self.my_layout.setContentsMargins(ColumnsSection.width_from_start_mouth_to_left_side - 2 , 15 , 0 , 0)
         self.my_layout.setSpacing(0);  
         self.model_hovering = False
         self.setLayout(self.my_layout)

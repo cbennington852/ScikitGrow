@@ -29,8 +29,8 @@ Whereas a conference is a brisker 5 pages.
     Fees : ~3,000$
 
 # For Real TODO list
-### 147. Consider moving the model training result values to their own section.
-    - This could be a groupbox, maybe below the chart? Maybe each model gets it's own groupbox.
+
+### 149. Make the layout management manual
 
 ### 146. Improve main menu.
 
