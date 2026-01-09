@@ -32,7 +32,7 @@ Whereas a conference is a brisker 5 pages.
 ### 147. Consider moving the model training result values to their own section.
     - This could be a groupbox, maybe below the chart? Maybe each model gets it's own groupbox.
 
-### 146. Improove main menu.
+### 146. Improve main menu.
 
 ### 147. Add basic data cleaning?
 

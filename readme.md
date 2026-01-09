@@ -1,4 +1,4 @@
-![blocks v python](images/Full_logo_SciKit_Grow.svg "Optional title text")
+![blocks v python](resources/Full_logo_SciKit_Grow.svg "Optional title text")
 
 ## Background & Inspiration
 

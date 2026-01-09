@@ -17,13 +17,13 @@ import pickle
 import traceback
 import time
 import pandas as pd
+from example_dataset_button import ExampleDatasetButton
 from predictor_GUI import PredictionGUI
 
 windows = []
 
 class MainMenu(QMainWindow):
 
-    curr_window = None
 
     def render_initial_screen(self):
         # Set up basic ptrs
@@ -36,34 +36,55 @@ class MainMenu(QMainWindow):
         self.import_dataset_button = QtW.QPushButton("Import datasets")
         self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
         self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
-        self.example_datasets_button.clicked.connect(lambda : self.slides.setCurrentIndex(1))
+        self.example_datasets_button.clicked.connect(lambda : self.slides_layout.setCurrentIndex(1))
         my_layout.addWidget(self.title_image)
         my_layout.addWidget(self.example_datasets_button)
         my_layout.addWidget(self.import_dataset_button)
 
+        return main_box
+
     def render_example_datasets_screen(self):
         main_box = QtW.QWidget() # self.open_main_window_on_sns_dataset(sns.load_dataset('iris')
+        self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
         main_layout = QtW.QGridLayout()
         main_box.setLayout(main_layout)
 
-        # Render all of the 
-        
+        # Render all of the example datasets.
+        main_layout.addWidget(
+            ExampleDatasetButton("Iris Measurements" , "A popular introductory dataset based on the measurements of flowers." , QPixmap(":images/Mini_Logo_Alantis_Learn_book.svg")),
+            0,
+            0
+        )
+        main_layout.addWidget(
+            ExampleDatasetButton("Tips" , "A dataset based on restaurant receipts, amount paid, and tips. " , QPixmap(":images/Mini_Logo_Alantis_Learn_book.svg")),
+            1,
+            0
+        )
+        main_layout.addWidget(
+            ExampleDatasetButton("Diamonds" , "A dataset that contains diamond measurements, and the price of those diamonds. " , QPixmap(":images/Mini_Logo_Alantis_Learn_book.svg")),
+            0,
+            1
+        )
+
+
+        return main_box
 
     def __init__(self ):
         super().__init__()
-        MainMenu.curr_window = self
 
         self.setWindowTitle("SciKit Grow Main Menu")
         self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
-        self.slides = QtW.QStackedWidget()
+        self.slides = QtW.QWidget()
+        self.slides_layout = QtW.QStackedLayout()
 
-        # Causes Seg fault
-        #self.slides.addWidget(self.render_initial_screen()) # Inital 0
-        #self.slides.addWidget(self.render_example_datasets_screen()) # Datasets 1
+        self.slides_layout.addWidget(self.render_initial_screen()) # Inital 0
+        self.slides_layout.addWidget(self.render_example_datasets_screen()) # Datasets 1
 
         self.setCentralWidget(self.slides)
+
+        self.hide()
 
       
 
@@ -332,6 +353,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         open_on_file_handle(sys.argv[1])
     else:
+        print("Here")
         main_menu = MainMenu()
-        main_menu.show()
+        #main_menu.show()
     sys.exit(app.exec_()) # Start the application's event loop
