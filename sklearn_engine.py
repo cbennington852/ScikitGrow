@@ -10,6 +10,11 @@ from abc import ABC , abstractmethod
 from matplotlib.colors import ListedColormap
 from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
+from aquarel import load_theme
+
+theme = load_theme("scientific")
+theme.apply()
+
 
 
 def is_regressor(x):
@@ -239,7 +244,6 @@ class SklearnEngine():
             color_cycle = SklearnEngine.get_color_map()
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            cmap = SklearnEngine.get_clf_color_map()
             ax.scatter(x.iloc[:, 0], x.iloc[:, 1], y, c=color_cycle[1], edgecolor='k')
             ax.set_xlabel(f"{pipeline_x_values[0]}")
             ax.set_ylabel(f"{pipeline_x_values[1]}")

@@ -471,6 +471,7 @@ class ParameterPopup(QtW.QDialog):
         new_parameters = []
         for parameter_name , q_line_edit in self.all_widgets:
             curr = None
+            print(f"Attemping save of {q_line_edit.text()}")
             try:
                 curr = (parameter_name , ast.literal_eval(q_line_edit.text()))
             except:

@@ -51,7 +51,8 @@ BANNED_PARAMETERS = {
     # Example: Verbose, which prints stuff out to the console, can be hidden from the user.
     'n_jobs',
     'verbose',
-    'warm_start'
+    'warm_start',
+    'dtype'
 }
 
 

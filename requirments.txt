@@ -5,3 +5,4 @@ seaborn
 pytest
 qtwidgets
 pyqtdarktheme
+aquarel

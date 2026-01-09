@@ -59,7 +59,7 @@ class MainMenu(QMainWindow):
         ]
 
         def open_on_dataset(dataset_name):
-            file = QFile(f":/example_datasets/{example_datasets[dataset_name.column()]}.csv")
+            file = QFile(f":/example_datasets/{example_datasets[dataset_name.row()]}.csv")
             if file.open(QIODevice.ReadOnly):
                 df = pd.read_csv(file)
                 curr = MainMenu.open_main_window_on_dataset(df)

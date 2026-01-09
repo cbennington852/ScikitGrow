@@ -34,16 +34,13 @@ Whereas a conference is a brisker 5 pages.
 
 ### 147. Add basic data cleaning?
 
-## 148. See what encoders do, and make sure they are in right area.
+### 148. See what encoders do, and make sure they are in right area. Ensure all pre-proccessors should be added.
+
+### 149. Make plotting options, or make it pretty. 
 
 
 # TODO LIST
 Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
-### 4. Making accuracy plot look nicer.
-
-
-
-### 5. Update pre-processor to have visual space similar to the columns
 
 .... This Packaging should be done thought fbs ... https://www.pythonguis.com/tutorials/packaging-pyqt5-apps-fbs/
 ### 6. Package for Windows.
