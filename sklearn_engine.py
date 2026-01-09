@@ -590,7 +590,7 @@ class SklearnEngine():
         #https://www.researchgate.net/figure/3-Dimensional-surface-plot-of-classification-accuracy-against-spread-and-pattern-numbers_fig1_273402360
         # shows how to do this.
 
-        def plot_4_plus(
+        def plot_3_plus(
                     main_dataframe ,
                     curr_pipeline , 
                     pipeline_x_values , 
@@ -641,17 +641,8 @@ class SklearnEngine():
                     x , 
                     y ,
                 )
-            elif len(x.columns) == 3:
-                visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_3d(
-                    main_dataframe ,
-                    curr_pipelines , 
-                    pipeline_x_values , 
-                    pipeline_y_value ,
-                    x , 
-                    y ,
-                )
             else:
-                visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_4_plus(
+                visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_3_plus(
                     main_dataframe ,
                     curr_pipelines , 
                     pipeline_x_values , 

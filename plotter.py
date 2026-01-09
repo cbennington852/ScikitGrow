@@ -75,7 +75,6 @@ class Plotter(QtW.QTabWidget):
 
     def do_regardless(self):
         self.ptr_to_train_models_button.setEnabled(True)
-        self.spinner_done = True
         if hasattr(self , 'spinner_thread'):
             self.spinner_thread.join()
         if hasattr(self , 'worker'):
@@ -153,26 +152,6 @@ class Plotter(QtW.QTabWidget):
             self.worker.finished.connect(self.worker_thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
             self.worker_thread.finished.connect(self.worker_thread.deleteLater)
-            self.spinner_done = False
-            def handle_spinner():
-                start_time = time.time()
-                progress = QtW.QProgressDialog("Training Model...", "Abort Training", 0, 100, self)
-                progress.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
-                progress.setWindowModality(Qt.WindowModality.WindowModal)
-                progress.setRange(0, 0) 
-                prog_window_open = False
-                while self.spinner_done == False:
-                    time.sleep(0.001)
-                    time_elapsed = time.time() - start_time
-                    print(f"Time elapsed ... {time_elapsed}")
-                    # Users found it annoything when small popup for a fast training, only show if takes longer than second
-                    if time_elapsed >= Plotter.TIME_DELAY_UNTIL_PROGRESS_WINDOW and prog_window_open == False:
-                        progress.show()
-                progress.deleteLater()
-                
-
-            self.spinner_thread = threading.Thread(target=handle_spinner)
-            self.spinner_thread.start()
             self.worker_thread.start()
 
             
@@ -296,7 +275,10 @@ class PlotterWorker(QtCore.QObject):
                 pipeline_x_values=self.x_cols,
                 pipeline_y_value=self.y_cols,
             )
-            self.finished.emit()
+            if QtCore.QThread.currentThread().isInterruptionRequested():
+                self.crashed.emit("Interrupted" ,"Interupted")
+            else:
+                self.finished.emit()
         except Exception as e:
             self.crashed.emit("Unknown error" , str(e))
         except sklearn_engine.InternalEngineError as e:        
