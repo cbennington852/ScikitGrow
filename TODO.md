@@ -30,8 +30,6 @@ Whereas a conference is a brisker 5 pages.
 
 # For Real TODO list
 
-### 149. Make the layout management manual
-
 ### 146. Improve main menu.
 
 ### 147. Add basic data cleaning?

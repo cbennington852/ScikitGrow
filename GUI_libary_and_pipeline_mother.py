@@ -219,6 +219,8 @@ class PipelineMother(QtW.QMainWindow):
         self.add_pipeline_button.setIcon(QIcon(":/images/add_pipeline.svg"))
         self.add_pipeline_button.clicked.connect(self.add_pipeline)
         toolbar.addWidget(self.add_pipeline_button)
+
+
         self.setCentralWidget(self.main_thing)
         self.addToolBar(toolbar)
 
@@ -280,13 +282,35 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
 
         self.setStyleSheet(f"background-color:{AppAppearance.PIPELINE_BACKGROUND_COLOR}")
 
+        
+        play_icon = self.style().standardIcon(QtW.QStyle.SP_MediaPlay)
+        # Set the icon on the button
         self.train_models = QtW.QPushButton(
             "Train Models"
         )
-        play_icon = self.style().standardIcon(QtW.QStyle.SP_MediaPlay)
-        
-        # Set the icon on the button
         self.train_models.setIcon(play_icon)
+
+        self.train_models.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {AppAppearance.TRAIN_BUTTON_BACKGROUND_COLOR};
+                color: black;
+                border-radius: 8px;
+                padding: 10px 20px;
+                font-size: 14px;
+                font-weight: bold;
+                border: none;
+            }}
+
+            QPushButton:hover {{
+                background-color: {AppAppearance.TRAIN_BUTTON_BACKGROUND_COLOR_HOVER};
+            }}
+
+            QPushButton:pressed {{
+                background-color: {AppAppearance.TRAIN_BUTTON_BACKGROUND_COLOR_HOVER};
+                padding-top: 12px;
+                padding-bottom: 8px;
+            }}
+        """)
 
 
         self.x_columns = ColumnsSection(

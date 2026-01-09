@@ -243,10 +243,11 @@ class Plotter(QtW.QTabWidget):
         for i in range(0 , self.count()):
             widget = self.widget(i)
             widget.deleteLater()
-        for model in self.worker.engine_results.trained_models:
-            print("Received Accuracy Parameters" , model.model_results.relevant_statistical_results)
         self.visual_plot = FigureCanvasQTAgg(self.worker.engine_results.visual_plot)
-        self.accuracy_plot = self.resolve_accuracy(self.worker.engine_results)
+        try:
+            self.accuracy_plot = self.resolve_accuracy(self.worker.engine_results)
+        except Exception as e:
+            self.accuracy_plot = QtW.QWidget()
         try:
             self.prediction_tab = PredictionGUI(self.worker.engine_results)
         except Exception as e:
