@@ -11,14 +11,14 @@ import drag_and_drop_utility as dnd
 class ColumnsSubmodule(QtW.QWidget):
     def __init__(self , lst_cols , **kwargs):
         super().__init__(**kwargs)
-        self.layout = QVBoxLayout(self)
+        self.my_layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
         self.setMinimumHeight(250)
         
         self.lst_cols = lst_cols
         for col in self.lst_cols:
             new_widget = DraggableColumn(col)
-            self.layout.addWidget(new_widget)
+            self.my_layout.addWidget(new_widget)
 
     def dragEnterEvent(self, e):
         pos = e.pos()

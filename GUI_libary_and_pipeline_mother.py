@@ -138,7 +138,7 @@ class GUILibary(QtW.QTabWidget):
         preproccessor_box = QtW.QWidget()
         preproccessor_layout = QtW.QVBoxLayout()
         preproccessor_box.setLayout(preproccessor_layout)
-        pre_sub_module = GUILibarySubmodule(
+        self.pre_sub_module = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.PREPROCESSORS,
                 ""
@@ -146,7 +146,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.INTERLOCK_RIGHT,
             hex_value=AppAppearance.PREPROCESSOR_COLOR
         ) 
-        preproccessor_layout.addWidget(pre_sub_module)
+        preproccessor_layout.addWidget(self.pre_sub_module)
 
 
         ########################################################
@@ -156,7 +156,7 @@ class GUILibary(QtW.QTabWidget):
         validator_box = QtW.QWidget()
         validator_layout = QtW.QVBoxLayout()
         validator_box.setLayout(validator_layout)
-        vali_submodule = GUILibarySubmodule(
+        self.vali_submodule = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.VALIDATORS,
                 ""
@@ -164,15 +164,15 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.POINTY,
             hex_value=AppAppearance.VALIDATOR_COLOR
         ) 
-        validator_layout.addWidget(vali_submodule)
+        validator_layout.addWidget(self.vali_submodule)
 
         addModule(QIcon(":/images/reggessor_icon.svg") , regressor_box)
         addModule(QIcon(":/images/classification_icon.svg") , classifier_box)
         addModule(QIcon(":/images/preproccessor_icon.svg") , preproccessor_box)
         addModule(QIcon(":/images/validators_icon.svg") , validator_box)
 
-
-        self.addTab(self.cols_tab() ,"")
+        self.columns_tab = self.cols_tab()
+        self.addTab(self.columns_tab ,"")
         self.setTabIcon(self.curr_index , QIcon(":/images/columns_icon.svg"))
 
         curr_index = 0

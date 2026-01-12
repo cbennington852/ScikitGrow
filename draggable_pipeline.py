@@ -114,6 +114,7 @@ class PipelineSection(QtW.QGroupBox):
         widget = e.source()
         from_parent = widget.parentWidget()
         to_parent = self
+        print("Drop event" , widget , from_parent , to_parent)
         def check_is_correct_type():
             if not isinstance(widget , Draggable):
                 e.ignore()
