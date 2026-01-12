@@ -48,6 +48,9 @@ Then activate your virtual environment.
 ```
 # Linux / Mac
 source ./myenv/bin/activate
+
+# Or
+
 # Windows
 call myenv\scripts\activate.bat
 ```
