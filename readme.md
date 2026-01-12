@@ -40,10 +40,19 @@ Currently, there is still a lot to work on for this application, most of the cor
 ## Running the current GUI
 
 Works on Linux , Windows , Mac
+Make a virtual environment
 ```
 python -m venv myenv
-echo "Then activate your venv, this varies slightly from platform to platform. The below command is for Unix-like systems. It is different for Mac and Powershell."
+```
+Then activate your virtual environment.
+```
+# Linux / Mac
 source ./myenv/bin/activate
+# Windows
+call myenv\scripts\activate.bat
+```
+Install the required dependencies.
+```
 pip install -r requirments.txt
 ```
 Running the GUI
