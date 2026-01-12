@@ -38,6 +38,8 @@ Whereas a conference is a brisker 5 pages.
 
 ### 149. Make plotting options, or make it pretty. 
 
+### 150. Export plotting charts
+
 
 # TODO LIST
 Below is a burn-down chart, I am going to stop adding things to the todo list, and only focus on these things. 
@@ -49,7 +51,7 @@ Below is a burn-down chart, I am going to stop adding things to the todo list, a
 
 ### 8. Package for Linux.
 
-### 9. Package for Max.
+### 9. Package for Mac.
     - testing is not required for this, as I don't own a MAC.
 
 ### 10. Add documentation for 6 files.

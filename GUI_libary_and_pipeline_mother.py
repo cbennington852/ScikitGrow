@@ -50,7 +50,7 @@ class GUILibary(QtW.QTabWidget):
         regressor_box.setLayout(regressor_layout)
 
         # make sublibaries from the picked out lists. 
-        lin_reg = GUILibarySubmodule(
+        self.lin_reg = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_LINEAR,
                 "Linear Models"
@@ -58,7 +58,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.REGRESSOR_LINEAR_COLOR
         ) 
-        lin_ens = GUILibarySubmodule(
+        self.lin_ens = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_ENSEMBLE,
                 "Ensemble Models"
@@ -66,7 +66,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.REGRESSOR_ENSEMBLE_COLOR
         ) 
-        lin_neu = GUILibarySubmodule(
+        self.lin_neu = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_NEURAL_NETWORK,
                 "Neural Network Models"
@@ -74,7 +74,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.REGRESSOR_NEURAL_COLOR
         ) 
-        lin_tre = GUILibarySubmodule(
+        self.lin_tre = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_TREE,
                 "Tree Models"
@@ -82,10 +82,10 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.REGRESSOR_TREE_COLOR
         ) 
-        regressor_layout.addWidget(lin_reg)
-        regressor_layout.addWidget(lin_ens)
-        regressor_layout.addWidget(lin_tre)
-        regressor_layout.addWidget(lin_neu)
+        regressor_layout.addWidget(self.lin_reg)
+        regressor_layout.addWidget(self.lin_ens)
+        regressor_layout.addWidget(self.lin_tre)
+        regressor_layout.addWidget(self.lin_neu)
 
         ########################################################
         # CLASSIFIERS 
@@ -94,7 +94,7 @@ class GUILibary(QtW.QTabWidget):
         classifier_box = QtW.QWidget()
         classifier_layout = QtW.QVBoxLayout()
         classifier_box.setLayout(classifier_layout)
-        cla_reg = GUILibarySubmodule(
+        self.cla_reg = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_LINEAR,
                 "Linear Models"
@@ -102,7 +102,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.CLASSIFIER_LINEAR_COLOR
         ) 
-        cla_ens = GUILibarySubmodule(
+        self.cla_ens = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_ENSEMBLE,
                 "Ensemble Models"
@@ -110,7 +110,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.CLASSIFIER_ENSEMBLE_COLOR
         ) 
-        cla_neu = GUILibarySubmodule(
+        self.cla_neu = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_NEURAL,
                 "Neural Network Models"
@@ -118,7 +118,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.CLASSIFIER_NEURAL_COLOR
         ) 
-        cla_tre = GUILibarySubmodule(
+        self.cla_tre = GUILibarySubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_TREE,
                 "Tree Models"
@@ -126,10 +126,10 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.CLASSIFIER_TREE_COLOR
         ) 
-        classifier_layout.addWidget(cla_reg)
-        classifier_layout.addWidget(cla_ens)
-        classifier_layout.addWidget(cla_tre)
-        classifier_layout.addWidget(cla_neu)
+        classifier_layout.addWidget(self.cla_reg)
+        classifier_layout.addWidget(self.cla_ens)
+        classifier_layout.addWidget(self.cla_tre)
+        classifier_layout.addWidget(self.cla_neu)
 
 
         ########################################################

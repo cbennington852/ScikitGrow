@@ -223,13 +223,14 @@ class MainWindow(QMainWindow):
             print(main_window)
             print("X cols" , main_window.pipeline_mother.x_columns.get_cols())
             return main_window
-        
+
 
     def render_menu_bar(self):
         menu = self.menuBar()
         
         # for file related actions.
         file_menu = menu.addMenu("&File")
+        graph_settings = menu.addMenu("&Graph Settings")
         
         # Save action
         save_action = QAction("Save Project" , self)
@@ -245,6 +246,10 @@ class MainWindow(QMainWindow):
         open_action = QAction("Open Project" , self)
         open_action.triggered.connect(self.open_button_pressed)
         file_menu.addAction(open_action)
+
+        # Change graph color themes
+        graph_colors = QAction("Change graph themes")
+        #graph_colors.triggered.connect()
 
     def save_button_pressed(self):
         if self.file_path is not None:

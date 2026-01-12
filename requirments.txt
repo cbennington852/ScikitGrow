@@ -6,3 +6,6 @@ pytest
 qtwidgets
 pyqtdarktheme
 aquarel
+pytest-qt
+coverage
+pytest-cov

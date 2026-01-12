@@ -12,14 +12,14 @@ import drag_and_drop_utility as dnd
 class GUILibarySubmodule(QtW.QGroupBox):
     def __init__(self , sublibary , render_type = "", hex_value = "",  **kwargs):
         super().__init__(**kwargs)
-        self.layout = QVBoxLayout(self)
+        self.my_layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
         self.sublibary = sublibary
         self.setTitle(self.sublibary.library_name)
         if len(self.sublibary.function_calls) == 0:
             self.deleteLater()
         for sklearn in self.sublibary.function_calls:
-            self.layout.addWidget(Draggable(
+            self.my_layout.addWidget(Draggable(
                 name=str(sklearn.__name__),
                 sklearn_function=sklearn,
                 render_type=render_type,
@@ -425,11 +425,11 @@ class Pipeline(QtW.QMdiSubWindow):
 
     def __init__(self, my_parent, GUI_parent ,  **kwargs):
         super().__init__(GUI_parent, **kwargs)
-        my_layout = QVBoxLayout()
+        self.my_layout = QVBoxLayout()
         self.main_thing = QtW.QWidget()
         self.my_parent = my_parent
         self.setStyleSheet(f"background-color:{AppAppearance.PIPELINE_BACKGROUND_COLOR}")
-        self.main_thing.setLayout(my_layout)
+        self.main_thing.setLayout(self.my_layout)
         self.setFixedSize(Pipeline.BASE_PIPELINE_WIDTH , Pipeline.BASE_PIPELINE_HEIGHT)
         self.name_pipeline = QtW.QLineEdit()
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
@@ -452,10 +452,10 @@ class Pipeline(QtW.QMdiSubWindow):
             max_num_models=1
         )
         # set mimumum heights
-        my_layout.addWidget(self.name_pipeline)
-        my_layout.addWidget(self.preproccessor_pipe)
-        my_layout.addWidget(self.model_pipe)
-        my_layout.addWidget(self.validator)
+        self.my_layout.addWidget(self.name_pipeline)
+        self.my_layout.addWidget(self.preproccessor_pipe)
+        self.my_layout.addWidget(self.model_pipe)
+        self.my_layout.addWidget(self.validator)
         self.setWidget(self.main_thing)
 
     def get_pipeline_data(self) -> PipelineData:

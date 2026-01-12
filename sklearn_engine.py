@@ -4,6 +4,7 @@ import threading
 import matplotlib.pyplot as plt
 import sklearn
 import random
+import os
 import pandas as pd
 import numpy as np
 from abc import ABC , abstractmethod
@@ -279,35 +280,9 @@ class SklearnEngine():
                 raise ValueError(f"Error: {y_col} is not in the dataset")
             
     def train_with_validator(model , kf, X , y):
-        y_pred = sklearn.model_selection.cross_val_predict(model, X, y, cv=kf)
+        num_cores = min(1 , os.cpu_count() - 1)
+        y_pred = sklearn.model_selection.cross_val_predict(model, X, y, cv=kf , n_jobs=num_cores)
         return y_pred
-
-    def k_fold_general_threads(model , kf , X , y):
-        def train_indexes(train_index , test_index):
-            """
-            The thing that we call each time in he k_fold
-            """
-            model_clone = sklearn.clone(model)
-            X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-            y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-            model_clone.fit(X_train , y_train)
-            curr_y_preds = model_clone.predict(X_test)
-            final_y[test_index] = curr_y_preds.flatten()
-
-        # the final array
-        final_y = np.empty(len(y))
-        # k fold thing 
-        threads = []
-        for fold, (train_index, test_index) in enumerate(kf.split(X, y)):
-            curr_thread = threading.Thread(target=train_indexes , kwargs={
-                "train_index" : train_index,
-                "test_index" : test_index
-            })
-            threads.append(curr_thread)
-            curr_thread.start()
-        for thread in threads:
-            thread.join()
-        return final_y 
     
 
     def train_model( main_dataframe , curr_pipeline : list[Pipeline] , x , y ) -> list[ModelTrainingResults]:
@@ -331,13 +306,6 @@ class SklearnEngine():
             curr.sklearn_pipeline.fit(x , y)
             # Apply the user specified validator and preform predictions.
             if (curr.validator is not None):
-                # y_preds = SklearnEngine.k_fold_general_threads(
-                #     model=curr_pipeline,
-                #     kf=curr.validator,
-                #     X=x,
-                #     y=y
-                # )
-                print("type " , type(curr.sklearn_pipeline))
                 y_preds = SklearnEngine.train_with_validator(
                     model=curr.sklearn_pipeline,
                     kf=curr.validator,
@@ -582,27 +550,25 @@ class SklearnEngine():
         
         def plot_3(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines :list[Pipeline] , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 ):
-            raise ValueError("TODO : Write a 3 dimensional classification visualization")
+            fig, ax = plt.subplots()
+            return fig
+        # Consider : 
         #https://www.researchgate.net/figure/3-Dimensional-surface-plot-of-classification-accuracy-against-spread-and-pattern-numbers_fig1_273402360
         # shows how to do this.
 
         def plot_3_plus(
                     main_dataframe ,
-                    curr_pipeline , 
+                    curr_pipelines :list[Pipeline] , 
                     pipeline_x_values , 
                     pipeline_y_value ,
                     x , 
                     y , 
-                    trained_model,
-                    y_predictions
                 ):
            fig, ax = plt.subplots()
            return fig
@@ -646,7 +612,7 @@ class SklearnEngine():
                     y ,
                 )
             else:
-                visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_3_plus(
+                visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_3d_plus(
                     main_dataframe ,
                     curr_pipelines , 
                     pipeline_x_values , 
@@ -726,35 +692,16 @@ class SklearnEngine():
             ax.set_title(f"3D Surface for {pipeline_y_value[0]}")
             return fig
             
-        def plot_3d(
+        def plot_3d_plus(
             main_dataframe ,
-            curr_pipeline , 
+            curr_pipelines : list[Pipeline], 
             pipeline_x_values , 
             pipeline_y_value ,
             x , 
             y , 
-            trained_model,
-            y_predictions
         ):
             fig, ax = plt.subplots()
             return fig
-
-
-
-        
-        def plot_4d_plus(
-            main_dataframe ,
-            curr_pipeline , 
-            pipeline_x_values , 
-            pipeline_y_value ,
-            x , 
-            y , 
-            trained_model,
-            y_predictions
-        ):
-            fig, ax = plt.subplots()
-            return fig
-
 
 
         def accuracy(

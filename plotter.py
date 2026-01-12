@@ -38,6 +38,7 @@ class Plotter(QtW.QTabWidget):
     def __init__(self , pipeline_mother : PipelineMother, dataframe : pd.DataFrame , **kwargs):
         super().__init__(**kwargs)
         self.pipeline_mother = pipeline_mother
+        self.work_done = False
         self.pipeline_mother.train_models.clicked.connect(self.plot_pipeline)
         self.dataframe = dataframe
 
@@ -79,11 +80,14 @@ class Plotter(QtW.QTabWidget):
             self.spinner_thread.join()
         if hasattr(self , 'worker'):
             self.worker.ptr_to_training_button.setEnabled(True)
+        self.work_done = True
+        
 
         
         
     @QtCore.pyqtSlot()
     def plot_pipeline(self):
+        self.work_done = False
         self.ptr_to_train_models_button = self.sender()
         
         try:
