@@ -1,10 +1,10 @@
 import pandas as pd
 import sklearn
-import src.sklearn_engine as sklearn_engine
+import src.scikitgrow.sklearn_engine as sklearn_engine
 import pandas as pd
 import sklearn
 import seaborn as sns
-from src.sklearn_engine import Pipeline , EngineResults
+from src.scikitgrow.sklearn_engine import Pipeline , EngineResults
 import sklearn.model_selection as val
 
 

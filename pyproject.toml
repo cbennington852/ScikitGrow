@@ -11,9 +11,21 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/scikitgrow"]
+
+
 [project.urls]
 Homepage = "https://github.com/cbennington852/ScikitGrow"
 Issues = "https://github.com/cbennington852/ScikitGrow/issues"
+
+[project.scripts]
+# This maps the command 'my-command' to the 'main' function in 'src/main.py'
+run_scikitgrow = "scikitgrow.main:main"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

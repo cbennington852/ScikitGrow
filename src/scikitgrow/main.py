@@ -352,8 +352,7 @@ def open_on_file_handle(file_handle):
                     )
 
 
-
-if __name__ == "__main__":
+def main():
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
@@ -369,3 +368,7 @@ if __name__ == "__main__":
         main_menu = MainMenu()
         #main_menu.show()
     sys.exit(app.exec_()) # Start the application's event loop
+
+
+if __name__ == "__main__":
+   main()

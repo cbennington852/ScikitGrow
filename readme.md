@@ -56,12 +56,16 @@ call myenv\scripts\activate.bat
 ```
 Install the required dependencies.
 ```
-pip install -r requirments.txt
+pip install ".[dev]"
+pip install -e .
 ```
-Running the GUI
+Running the GUI (This may be slow the first time you run it).
 ```
-python main.py
+run_scikitgrow
 ```
-
+Running Unit tests
+```
+pytest --cov=..
+```
 
 
