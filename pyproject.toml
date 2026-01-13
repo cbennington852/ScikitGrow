@@ -46,7 +46,6 @@ dependencies = [
     "qtwidgets",
     "pyqtdarktheme",
     "aquarel",
-    "PyInstaller == 3.4",
 ]
 
 [project.optional-dependencies]
