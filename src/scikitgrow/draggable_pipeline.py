@@ -10,6 +10,7 @@ from .colors_and_appearance import AppAppearance
 from . import drag_and_drop_utility as dnd
 
 class GUILibarySubmodule(QtW.QGroupBox):
+    
     def __init__(self , sublibary , render_type = "", hex_value = "",  **kwargs):
         super().__init__(**kwargs)
         self.my_layout = QVBoxLayout(self)

@@ -1,6 +1,10 @@
 
 
 class AppAppearance():
+	"""
+	A python class containing all of the colors for the application, all in a place where they 
+	can be easily tweaked and changed. 
+	"""
 
 	MDI_AREA_COLOR = "#F0F0F0"
 	TRAIN_BUTTON_BACKGROUND_COLOR = "#F0F0F0"
@@ -21,7 +25,7 @@ class AppAppearance():
 	DRAGGABLE_COLOMN_BORDER_COLOR = "#040404"
 	
 	# REGRESSORS
-	REGRESSOR_LINEAR_COLOR = "#ffa600" #ffa600
+	REGRESSOR_LINEAR_COLOR = "#ffa600" 
 	REGRESSOR_ENSEMBLE_COLOR = "#ff8531"
 	REGRESSOR_TREE_COLOR = "#ff6361"
 	REGRESSOR_NEURAL_COLOR = "#de5a79"
@@ -32,10 +36,11 @@ class AppAppearance():
 	CLASSIFIER_TREE_COLOR = "#72DD59"
 	CLASSIFIER_NEURAL_COLOR = "#02A376"
 
-#"#009663ff"
-#"#72DD59"
+	# PRE_PROCESSORS
 	PREPROCESSOR_COLOR = "#5D0F91"
 	PREPROCESSOR_BORDER_COLOR = "#5D0F9D"
+
+	# VALIDATORS
 	VALIDATOR_COLOR = "#068D41"
 
 	

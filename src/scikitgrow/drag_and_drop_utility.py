@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QWidget
 def end_drag_and_drop_event(to_parent : QWidget , from_parent : QWidget):
 	"""
 		Small utility function to handle universally drag and drop things.
+
+		This calls some of the functions nessicary to drag and drop if the corresponding widgets have those.
 	"""
 	# 1. Resizing 
 	if hasattr(from_parent , "resize_based_on_children"):

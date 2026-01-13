@@ -25,20 +25,53 @@ Whereas a conference is a brisker 5 pages.
     whole software. 
     Relevance: Your Python library for Scikit-learn is a perfect fit. The drag-and-drop tool, if framed as a tool for researchers or advanced students to visually prototype models, might also be accepted under the "research software" definition.
 
+
 - interactive learning environments
     Fees : ~3,000$
 
-# For Real TODO list
 
-### 146. Improve main menu.
+#### FOR REAL ... JOSS GUIDELINES
+- Determine full name (Leading idea ___ DataScratch)
 
-### 147. Add basic data cleaning?
+- Documentation ... For core sections.
 
-### 148. See what encoders do, and make sure they are in right area. Ensure all pre-proccessors should be added.
+- Full test for uploading a package. 
 
-### 149. Make plotting options, or make it pretty. 
+- paper start writing (JOSS formatt https://joss.readthedocs.io/en/latest/paper.html)
 
-### 150. Export plotting charts
+- Get some sort of "community engagement"
+    - Ask some fellow dev's and data science people what they think of the software and encourage feedback.
+
+- CI/CD for unit testing. 
+
+- CI/CD for package publishing.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # TODO LIST

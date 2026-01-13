@@ -15,6 +15,14 @@ from .sklearn_engine import EngineResults , Pipeline
 class DescriptorStatisticsGUI(QtW.QScrollArea):
 
     def __init__(self, engine_results : EngineResults, dataframe : pd.DataFrame, **kwargs):
+        """
+        A GUI class to show general statistics about the data, and plot those statistics, 
+        this is to help with the general data visualization goal.
+
+        Args:
+            engine_results (EngineResults):
+            dataframe (pd.DataFrame): 
+        """
         super().__init__(**kwargs)
         self.engine_results = engine_results
         self.dataframe = dataframe
@@ -56,19 +64,21 @@ class ColumnDescriptor(QtW.QGroupBox):
     digit_rounding = 5
 
     def __init__(self , dataframe : pd.DataFrame , column_name : str, **kwargs):
-        super().__init__(**kwargs)
-        self.setTitle(column_name)
-        self.dataframe = dataframe
-        self.column_name = column_name
-
         """
+        A subclass which renders each individual column data information, this gives general stats,
+        as well as a bar chart to show data skew.s
+
         Two sections L | R
             L ... shows Statistics
                 - min
                 - max
             R ... shows bar graph
-        both are surrounded by try catch
+
         """
+        super().__init__(**kwargs)
+        self.setTitle(column_name)
+        self.dataframe = dataframe
+        self.column_name = column_name
         self.main_layout = QtW.QHBoxLayout()
         self.setLayout(self.main_layout)
         
@@ -77,6 +87,9 @@ class ColumnDescriptor(QtW.QGroupBox):
 
 
     def render_left(self):
+        """
+        renders left side of the GUI components
+        """
         self.left = QtW.QWidget()
         main_lay = QtW.QFormLayout()
         self.left.setLayout(main_lay)
@@ -108,6 +121,9 @@ class ColumnDescriptor(QtW.QGroupBox):
 
 
     def render_right(self):
+        """
+        renders right side of the GUI components
+        """
         col = self.dataframe[self.column_name]
         fig, axs = plt.subplots(figsize=(4 ,4))
         axs.hist(col)

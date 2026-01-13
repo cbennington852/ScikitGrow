@@ -14,6 +14,7 @@ from PyQt5.QtCore import Qt, QMimeData, QEvent
 import sklearn.model_selection as val
 from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtCore, QtTest
+import pytest
 
 df = pd.read_csv("resources/random_data.csv")
 
@@ -69,7 +70,6 @@ class FakeDropEvent():
         target_drop.paintEvent(self)
         # Drag enter 
         target_drop.dropEvent(self)
-
 
 
 def test_library_model_to_pipeline(qtbot):
@@ -141,7 +141,6 @@ def test_library_validator_to_pipeline(qtbot):
     
     assert len(target_drop.get_pipeline_objects()) != 0
 
-
 def test_library_to_columns_to_pipeline(qtbot):
     window = MainWindow(df)
     qtbot.addWidget(window)
@@ -164,7 +163,6 @@ def test_library_to_columns_to_pipeline(qtbot):
     fake_drop.simulate_fake_drop(target_drop)
     
     assert target_drop.get_num_cols() != 0
-
 
 def test_main_menu_loads(qtbot):
     window = MainMenu()

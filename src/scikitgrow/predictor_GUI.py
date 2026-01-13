@@ -11,6 +11,13 @@ from .sklearn_engine import EngineResults , Pipeline
 
 class PredictionGUI(QtW.QScrollArea):
     def __init__(self, engine_results : EngineResults, hide_export_features = False, **kwargs):
+        """
+        A small part of the GUI which allows users to predict 
+
+        Args:
+            engine_results (EngineResults): _description_
+            hide_export_features (bool, optional): _description_. Defaults to False.
+        """
         super().__init__(**kwargs)
 
         self.engine_results = engine_results

@@ -2,6 +2,12 @@ import PyQt5.QtWidgets as QtW
 
 # This is an abstract class BTW.
 class Parameter(QtW.QWidget):
+    """
+    Abstract class to handle parameter fields.
+
+    Args:
+        QtW (_type_): _description_
+    """
     def __init__(self):
         pass
 
@@ -57,6 +63,14 @@ BANNED_PARAMETERS = {
 
 
 def parameter_filter(name : str , value) -> Parameter:
+    """
+    Args:
+        name (str): _description_
+        value (_type_): _description_
+
+    Returns:
+        Parameter: _description_
+    """
     try:
         if type(value) is int:
             return IntSingleLine(name , value)

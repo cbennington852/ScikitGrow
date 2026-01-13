@@ -1,15 +1,21 @@
 from .draggable import DraggableColumn
-from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QVBoxLayout
 import PyQt5.QtWidgets as QtW
-from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
-from PyQt5.QtCore import  QPoint , QRect
-from PyQt5.QtCore import Qt, QMimeData
+from PyQt5.QtGui import QColor , QPolygon, QPainter
+from PyQt5.QtCore import  QPoint
+from PyQt5.QtCore import Qt
 from .colors_and_appearance import AppAppearance
 from . import drag_and_drop_utility as dnd
 
 
 class ColumnsSubmodule(QtW.QWidget):
     def __init__(self , lst_cols , **kwargs):
+        """
+        A part of the GUI library, this renders a group of draggable columns to the library. 
+
+        Args:
+            lst_cols (str): list of strings of the dataframe columns.
+        """
         super().__init__(**kwargs)
         self.my_layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
@@ -26,6 +32,12 @@ class ColumnsSubmodule(QtW.QWidget):
         e.accept()
 
     def dropEvent(self, e):
+        """
+        An event where something is dropped onto the library. 
+
+        Args:
+            e (_type_): _description_
+        """
         pos = e.pos()
         widget = e.source()
         from_parent = widget.parentWidget()
@@ -41,6 +53,14 @@ class ColumnsSubmodule(QtW.QWidget):
 
 class ColumnsSection(QtW.QGroupBox):
     def __init__(self , title, my_parent , max_num_cols = 100, **kwargs):
+        """
+        A droppable holder for the ColumnsMDI subwindow. 
+
+        Args:
+            title (str): The name of the holder.
+            my_parent (pointer): pointer to the parent of this.
+            max_num_cols (int, optional): Defaults to 100.
+        """
         super().__init__( **kwargs)
         self.my_title = title
         self.my_parent = my_parent
@@ -63,6 +83,9 @@ class ColumnsSection(QtW.QGroupBox):
 
 
     def dragEnterEvent(self, e):
+        """
+        Drag enter event, this checks to see if the object being dragged is a column
+        """
         pos = e.pos()
         widget = e.source()
         if isinstance(widget , DraggableColumn):
@@ -73,14 +96,28 @@ class ColumnsSection(QtW.QGroupBox):
             e.ignore()
 
     def dragLeaveEvent(self, e):
+        """
+        The item is leaving the object, this is part of the hover mechanic,
+        """
         self.hovering = False
         self.repaint()
         e.accept() 
     
-    def get_num_cols(self):
+    def get_num_cols(self) -> int:
+        """
+        Returns:
+            int: returns the number of columns.
+        """
         return len(self.get_cols())
     
     def set_cols_as_string_list(self , str_lst : list[str]):
+        """
+        Changes this columns section to be a specified string list. Part of loading 
+        from a file. 
+
+        Args:
+            str_lst (list[str]): list of strings
+        """
         # Remove all prior draggable (If applicable). 
         for child in self.findChildren(QtW.QWidget):
             if isinstance(child , DraggableColumn):
@@ -92,6 +129,11 @@ class ColumnsSection(QtW.QGroupBox):
         
     
     def get_cols_as_string_list(self) -> list[str]:
+        """Returns a list of strings representing the columns picked. 
+
+        Returns:
+            list[str]: _description_
+        """
         return [drag_col.name for drag_col in self.get_cols()]
     
     # re-doing the layout events
@@ -99,18 +141,31 @@ class ColumnsSection(QtW.QGroupBox):
         return super().resizeEvent(a0)
     
     def get_cols(self) -> list[DraggableColumn]:
+        """
+
+
+        Returns:
+            list[DraggableColumn]: list of draggable columns for this area.
+        """
         res_cols = []
         for child in self.findChildren(QtW.QWidget):
             if isinstance(child , DraggableColumn):
                 res_cols.append(child)
         return res_cols
     
+    # The 
     bevel_left_start = DraggableColumn.bevel_width + DraggableColumn.bevel_slant_width*2 + DraggableColumn.left_of_bevel_width
     bottom_right_of_top_bevel_x = bevel_left_start + DraggableColumn.bevel_slant_width + DraggableColumn.bevel_width
     width_from_start_mouth_to_left_side = 10
     height_between_top_mouth_and_top_bar = 30
     
     def paintEvent(self, event):
+        """
+        Paints the section to cover and fill the column descriptions.
+
+        Args:
+            event (_type_): _description_
+        """
         painter = QPainter(self)
         
         print(f"Curr height {self.max_num_cols} ... {self.geometry()}")
@@ -218,6 +273,9 @@ class ColumnsSection(QtW.QGroupBox):
         
 
     def dropEvent(self, e):
+        """"
+            Conducts a drop event.
+        """
         pos = e.pos()
         widget = e.source()
         from_parent = widget.parentWidget()

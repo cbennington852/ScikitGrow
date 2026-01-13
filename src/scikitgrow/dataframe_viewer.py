@@ -6,6 +6,9 @@ import PyQt5.QtWidgets as QtW
 
 
 class DataframeViewer(QtW.QTableView):
+    """
+    Small data frame class to view a dataframe.
+    """
     def __init__(self, df, **kwargs):
         super().__init__(**kwargs)
         self.resize(800, 500)
