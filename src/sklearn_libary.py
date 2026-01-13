@@ -1,5 +1,5 @@
 import sklearn
-from draggable_parameter import BANNED_PARAMETERS
+from .draggable_parameter import BANNED_PARAMETERS
 import inspect
 
 class SubLibary():

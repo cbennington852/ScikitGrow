@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from abc import ABC , abstractmethod
 from matplotlib.colors import ListedColormap
-from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
+from .list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 
 from aquarel import load_theme
 

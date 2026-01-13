@@ -1,11 +1,10 @@
-import sklearn_engine
 import pandas as pd
 import sklearn
-import sklearn_engine
+import src.sklearn_engine as sklearn_engine
 import pandas as pd
 import sklearn
 import seaborn as sns
-from sklearn_engine import Pipeline , EngineResults
+from src.sklearn_engine import Pipeline , EngineResults
 import sklearn.model_selection as val
 
 

@@ -1,24 +1,24 @@
 import sys
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QAction
-from GUI_libary_and_pipeline_mother import PipelineMother , GUILibary
-from sklearn_libary import SubLibary 
-from dataframe_viewer import DataframeViewer
+from .GUI_libary_and_pipeline_mother import PipelineMother , GUILibary
+from .sklearn_libary import SubLibary 
+from .dataframe_viewer import DataframeViewer
 import sklearn
 import seaborn as sns
-import image_resources
+from . import image_resources
 from PyQt5.QtGui import QIcon , QPixmap
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from plotter import Plotter
-from save_file import SaveFileException , SaveFile
+from .plotter import Plotter
+from .save_file import SaveFileException , SaveFile
 import os
 import pickle
 import traceback
 import time
 import qdarktheme
 import pandas as pd
-from predictor_GUI import PredictionGUI
+from .predictor_GUI import PredictionGUI
 
 windows = []
 

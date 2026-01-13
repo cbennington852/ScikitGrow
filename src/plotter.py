@@ -12,16 +12,15 @@ import traceback
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-import sklearn_engine
+from . import sklearn_engine
 import sklearn
 import pandas as pd
 import threading
-from GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
+from .GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
 import matplotlib.pyplot as plt
-from predictor_GUI import PredictionGUI
-from descriptor_statistics_GUI import DescriptorStatisticsGUI , ColumnDescriptor
+from .predictor_GUI import PredictionGUI
+from .descriptor_statistics_GUI import DescriptorStatisticsGUI , ColumnDescriptor
 
-plt.style.use("seaborn-v0_8-darkgrid")
 
 
 

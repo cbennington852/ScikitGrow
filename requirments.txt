@@ -9,5 +9,4 @@ aquarel
 pytest-qt
 coverage
 pytest-cov
-fbs
 PyInstaller==3.4

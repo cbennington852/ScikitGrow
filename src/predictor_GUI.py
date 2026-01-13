@@ -6,7 +6,7 @@ from PyQt5.QtGui import QDrag , QIcon
 import PyQt5.QtCore as QtCore 
 import pandas as pd
 import pickle
-from sklearn_engine import EngineResults , Pipeline
+from .sklearn_engine import EngineResults , Pipeline
 
 
 class PredictionGUI(QtW.QScrollArea):

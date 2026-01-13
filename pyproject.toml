@@ -1,0 +1,43 @@
+[project]
+name = "scikit-grow"
+version = "0.1.0"
+authors = [
+  { name="Charles Bennington", email="c.bennington852@gmail.com" },
+]
+description = "https://github.com/cbennington852/ScikitGrow"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/cbennington852/ScikitGrow"
+Issues = "https://github.com/cbennington852/ScikitGrow/issues"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+dependencies = [
+    "scikit-learn",
+    "PyQt5",
+    "matplotlib",
+    "seaborn",
+    "qtwidgets",
+    "pyqtdarktheme",
+    "aquarel",
+    "PyInstaller == 3.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-qt",
+    "coverage",
+    "pytest-cov",
+]

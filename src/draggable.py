@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel
-from sklearn_libary import SubLibary
+from .sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 import PyQt5.QtGui as PGui
 from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush, QIcon
 import PyQt5.QtCore as QtCore 
-from colors_and_appearance import AppAppearance
-from draggable_parameter import parameter_filter , BANNED_PARAMETERS
+from .colors_and_appearance import AppAppearance
+from .draggable_parameter import parameter_filter , BANNED_PARAMETERS
 import ast
 import time
 

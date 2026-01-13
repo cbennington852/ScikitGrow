@@ -1,17 +1,17 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel
-from sklearn_libary import SubLibary
+from .sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QDrag , QIcon , QPixmap , QCursor , QColor , QPolygon, QPen, QBrush, QIcon, QPainter
 import PyQt5.QtCore as QtCore 
-from draggable import Draggable , DraggableColumn , DraggableData
+from .draggable import Draggable , DraggableColumn , DraggableData
 from sklearn.base import is_regressor, is_classifier
 import sklearn
-from column_pipeline import ColumnsSection , ColumnsSubmodule
-from draggable_pipeline import DraggableColumn , PipelineSection, Pipeline, PipelineData, GUILibarySubmodule
-from list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
-from colors_and_appearance import AppAppearance
+from .column_pipeline import ColumnsSection , ColumnsSubmodule
+from .draggable_pipeline import DraggableColumn , PipelineSection, Pipeline, PipelineData, GUILibarySubmodule
+from .list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
+from .colors_and_appearance import AppAppearance
 
 class ColumnsWindowData():
     def __init__(self , x_cols : list[str] , y_cols : list[str]):

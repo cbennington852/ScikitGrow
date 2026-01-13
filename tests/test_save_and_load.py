@@ -1,13 +1,13 @@
-from main import MainMenu , MainWindow , SaveFile , SaveFileException
+from src.main import MainMenu , MainWindow , SaveFile , SaveFileException
 import pandas as pd
-from draggable import Draggable , DraggableColumn
+from src.draggable import Draggable , DraggableColumn
 import sklearn
 import pickle
-from save_file import SaveFile
+from src.save_file import SaveFile
 from PyQt5.QtTest import QTest
 import time
 import os.path
-from descriptor_statistics_GUI import DescriptorStatisticsGUI
+from src.descriptor_statistics_GUI import DescriptorStatisticsGUI
 from pytestqt import qtbot
 
 df = pd.read_csv("resources/random_data.csv")

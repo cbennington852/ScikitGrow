@@ -1,15 +1,13 @@
-import sklearn_engine
+import src.sklearn_engine
 import pandas as pd
-from main import MainMenu , MainWindow , SaveFile , SaveFileException
-
+from src.main import MainMenu , MainWindow , SaveFile , SaveFileException
 import sklearn
-import sklearn_engine
 import time
 import pandas as pd
 import sklearn
 import seaborn as sns
-from sklearn_engine import Pipeline , EngineResults
-from draggable import Draggable
+from src.sklearn_engine import Pipeline , EngineResults
+from src.draggable import Draggable
 from PyQt5.QtGui import QDropEvent, QDrag
 from PyQt5.QtCore import Qt, QMimeData, QEvent
 
