@@ -57,6 +57,7 @@ call myenv\scripts\activate.bat
 Install the required dependencies.
 ```
 pip install ".[dev]"
+pip install .
 pip install -e .
 ```
 Running the GUI (This may be slow the first time you run it).
