@@ -22,6 +22,7 @@ from .predictor_GUI import PredictionGUI
 
 windows = []
 
+
 class MainMenu(QMainWindow):
 
 
@@ -75,7 +76,7 @@ class MainMenu(QMainWindow):
     def __init__(self ):
         super().__init__()
 
-        self.setWindowTitle("SciKit Grow Main Menu")
+        self.setWindowTitle("DataScratchMain Menu")
         self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
@@ -92,6 +93,7 @@ class MainMenu(QMainWindow):
       
 
     def open_main_window_on_dataset(dataframe):
+        pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
         splash = QtW.QSplashScreen(pixmap)
         splash.show()
         my_window = MainWindow(dataframe) # Create an instance of our custom window
@@ -268,7 +270,7 @@ class MainWindow(QMainWindow):
 
     def open_button_pressed(self):
         file_path, _ = QtW.QFileDialog.getOpenFileName(
-                None, "Open Project",None ,f"All Files (*.pkl *.csv *.xls *{PredictionGUI.model_save_extension});; Pickle Files (*.pkl);; CSV Files (*.csv);; Excel Files (*.xls);; Scikit Grow Pipeline File (*{PredictionGUI.model_save_extension});; "
+                None, "Open Project",None ,f"All Files (*.pkl *.csv *.xls *{PredictionGUI.model_save_extension});; Pickle Files (*.pkl);; CSV Files (*.csv);; Excel Files (*.xls);; DataScratch Pipeline File (*{PredictionGUI.model_save_extension});; "
             )
         if file_path:
             open_on_file_handle(file_path)
@@ -313,7 +315,7 @@ def open_on_file_handle(file_handle):
                     model_pred = PredictionGUI(loaded_data , True)
                     new_win = QMainWindow()
                     new_win.setWindowIcon(QIcon(":images/Mini_Logo_Alantis_2_Box.svg"))
-                    new_win.setWindowTitle("Scikit Grow Pipeline File")
+                    new_win.setWindowTitle("DataScratch Pipeline File")
                     new_win.setCentralWidget(model_pred)
                     new_win.show()
                     windows.append(new_win)
@@ -357,7 +359,6 @@ def main():
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv) # Create the application instance
-    pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
     # Below handles the opening of a main menu bar, 
     stylesheet = qdarktheme.load_stylesheet(theme='light') 
     app.setStyleSheet(stylesheet)

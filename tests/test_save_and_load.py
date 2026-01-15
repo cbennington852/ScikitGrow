@@ -1,13 +1,13 @@
-from src.scikitgrow.main import MainMenu , MainWindow , SaveFile , SaveFileException
+from src.datascratch.main import MainMenu , MainWindow , SaveFile , SaveFileException
 import pandas as pd
-from src.scikitgrow.draggable import Draggable , DraggableColumn
+from src.datascratch.draggable import Draggable , DraggableColumn
 import sklearn
 import pickle
-from src.scikitgrow.save_file import SaveFile
+from src.datascratch.save_file import SaveFile
 from PyQt5.QtTest import QTest
 import time
 import os.path
-from src.scikitgrow.descriptor_statistics_GUI import DescriptorStatisticsGUI
+from src.datascratch.descriptor_statistics_GUI import DescriptorStatisticsGUI
 from pytestqt import qtbot
 
 df = pd.read_csv("resources/random_data.csv")

@@ -1,5 +1,5 @@
 [project]
-name = "scikit-grow"
+name = "datascratch"
 version = "0.1.0"
 authors = [
   { name="Charles Bennington", email="c.bennington852@gmail.com" },
@@ -16,7 +16,7 @@ classifiers = [
 where = ["src"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/scikitgrow"]
+packages = ["src/datascratch"]
 
 
 [project.urls]
@@ -25,7 +25,7 @@ Issues = "https://github.com/cbennington852/ScikitGrow/issues"
 
 [project.scripts]
 # This maps the command 'my-command' to the 'main' function in 'src/main.py'
-run_scikitgrow = "scikitgrow.main:main"
+datascratch = "datascratch.main:main"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

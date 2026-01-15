@@ -59,10 +59,11 @@ Install the required dependencies.
 pip install ".[dev]"
 pip install .
 pip install -e .
+python load_dll.py
 ```
 Running the GUI (This may be slow the first time you run it).
 ```
-run_scikitgrow
+datascratch
 ```
 Running Unit tests
 ```

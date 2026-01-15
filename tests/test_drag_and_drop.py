@@ -1,13 +1,13 @@
-import src.scikitgrow.sklearn_engine
+import src.datascratch.sklearn_engine
 import pandas as pd
-from src.scikitgrow.main import MainMenu , MainWindow , SaveFile , SaveFileException
+from src.datascratch.main import MainMenu , MainWindow , SaveFile , SaveFileException
 import sklearn
 import time
 import pandas as pd
 import sklearn
 import seaborn as sns
-from src.scikitgrow.sklearn_engine import Pipeline , EngineResults
-from src.scikitgrow.draggable import Draggable
+from src.datascratch.sklearn_engine import Pipeline , EngineResults
+from src.datascratch.draggable import Draggable
 from PyQt5.QtGui import QDropEvent, QDrag
 from PyQt5.QtCore import Qt, QMimeData, QEvent
 
