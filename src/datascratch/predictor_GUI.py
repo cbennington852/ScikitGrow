@@ -71,7 +71,7 @@ class PredictionGUI(QtW.QScrollArea):
 
 
         export_as_software_action = QtW.QAction("Export as software" , self.main)
-        export_as_software_action.triggered.connect(lambda x : self.export_function_button_clicked(self.export_as_software , f"Scikit Grow Pipeline File (*{PredictionGUI.model_save_extension});;"))
+        export_as_software_action.triggered.connect(lambda x : self.export_function_button_clicked(self.export_as_software , f"DataScratch Pipeline File (*{PredictionGUI.model_save_extension});;"))
         self.export_as_software_button.menu().addAction(export_as_software_action)
 
         export_as_pickle_action = QtW.QAction("Export as python pickle" , self.main)
