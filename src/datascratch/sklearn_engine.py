@@ -82,6 +82,16 @@ class ConvertedColumn():
     def __init__(self , column_name , code_map):
         self.column_name = column_name
         self.code_map = code_map.tolist()
+
+    def convert_int_to_string(self , value):
+        return self.code_map[value]
+    
+    def convert_string_to_int(self, value):
+        for x in range(0 , len(self.code_map)):
+            print()
+            if value == self.code_map[x]:
+                return x
+        raise InternalEngineError(f"{value} is not a value in the trained dataset.")
     
 
 class EngineResults():
@@ -103,21 +113,30 @@ class EngineResults():
         self.x_cols = x_cols
         self.y_col = y_col
         self.list_converted_columns = list_converted_columns
-
+    
 
     def predict(self , x_values : list ):
         if len(self.x_cols) != len(x_values):
             raise InternalEngineError("Did not provide all of the values. Must provide all values.")
-        print("TODO: later verify that we have right types. Will be tricky for strings...")
-        for k in range(0 , len(self.x_cols)):
-            curr_col_name = self.x_cols[k]
-            curr_x_value = x_values[k]
-
+       
+        # Resolve the list of converted columns.
+        for converted_col in self.list_converted_columns:
+            for j in range(0 ,len(self.x_cols)):
+                print("Hello ? " , j , x_values[j] , converted_col.column_name)
+                if converted_col.column_name == self.x_cols[j]:
+                    x_values[j] = converted_col.convert_string_to_int(x_values[j])
+                    # Convert thing
         # Assemble as dataframe
         tmp_df = pd.DataFrame([x_values] , columns=self.x_cols)
         results = {}
         for pipeline in self.trained_models:
-            results[pipeline] = pipeline.predict(tmp_df)
+            print(tmp_df)
+            curr = pipeline.predict(tmp_df)
+            for converted_col in self.list_converted_columns:
+                if self.y_col[0] == converted_col.column_name:
+                    results[pipeline] = converted_col.convert_int_to_string(curr)
+                else:
+                    results[pipeline] = curr
         return results
 
 
