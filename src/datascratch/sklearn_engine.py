@@ -78,6 +78,10 @@ class ModelTrainingResults():
         self.trained_model = trained_model
         self.relevant_statistical_results = relevant_statistical_results
 
+class ConvertedColumn():
+    def __init__(self , column_name , code_map):
+        self.column_name = column_name
+        self.code_map = code_map.tolist()
     
 
 class EngineResults():
@@ -91,13 +95,14 @@ class EngineResults():
             trained_models : list[Pipeline] , 
             x_cols : list[str] , 
             y_col : str,
-            
+            list_converted_columns : list[ConvertedColumn]
             ):
         self.visual_plot = visual_plot
         self.accuracy_plot = accuracy_plot
         self.trained_models = trained_models
         self.x_cols = x_cols
         self.y_col = y_col
+        self.list_converted_columns = list_converted_columns
 
 
     def predict(self , x_values : list ):
@@ -167,10 +172,10 @@ class SklearnEngine():
         supervised_learning_type = SklearnEngine.check_all_same_supervised_learning_type(curr_pipelines)
 
         # If user wants a string, try to factorize.
-        main_dataframe_copy = SklearnEngine.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
-
+        main_dataframe_copy , list_converted_columns = SklearnEngine.factorize_string_cols(main_dataframe_copy , pipeline_x_values , pipeline_y_value)
+        print("List converted" , list_converted_columns)
         # Preform basic validation on the inputs
-        result_validation = SklearnEngine.validate_column_inputs(main_dataframe_copy , curr_pipelines, pipeline_x_values , pipeline_y_value)
+        result_validation = SklearnEngine.validate_column_inputs(main_dataframe_copy , curr_pipelines, pipeline_x_values , pipeline_y_value, list_converted_columns)
 
         if result_validation:
             return result_validation
@@ -197,6 +202,7 @@ class SklearnEngine():
                 pipeline_y_value ,
                 x , 
                 y , 
+                list_converted_columns
             )
         elif supervised_learning_type == SklearnEngine.REGRESSION:
             return SklearnEngine.RegressionPlotterFilter.main_filter(
@@ -206,6 +212,7 @@ class SklearnEngine():
                 pipeline_y_value ,
                 x , 
                 y , 
+                list_converted_columns
             )
         else:
             raise ValueError("Internal Engine Error : Not Regression or classification")
@@ -220,13 +227,38 @@ class SklearnEngine():
             pipeline_y_value ([str]): _description_
         """
         cols = pipeline_x_values + pipeline_y_value
+        list_code_maps = []
         for col in cols:
             if pd.api.types.is_string_dtype(main_dataframe[col]):
                 codes, uniques = pd.factorize(main_dataframe[col])
+                # Index of the unique corresponds to the actual code later. 
+                # Plan ... make a conversion tuple? 
                 main_dataframe[col] = codes
-        return main_dataframe
+                new_code_map = ConvertedColumn(
+                    column_name=col,
+                    code_map=uniques
+                )
+                list_code_maps.append(new_code_map)
+        return main_dataframe , list_code_maps
     
-    def plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value):
+    def handle_2d_column_conversion(ax , list_converted_columns , pipeline_x_values , pipeline_y_value):
+        def list_of_indexes(converted_col) -> list[int]:
+                curr_list = []
+                for x in range(0 , len(converted_col.code_map)):
+                    curr_list.append(x)
+                return curr_list
+        # Handleing special graphing. 
+        for converted_col in list_converted_columns:
+            if converted_col.column_name == pipeline_x_values[0]:
+                print("Doing conversion")
+                ax.set_xticks(list_of_indexes(converted_col))
+                ax.set_xticklabels(converted_col.code_map)
+            if converted_col.column_name == pipeline_y_value[0]:
+                print("Doing conversion")
+                ax.set_yticks(list_of_indexes(converted_col))
+                ax.set_yticklabels(converted_col.code_map)
+    
+    def plot_no_model(main_dataframe , curr_pipeline , pipeline_x_values , pipeline_y_value , list_converted_columns):
         # load x and y_values        
         x = main_dataframe[pipeline_x_values]
         y = main_dataframe[pipeline_y_value].iloc[:, 0]
@@ -236,6 +268,12 @@ class SklearnEngine():
             color_cycle = SklearnEngine.get_color_map()
             ax.scatter(x , y , color=color_cycle[0], label=f"Dataset")
             ax.set_title(f"{pipeline_x_values[0]} and {pipeline_y_value[0]}")
+            SklearnEngine.handle_2d_column_conversion(
+                ax,
+                list_converted_columns,
+                pipeline_x_values,
+                pipeline_y_value
+            )
             ax.set_xlabel(f"{pipeline_x_values[0]}")
             ax.set_ylabel(f"{pipeline_y_value[0]}")
             ax.legend(loc='upper left')
@@ -259,16 +297,17 @@ class SklearnEngine():
    
         
 
-    def validate_column_inputs(main_dataframe, curr_pipelines, pipeline_x_values , pipeline_y_value):
+    def validate_column_inputs(main_dataframe, curr_pipelines, pipeline_x_values , pipeline_y_value , list_converted_columns):
         lst_cols = main_dataframe.columns
         # If model empty do empty plot
         if len(curr_pipelines) == 0:
             return EngineResults(
-                visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipelines , pipeline_x_values , pipeline_y_value),
+                visual_plot=SklearnEngine.plot_no_model(main_dataframe , curr_pipelines , pipeline_x_values , pipeline_y_value, list_converted_columns),
                 accuracy_plot=None,
                 trained_models=None,
                 x_cols=pipeline_x_values,
-                y_col=pipeline_y_value
+                y_col=pipeline_y_value,
+                list_converted_columns=list_converted_columns
             )
 
         # check to make sure cols are from this dataset.
@@ -389,6 +428,7 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns
         ) -> EngineResults:
             pass
 
@@ -400,6 +440,7 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns : list[ConvertedColumn]
         ) -> EngineResults:
             visual_plot = None
             accuracy_plot = SklearnEngine.ClassificationPlotterFilter.accuracy_plot(
@@ -409,6 +450,7 @@ class SklearnEngine():
                 pipeline_y_value ,
                 x , 
                 y , 
+                list_converted_columns
             )
             if len(x.columns) == 1:
                 visual_plot = SklearnEngine.ClassificationPlotterFilter.plot_1d(
@@ -418,6 +460,7 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns
                 )
             elif len(x.columns) == 2:
                 visual_plot = SklearnEngine.ClassificationPlotterFilter.plot_2d(
@@ -427,6 +470,7 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns
                 )
             elif len(x.columns) == 3:
                 visual_plot =  SklearnEngine.ClassificationPlotterFilter.plot_3(
@@ -436,6 +480,7 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns
                 )
             else:
                 visual_plot =  SklearnEngine.ClassificationPlotterFilter.plot_3_plus(
@@ -445,13 +490,15 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns
                 )
             return EngineResults(
                 visual_plot=visual_plot,
                 accuracy_plot=accuracy_plot,
                 trained_models=curr_pipelines,
                 x_cols=pipeline_x_values,
-                y_col=pipeline_y_value
+                y_col=pipeline_y_value,
+                list_converted_columns=list_converted_columns
             )
             
         def accuracy_plot(
@@ -461,6 +508,7 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns
         ):
             fig, ax = plt.subplots()
             results = []
@@ -484,6 +532,7 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns : list[ConvertedColumn]
                 ):
             max_margin = 0.5
             fig, ax = plt.subplots()
@@ -499,10 +548,23 @@ class SklearnEngine():
                 decision_boundary_x = x_plot[switch_index, 0]
                 ax.axvline(x=decision_boundary_x, linestyle='--',
                             label=f'Decision Boundary (x={decision_boundary_x:.2f})')
+            SklearnEngine.handle_2d_column_conversion(
+                ax,
+                list_converted_columns,
+                pipeline_x_values,
+                pipeline_y_value
+            )
             ax.set_title(f'Classifier for {pipeline_y_value[0]}')
             ax.scatter(x, y, c=y_enc, cmap=cmap, edgecolor='k', marker='o', s=50, label=f'')
-            ax.set_xlabel(f'{pipeline_y_value[0]}')
+            ax.set_xlabel(f'{pipeline_x_values[0]}')
             ax.set_ylabel(f'{pipeline_y_value[0]}')
+            # Handleing special graphing. 
+            for converted_col in list_converted_columns:
+                print("Special graph" , converted_col , converted_col.code_map)
+                if converted_col.column_name == pipeline_x_values[0]:
+                    ax.set_xticklabels(converted_col.code_map)
+                if converted_col.column_name == pipeline_y_value[0]:
+                    ax.set_yticklabels(converted_col.code_map)
             fig.legend(loc='outside upper right')
             ax.grid(True, axis='x', linestyle='--', alpha=0.6)
             return fig
@@ -514,6 +576,8 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns : list[ConvertedColumn]
+
                 ):
             fig, axs = plt.subplots( 1 , len(curr_pipelines) )
             if len(curr_pipelines) == 1:
@@ -526,6 +590,22 @@ class SklearnEngine():
             classes_color_encoding = np.unique(y_enc)
             for i in range(0 , len(curr_pipelines)):
                 current_ax = axs[i]
+                
+                def custom_convert():
+                    # Custom Converted Columns snippet.
+                    def list_of_indexes(converted_col) -> list[int]:
+                            curr_list = []
+                            for x in range(0 , len(converted_col.code_map)):
+                                curr_list.append(x)
+                            return curr_list
+                    # Handleing special graphing. 
+                    for converted_col in list_converted_columns:
+                        if converted_col.column_name == pipeline_x_values[0]:
+                            current_ax.set_xticks(list_of_indexes(converted_col))
+                            current_ax.set_xticklabels(converted_col.code_map)
+                        if converted_col.column_name == pipeline_x_values[1]:
+                            current_ax.set_yticks(list_of_indexes(converted_col))
+                            current_ax.set_yticklabels(converted_col.code_map)
                 sklearn.inspection.DecisionBoundaryDisplay.from_estimator(
                     curr_pipelines[i].model_results.trained_model,
                     x,
@@ -533,11 +613,13 @@ class SklearnEngine():
                     cmap=cmap,
                     ax=current_ax
                 )
+                custom_convert()
                 # Plot the data points
                 axs[i].scatter(x.iloc[:, 0], x.iloc[:, 1], cmap=cmap,  c=y_enc, edgecolors='k')
                 axs[i].set_title(f"Classifier for {pipeline_y_value[0]} : {curr_pipelines[i].name}")
                 axs[i].set_xlabel(f"{pipeline_x_values[0]}")
                 axs[i].set_ylabel(f"{pipeline_x_values[1]}")
+                #custom_convert()
                 handles = []
                 for k in range(0 , len(classes)):
                     class_val = classes_color_encoding[k]
@@ -555,6 +637,8 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns : list[ConvertedColumn]
+
                 ):
             fig, ax = plt.subplots()
             return fig
@@ -569,6 +653,8 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns : list[ConvertedColumn]
+
                 ):
            fig, ax = plt.subplots()
            return fig
@@ -583,6 +669,8 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns : list[ConvertedColumn]
+            
         ) -> EngineResults:
             accuracy_plot = SklearnEngine.RegressionPlotterFilter.accuracy(
                 main_dataframe ,
@@ -591,6 +679,8 @@ class SklearnEngine():
                 pipeline_y_value ,
                 x , 
                 y , 
+                list_converted_columns
+
             )
             visual_plot = None
             if len(x.columns) == 1:
@@ -601,6 +691,7 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y , 
+                    list_converted_columns
                 )
             elif len(x.columns) == 2:
                 visual_plot = SklearnEngine.RegressionPlotterFilter.plot_2d(
@@ -610,6 +701,7 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y ,
+                    list_converted_columns
                 )
             else:
                 visual_plot =  SklearnEngine.RegressionPlotterFilter.plot_3d_plus(
@@ -619,13 +711,15 @@ class SklearnEngine():
                     pipeline_y_value ,
                     x , 
                     y ,
+                    list_converted_columns
                 )
             return EngineResults(
                 visual_plot=visual_plot,
                 accuracy_plot=accuracy_plot,
                 trained_models=curr_pipelines,
                 x_cols=pipeline_x_values,
-                y_col=pipeline_y_value
+                y_col=pipeline_y_value,
+                list_converted_columns=list_converted_columns
             )
 
 
@@ -636,6 +730,7 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns
         ):
             fig, ax = plt.subplots()
             color_cycle = SklearnEngine.get_color_map()
@@ -643,6 +738,12 @@ class SklearnEngine():
             for i in range(0 , len(curr_pipelines)):
                 curr = curr_pipelines[i].model_results.y_predictions
                 ax.plot(x , curr ,  color=color_cycle[i+1] , label=f'{curr_pipelines[i].name} predictions')
+            SklearnEngine.handle_2d_column_conversion(
+                ax,
+                list_converted_columns,
+                pipeline_x_values,
+                pipeline_y_value
+            )
             ax.set_title(f"{pipeline_x_values[0]} and {pipeline_y_value[0]}")
             ax.set_xlabel(f"{pipeline_x_values[0]}")
             ax.set_ylabel(f"{pipeline_y_value[0]}")
@@ -656,7 +757,25 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns
         ):
+            def resolve_ticks():
+                def list_of_indexes(converted_col) -> list[int]:
+                        curr_list = []
+                        for x in range(0 , len(converted_col.code_map)):
+                            curr_list.append(x)
+                        return curr_list
+                # Handleing special graphing. 
+                for converted_col in list_converted_columns:
+                    if converted_col.column_name == pipeline_x_values[0]:
+                        ax.set_xticks(list_of_indexes(converted_col))
+                        ax.set_xticklabels(converted_col.code_map)
+                    if converted_col.column_name == pipeline_x_values[1]:
+                        ax.set_zticks(list_of_indexes(converted_col))
+                        ax.set_zticklabels(converted_col.code_map)
+                    if converted_col.column_name == pipeline_y_value[0]:
+                        ax.set_yticks(list_of_indexes(converted_col))
+                        ax.set_yticklabels(converted_col.code_map)
             # Step 3: Create grid for plotting
             x1_range = np.linspace(x.iloc[:, 0].min(), x.iloc[:, 0].max(), 50)
             x2_range = np.linspace(x.iloc[:, 1].min(), x.iloc[:, 1].max(), 50)
@@ -671,6 +790,7 @@ class SklearnEngine():
 
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
+            resolve_ticks()
 
             for i  in range(0 , len(curr_pipelines)):
                 pipeline = curr_pipelines[i]
@@ -699,6 +819,7 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns
         ):
             fig, ax = plt.subplots()
             return fig
@@ -711,6 +832,7 @@ class SklearnEngine():
             pipeline_y_value ,
             x , 
             y , 
+            list_converted_columns
         ):
             fig, axs = plt.subplots( 1 , len(curr_pipelines) )
             if len(curr_pipelines) <= 1:
