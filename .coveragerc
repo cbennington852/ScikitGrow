@@ -1,0 +1,6 @@
+[run]
+omit =
+    src/datascratch/image_resources.py
+    src/datascratch/colors_and_appearance.py
+    tests/*.py
+    load_dll.py

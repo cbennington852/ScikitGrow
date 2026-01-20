@@ -19,11 +19,11 @@ theme.apply()
 
 
 def is_regressor(x):
-    return x in SklearnAcceptableFunctions.REGRESSORS
+    return x.__class__ in SklearnAcceptableFunctions.REGRESSORS
         
 
-def classification_filter(x):
-    return x in SklearnAcceptableFunctions.CLASSIFIERS
+def is_classifier(x):
+    return x.__class__ in SklearnAcceptableFunctions.CLASSIFIERS
 
 # Feature expansion plan ... multiple pipelines
     # SklearnEngine takes in multiple "Pipelines"
@@ -35,11 +35,6 @@ class InternalEngineError(Exception):
     pass
 
 class Pipeline():
-    rand_adj = [
-        "Awesome", "Beautiful", "Charming", "Delightful", "Energetic", 
-        "Fantastic", "Gorgeous", "Happy", "Intelligent", "Joyful"
-    ]
-
     """
     A small class to hold a sklearn pipeline and optionally a validator.
     """
@@ -50,10 +45,11 @@ class Pipeline():
         self.model_results : ModelTrainingResults = None
         last_step_name , last_step_model = self.sklearn_pipeline.steps[-1]
         if self.name is None:
-            self.name = random.choice(Pipeline.rand_adj) + " " + last_step_model.__class__.__name__
-        if sklearn.base.is_classifier(last_step_model):
+            self.name = last_step_model.__class__.__name__
+        print("Last step model : " , last_step_model)
+        if is_classifier(last_step_model):
             self.supervised_learning_type = SklearnEngine.CLASSIFICATION
-        elif sklearn.base.is_regressor(last_step_model):
+        elif is_regressor(last_step_model):
             self.supervised_learning_type = SklearnEngine.REGRESSION
         else:
             raise InternalEngineError(f"Pipeline {name} has neither a regressor or classifier. Crashing")
@@ -250,7 +246,7 @@ class SklearnEngine():
                 list_converted_columns
             )
         else:
-            raise ValueError("Internal Engine Error : Not Regression or classification")
+            raise InternalEngineError("Internal Engine Error : Not Regression or classification")
 
     def factorize_string_cols(main_dataframe , pipeline_x_values , pipeline_y_value):
         """Takes all of the string like columns and serializes them, with each unique 
@@ -348,10 +344,10 @@ class SklearnEngine():
         # check to make sure cols are from this dataset.
         for x_col in pipeline_x_values:
             if x_col not in lst_cols:
-                raise ValueError(f"Error: {x_col} is not in the dataset")
+                raise InternalEngineError(f"Error: {x_col} is not in the dataset")
         for y_col in pipeline_y_value:
             if y_col not in lst_cols:
-                raise ValueError(f"Error: {y_col} is not in the dataset")
+                raise InternalEngineError(f"Error: {y_col} is not in the dataset")
             
     def train_with_validator(model , kf, X , y):
         num_cores = min(1 , os.cpu_count() - 1)

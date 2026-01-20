@@ -360,6 +360,92 @@ def test_classification_4_cols():
         )
     assert res
 
+
+def test_converted_cols():
+    res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+            main_dataframe=classifier_dataframe,
+            pipeline_x_values=['sepal_width' , 'species'],
+            pipeline_y_value=['species'],
+            curr_pipelines=[
+                Pipeline(
+                    sklearn_pipeline=linear_pipe,
+                ),
+                Pipeline(
+                    sklearn_pipeline=linear_pipe_2,
+                )
+            ]
+        )
+    assert res
+
+def test_converted_cols():
+    res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+            main_dataframe=classifier_dataframe,
+            pipeline_x_values=['species' , 'sepal_width'],
+            pipeline_y_value=['species'],
+            curr_pipelines=[
+                Pipeline(
+                    sklearn_pipeline=linear_pipe,
+                ),
+                Pipeline(
+                    sklearn_pipeline=linear_pipe_2,
+                )
+            ]
+        )
+    assert res
+
+def test_clashing_models():
+    try:
+        res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+                main_dataframe=classifier_dataframe,
+                pipeline_x_values=['sepal_width' , 'petal_length' , 'sepal_length'],
+                pipeline_y_value=['species'],
+                curr_pipelines=[
+                    Pipeline(
+                        sklearn_pipeline=linear_pipe,
+                        validator=val.KFold(n_splits=2)
+                    ),
+                    Pipeline(
+                        sklearn_pipeline=classifier_pipe_2,
+                        validator=val.KFold(n_splits=2)
+                    )
+                ]
+            )
+        assert False
+    except Exception:
+        assert True
+
+def test_invalid_xcols():
+    try:
+        res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+                main_dataframe=classifier_dataframe,
+                pipeline_x_values=['sepal_width' , 'asdasdasd' , 'sepal_length'],
+                pipeline_y_value=['species'],
+                curr_pipelines=[
+                    Pipeline(
+                        sklearn_pipeline=linear_pipe,
+                    ),
+                ]
+            )
+        assert False
+    except Exception:
+        assert True
+
+def test_invalid_ycols():
+    try:
+        res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+                main_dataframe=classifier_dataframe,
+                pipeline_x_values=['sepal_width' , 'asdasdasd' , 'sepal_length'],
+                pipeline_y_value=['species'],
+                curr_pipelines=[
+                    Pipeline(
+                        sklearn_pipeline=linear_pipe,
+                    ),
+                ]
+            )
+        assert False
+    except Exception:
+        assert True
+    
 def test_classification_5_cols():
     res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
             main_dataframe=classifier_dataframe,
@@ -375,5 +461,15 @@ def test_classification_5_cols():
                     validator=val.KFold(n_splits=2)
                 )
             ]
+        )
+    assert res
+
+
+def test_no_model_5_cols():
+    res = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+            main_dataframe=classifier_dataframe,
+            pipeline_x_values=['sepal_width' , 'petal_length' , 'sepal_length' , 'petal_width'],
+            pipeline_y_value=['species'],
+            curr_pipelines=[]
         )
     assert res

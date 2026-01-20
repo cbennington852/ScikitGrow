@@ -1,0 +1,199 @@
+<!--
+Important Notes: 
+    Length : 750 words - 1,750 words
+
+-->
+<h1 id="summary">Summary</h1>
+<p>Data science is a current and evolving field. Currently, this field
+is historicity a extremely coding heavy field. DataScratch is a novel
+approach to perform data science tasks, such as model training, and
+validation, through drag and drop interface without requiring heavy
+coding knowledge.</p>
+<h1 id="statement-of-need">Statement of need</h1>
+<p>The current educational landscape presents a significant hurdle for
+novices seeking to engage with data science. While foundational
+mathematical concepts like algebra and basic statistics are often
+introduced in high school, students often do not study data science and
+AI until middle-late undergraduate.</p>
+<p>Many educators cite that programming is a barrier to entry to data
+science <span class="citation"
+data-cites="bart2016implementing thayer2020practical brunner2016teaching">(Bart
+et al. 2016; Thayer 2020; Brunner and Kim 2016)</span>. This is because
+many tools and libraries for data science are called programmatically.
+The cognitive load associated with learning both programming syntax and
+complex statistical concepts simultaneously is often deemed detrimental
+to meaningful learning.</p>
+<p>This lack of accessible entry points limits the potential for
+widespread data science literacy. As AI increasingly permeates various
+aspects of modern life understanding its underlying principles becomes
+essential. Data science literacy empowers individuals to critically
+evaluate these systems, fostering informed decision-making and promoting
+responsible technological development<span class="citation"
+data-cites="provost2013data jain2021smart">(Provost and Fawcett 2013;
+Jain 2021)</span>. Moreover, a basic grasp of AI models can demystify
+complex technologies, enabling students to navigate a world shaped by
+intelligent systems with greater confidence and agency.<span
+class="citation" data-cites="hsu2025effects">(Hsu and Chen
+2025)</span></p>
+<p>Therefore, there’s an urgent need for tools that prioritize
+accessibility and intuitive learning. A low barrier to entry is
+paramount; users should be able to explore core data science concepts
+without needing prior programming experience. This necessitates a
+paradigm shift away from code-centric approaches towards user-friendly
+interfaces that abstract the complexities of programming while
+preserving the fundamental principles of data analysis.</p>
+<p>DataScratch directly addresses this need by offering a visual,
+drag-and-drop environment for building and experimenting with AI models.
+By removing the immediate requirement to write code, DataScratch
+provides novice users with an accessible gateway to exploring core
+concepts in data science and AI.</p>
+<h1 id="state-of-the-field">State of the field</h1>
+<p>There are several no-code, low code platforms available on the
+internet. However these are often designed with power users in mind, and
+are often expensive, making them frustrating to novices. Many of these
+softwares are geared twoard commercial data science use, with a focus on
+integration with common business tools.</p>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 29%" />
+<col style="width: 17%" />
+<col style="width: 23%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+<th>Target Audience</th>
+<th>License</th>
+<th>Drag and drop</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DataBricks</td>
+<td>Generative AI</td>
+<td>Businesses</td>
+<td>Paid / Commercial</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td>Power BI</td>
+<td>Visualization Interface</td>
+<td>Businesses</td>
+<td>Paid / Commercial</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
+<td>Rapid Miner</td>
+<td>Training / Visualization</td>
+<td>Data Scientists</td>
+<td>Free for individuals</td>
+<td>No</td>
+</tr>
+<tr class="even">
+<td>JASP</td>
+<td>Statistics / Visualization</td>
+<td>High Undergraduate / Graduate</td>
+<td>Free</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>Scratch, a visual programming language designed for children, offers
+a compelling model for accessible computational learning. Its intuitive
+drag-and-drop interface allows beginners to grasp fundamental
+programming concepts without needing to decipher complex syntax.
+DataScratch seeks to replicate this accessibility within the realm of
+data science.</p>
+<h1 id="software-design">Software design</h1>
+<p>The language for this software is python, this is because python
+possesses several libraries, such as pandas[CITATION],
+matplotlib[CITATION], and scikit-learn[CITATION], which are standard
+tools for data science and AI modeling. Another reason would be
+portability. If a user desires features that are beyond the scope of
+DataScratch, the software is built in a way the models and utilizes
+underlying data science libraries, to make the transition from using
+DataScratch to programming in python easier.</p>
+<p>The GUI software was originally written using a python library called
+PyGtk[CITATION], however after several months of development this
+library was dropped, due to the PyGtk library having a non-functional
+pip installation, and graphical issues when run on windows.
+Additionally, electron was considered, with the benifit being easier
+styling, however it did not posses seamless python support. The project
+later switched to PyQt, which featured cross platform support, and
+allowed for installation via pip by default.</p>
+<p>The drag and drop components are modeled closely after
+scratch[CITATION], a library which has been shown to be very intuitive
+and easy to use[CITATION]. This choice was intended to make the software
+easier to use for people who aren’t heavy coders. The shape of each
+draggable block corresponds to a shape on the pipeline to give the user
+visual signifiers telling them where things should go.<br />
+<img src="paper_images/Python_v_datascratch.png"
+title="Image showing the complexity of coding versus the new drag and drop interface."
+alt="blocks v python" /> The interface also enables the user to assemble
+and train multiple models at once, allowing for quick model comparison.
+This enables common user desires within data science, where data
+scientists often compare and contrast models. <img
+src="paper_images/Example_model_comparison.svg"
+title="Image showing model comparison for the software."
+alt="model comparison" /></p>
+<p>Additionally, Datascratch comes pre-loaded with several example
+datasets, which have been crafted to be usable to a wide range of users,
+allowing novices to get learning right away, without having to procure a
+dataset first. <img src="paper_images/diamonds_descriptive.png"
+title="Image showing descriptive statistics for the diamonds dataset"
+alt="example dataset descriptive statistics" /></p>
+<h1 id="research-impact-statement">Research impact statement</h1>
+<ul>
+<li>Talk about the near-term significance (benchmarks, reproducible
+materials, community-readiness signals).
+<ul>
+<li>Enhanced Data Science Literacy</li>
+<li>Democratization of AI literacy</li>
+</ul></li>
+</ul>
+<h1 id="ai-usage-disclosure">AI usage disclosure</h1>
+<p>The dataframe_viewer class was heavily written by AI. This is a small
+subclass which renders a pandas dataframe as a PyQt table. Google was
+used to search for API documentation. The built in AI overview on google
+cannot be deactivated, and thus the AI overview was unintentionally used
+upon each google search. Oftentimes, the AI overview provided false
+information, and was later ignored due to a lack of verifiability.</p>
+<p>Generative AI was later used during the proofreading stage of writing
+the paper, with it helping catch several clarity and grammatical errors.
+These AI suggestions were then verified with human experts.</p>
+<h1 class="unnumbered" id="references">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent"
+role="list">
+<div id="ref-bart2016implementing" class="csl-entry" role="listitem">
+Bart, Austin Cory, Javier Tibau, Eli Tilevich, Clifford A Shaffer, and
+Dennis G Kafura. 2016. <span>“Implementing an Open-Access, Data Science
+Programming Environment for Learners.”</span> In <em>COMPSAC</em>,
+728–37.
+</div>
+<div id="ref-brunner2016teaching" class="csl-entry" role="listitem">
+Brunner, Robert J, and Edward J Kim. 2016. <span>“Teaching Data
+Science.”</span> <em>Procedia Computer Science</em> 80: 1947–56.
+</div>
+<div id="ref-hsu2025effects" class="csl-entry" role="listitem">
+Hsu, Ting-Chia, and Mu-Sheng Chen. 2025. <span>“Effects of Students
+Using Different Learning Approaches for Learning Computational Thinking
+and AI Applications.”</span> <em>Education and Information
+Technologies</em> 30 (6): 7549–71.
+</div>
+<div id="ref-jain2021smart" class="csl-entry" role="listitem">
+Jain, Lakhmi C. 2021. <span>“Smart Innovation, Systems and
+Technologies.”</span> Springer: Singapore.
+</div>
+<div id="ref-provost2013data" class="csl-entry" role="listitem">
+Provost, Foster, and Tom Fawcett. 2013. <span>“Data Science and Its
+Relationship to Big Data and Data-Driven Decision Making.”</span>
+<em>Big Data</em> 1 (1): 51–59.
+</div>
+<div id="ref-thayer2020practical" class="csl-entry" role="listitem">
+Thayer, Kyle Matthew. 2020. <span>“Practical Knowledge Barriers in
+Professional Programming.”</span> PhD thesis.
+</div>
+</div>

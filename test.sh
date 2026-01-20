@@ -1,2 +1,2 @@
 source ./myenv/bin/activate
-pytest --cov=..
+pytest --cov=.. --cov-report html

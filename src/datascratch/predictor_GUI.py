@@ -135,7 +135,9 @@ class PredictionGUI(QtW.QScrollArea):
         try:
             x_values = []
             for x_col in self.x_cols_ptr_lst:
-                x_values.append(str(x_col.text()))
+                curr_value = str(x_col.text())
+                new_value = curr_value if curr_value != "" else 0
+                x_values.append(new_value)
 
             res = self.engine_results.predict(x_values )
             for pipeline_ptr , value in res.items():

@@ -9,6 +9,7 @@ import time
 import os.path
 from src.datascratch.descriptor_statistics_GUI import DescriptorStatisticsGUI
 from pytestqt import qtbot
+from src.datascratch.sklearn_engine import EngineResults , InternalEngineError
 
 df = pd.read_csv("resources/random_data.csv")
 
@@ -103,7 +104,7 @@ def setup_test_environment_two():
     return window
 
 
-def setup_generator_environment(window ):
+def setup_generator_environment(qtbot , window ) -> EngineResults:
     """Setup test envorment 2 and return engine results, once trained. 
 
     Returns:
@@ -119,6 +120,11 @@ def setup_generator_environment(window ):
         time.sleep(0.01)
     while not hasattr(window.plotter.worker, 'engine_results') and check_time():
         time.sleep(0.01)
+    # now we use the qtbot wait until. 
+    print("ptr check" ,  window.pipeline_mother.columns_subwindow.train_models)
+    def check_if_done():
+        return window.pipeline_mother.columns_subwindow.train_models.isEnabled()
+    qtbot.waitUntil(check_if_done)
     # Setting a timer due to absurd internal PyQt libary error
     # The even thread is messed up for some reason only while testing.
     return window.plotter.worker.engine_results
@@ -204,14 +210,23 @@ def test_wrong_file_type(qtbot):
     except Exception:
         assert True
 
-
-def test_running_predictor(qtbot):
-    # check to see that the prredictor does not crash and returns an engine result
+def test_setting_up_generator(qtbot):
+    # check to see that the generator does not crash and returns an engine result
     window = setup_test_environment_two()
     qtbot.addWidget(window)
 
-    if setup_generator_environment(window) is not None:
+    if setup_generator_environment(qtbot , window) is not None:
         assert True
     else:
         assert False
+
+def test_running_manual_predictor(qtbot):
+    window = setup_test_environment_two()
+    qtbot.addWidget(window)
+    setup_generator_environment(qtbot , window)
+    print("Curr tab" , window.plotter.prediction_tab)
+    window.plotter.prediction_tab.run_all_predictions()
+    assert True
+
+
 
