@@ -19,7 +19,7 @@ import threading
 from .GUI_libary_and_pipeline_mother import PipelineMother , Pipeline
 import matplotlib.pyplot as plt
 from .predictor_GUI import PredictionGUI
-from .descriptor_statistics_GUI import DescriptorStatisticsGUI , ColumnDescriptor
+from .descriptor_statistics_GUI import DescriptorStatisticsGUI , GeneralDescriptor
 
 
 
@@ -210,7 +210,7 @@ class Plotter(QtW.QTabWidget):
             pipeline_group_box.setLayout(pipeline_group_box_lay)
             for stat_name , value in pipeline.model_results.relevant_statistical_results:
                 print(f"stat: {stat_name} , Val:{value}")
-                pipeline_group_box_lay.addRow(QtW.QLabel(stat_name) , QtW.QLabel(str(round(value , ColumnDescriptor.digit_rounding))))
+                pipeline_group_box_lay.addRow(QtW.QLabel(stat_name) , QtW.QLabel(str(round(value , GeneralDescriptor.digit_rounding))))
             stats_layout.addWidget(pipeline_group_box)
 
         main_layout.addWidget(FigureCanvasQTAgg(engine_results.accuracy_plot))
@@ -229,11 +229,14 @@ class Plotter(QtW.QTabWidget):
         try:
             self.accuracy_plot = self.resolve_accuracy(self.worker.engine_results)
         except Exception as e:
+            traceback.print_exception(e)
+            print(str(e))
             self.accuracy_plot = QtW.QWidget()
         try:
             self.prediction_tab = PredictionGUI(self.worker.engine_results)
         except Exception as e:
             print("ERROR PREDICTION GUI" , str(e))
+            traceback.print_exception(e)
             self.prediction_tab = QtW.QWidget()
         try: 
             self.descriptive_statistics = DescriptorStatisticsGUI(self.worker.engine_results , self.dataframe)

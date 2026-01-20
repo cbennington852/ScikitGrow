@@ -19,6 +19,8 @@ import time
 import qdarktheme
 import pandas as pd
 from .predictor_GUI import PredictionGUI
+import logging
+logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
 
 windows = []
 

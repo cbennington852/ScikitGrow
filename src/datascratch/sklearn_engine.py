@@ -113,6 +113,17 @@ class EngineResults():
         self.x_cols = x_cols
         self.y_col = y_col
         self.list_converted_columns = list_converted_columns
+
+    def is_column_in_list_converted_columns(self, col_name : str):
+        for converted_col in self.list_converted_columns:
+            if col_name == converted_col.column_name:
+                return True
+        return False
+    
+    def get_converted_column(self , col_name) -> ConvertedColumn:
+        for converted_col in self.list_converted_columns:
+            if col_name == converted_col.column_name:
+                return converted_col
     
 
     def predict(self , x_values : list ):
@@ -126,17 +137,22 @@ class EngineResults():
                 if converted_col.column_name == self.x_cols[j]:
                     x_values[j] = converted_col.convert_string_to_int(x_values[j])
                     # Convert thing
+
+                    
         # Assemble as dataframe
         tmp_df = pd.DataFrame([x_values] , columns=self.x_cols)
         results = {}
         for pipeline in self.trained_models:
-            print(tmp_df)
+            print("Temp DF " , tmp_df)
             curr = pipeline.predict(tmp_df)
-            for converted_col in self.list_converted_columns:
-                if self.y_col[0] == converted_col.column_name:
-                    results[pipeline] = converted_col.convert_int_to_string(curr)
-                else:
-                    results[pipeline] = curr
+            if self.list_converted_columns != []:
+                for converted_col in self.list_converted_columns:
+                    if self.y_col[0] == converted_col.column_name:
+                        results[pipeline] = converted_col.convert_int_to_string(curr)
+                    else:
+                        results[pipeline] = curr
+            else:
+                results[pipeline] = curr
         return results
 
 

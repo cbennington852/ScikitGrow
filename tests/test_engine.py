@@ -107,7 +107,7 @@ def test_3d_classification():
     assert isinstance(res , sklearn_engine.EngineResults)
 
 
-def test_predictions():
+def test_predictions_2d_reg():
     res : EngineResults = sklearn_engine.SklearnEngine.main_sklearn_pipe(
         main_dataframe=dataframe,
         pipeline_x_values=['Example Chemical 2' , 'Example Chemical 3' ],
@@ -123,11 +123,11 @@ def test_predictions():
             )
         ]
     )
-    res_value = res.predict([5.0 , 5.0] , dataframe)
-    print(res_value[res.trained_models[0]])
+    res_value = res.predict([5.0 , 5.0])
+    print(res_value)
     assert round(res_value[res.trained_models[0]] , 3) == round(40.43950829 , 3)
 
-def test_predictions():
+def test_predictions_1d_reg():
     res : EngineResults = sklearn_engine.SklearnEngine.main_sklearn_pipe(
         main_dataframe=dataframe,
         pipeline_x_values=['Example Chemical 2'  ],
@@ -144,10 +144,28 @@ def test_predictions():
         ]
     )
     res_value = res.predict([5.0])
-    print(res_value[res.trained_models[0]])
+    print("Res Value"  ,res_value)
     assert round(res_value[res.trained_models[0]] , 3) == round(38.422 , 3)
 
-    
+def test_predictions_1d_reg():
+    res : EngineResults = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+        main_dataframe=classifier_dataframe,
+        pipeline_x_values=['sepal_width' , 'species'  ],
+        pipeline_y_value=['species'],
+        curr_pipelines=[
+            Pipeline(
+                sklearn_pipeline=classifier_pipe,
+                validator=None
+            ),
+            Pipeline(
+                sklearn_pipeline=classifier_pipe_2,
+                validator=None
+            )
+        ]
+    )
+    res_value = res.predict([5.0 , 'setosa'])
+    print("Res Value"  ,res_value)
+    assert res_value[res.trained_models[0]] == 'setosa'
 
 def test_metrics():
     res : EngineResults = sklearn_engine.SklearnEngine.main_sklearn_pipe(
