@@ -58,6 +58,8 @@ class PipelineSection(QtW.QGroupBox):
         super().__init__( **kwargs)
         self.my_title = title
         self.setTitle(title)
+        # Lock size
+        self.setFixedHeight(int(AppAppearance.BASE_PIPELINE_HEIGHT / 3))
         self.my_parent = my_parent
         self.max_num_models = max_num_models
         self.accepting_function = accepting_function
@@ -228,7 +230,7 @@ class PipelineSection(QtW.QGroupBox):
                 top_bottom_margin = 20
                 width_rect = self.width() - left_right_margin*2
                 height_rect = self.height() - top_bottom_margin*2
-                corner_radius = 15
+                corner_radius = AppAppearance.MODEL_CORNER_RADIUS
                 round_rect_y = top_bottom_margin
                 round_rect_x = int(self.width() / 2) - int(width_rect/2)
                 painter.drawRoundedRect(
@@ -240,149 +242,34 @@ class PipelineSection(QtW.QGroupBox):
                     corner_radius
                 )
         elif self.my_title == 'Preprocessors':
-            painter = QPainter(self)
-            
-            if self.model_hovering == True:
-                painter.fillRect(self.rect(), QColor(AppAppearance.PIPELINE_HOVER_COLOR))
+            if dnd.is_holding(self):
+                painter = QPainter(self)
+                painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
+                painter.drawText( 0 , 15 , self.my_title)
             else:
-                painter.fillRect(self.rect(), QColor(AppAppearance.PIPELINE_NOT_HOVER_COLOR))
+                painter = QPainter(self)
+                # Writing the name of the thing.
+                painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
+                painter.drawText( 0 , 15 , self.my_title)
+                if self.model_hovering == True:
+                    painter.setBrush(QColor(AppAppearance.PIPELINE_HOVER_COLOR))
+                else:
+                    painter.setBrush(QColor(AppAppearance.PIPELINE_NOT_HOVER_COLOR))
+                painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
 
-
-            painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
-            painter.setBrush(QColor(AppAppearance.PIPELINE_PREPROCESSOR_BACKGROUND_COLOR))
-            # Top level calculations
-            width = self.width()
-            height = self.height()
-        
-
-            # Top level input Calculations
-            starting_x = 0
-            starting_y = 0
-            right_of_bevel_width = max(width - Draggable.left_of_bevel_width + 5,120)
-            
-            top_of_left_bevel_x = starting_x + Draggable.left_of_bevel_width 
-            bottom_right_of_top_bevel_x = top_of_left_bevel_x + Draggable.bevel_slant_width + Draggable.bevel_width
-            far_right_corner_x = bottom_right_of_top_bevel_x + Draggable.bevel_slant_width + right_of_bevel_width
-            start_second_bevel = bottom_right_of_top_bevel_x + Draggable.bevel_slant_width + Draggable.space_in_between_two_bevels
-            left_margin = 10
-
-            space_in_between_two_bevels = Draggable.space_in_between_two_bevels
-
-            #space_needed_for_mouth = height - ColumnsSection.height_between_top_mouth_and_top_bar*2
-            space_needed_for_mouth = max(self.get_num_models() * DraggableColumn.block_height , DraggableColumn.block_height)
-
-            second_bevel_x_offset = 40 + space_in_between_two_bevels
-            test_offset = 10
-            # where to start the bevel from the left. 
-            holder_block = QPolygon([
-                    QPoint( 0 , 0),             # Left Top corner
-                    QPoint(width , 0),          # Right Top corner
-                    QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar),
-
-                    QPoint(test_offset+ second_bevel_x_offset + ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
-                    # Bottom right of bevel
-                    QPoint(
-                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
-                        ),
-                    # Bottom left of bevel
-                    QPoint(
-                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
-                        ),
-                    QPoint(
-                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar 
-                        ),
-
-                    # right top of mouth
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, ColumnsSection.height_between_top_mouth_and_top_bar), # right start bevel.
-                    # Bottom right of bevel
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
-                        ),
-                    # Bottom left of bevel
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth
-                        ),
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar 
-                        ),
-
-                    # left top of mouth
-                    QPoint(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar),
-                    # Bottom of the mouth
-                    QPoint(ColumnsSection.width_from_start_mouth_to_left_side , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
-
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
-                        ),
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
-                        ),
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
-                        ),
-                    QPoint(
-                        test_offset+ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
-                        ), # right start bevel.
-
-
-                    QPoint(
-                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - (DraggableColumn.bevel_slant_width*2) - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth
-                        ),
-                    QPoint(
-                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width - DraggableColumn.bevel_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
-                        ),
-                    # Bottom right of bevel
-                    QPoint(
-                        test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start - DraggableColumn.bevel_slant_width + ColumnsSection.width_from_start_mouth_to_left_side, 
-                        ColumnsSection.height_between_top_mouth_and_top_bar + DraggableColumn.bevel_depth + space_needed_for_mouth
-                        ),
-                    # Bottom left of bevel
-                    QPoint(test_offset+second_bevel_x_offset + ColumnsSection.bevel_left_start + ColumnsSection.width_from_start_mouth_to_left_side, 
-                           ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth), # right start bevel.
-                    
-                    
-                    
-                
-                    QPoint(width , ColumnsSection.height_between_top_mouth_and_top_bar + space_needed_for_mouth),
-
-                    QPoint(width , height),     # Right Bottom corner
-                    QPoint(0 , height)          # Left Bottom corner
-                ])
-
-            painter.drawPolygon(holder_block)
-            # Render title
-            painter.setPen(QColor(AppAppearance.PIPELINE_TITLE_COLOR))
-            painter.drawText(15 , 20, self.my_title)
-
-            # 5 putting all of the children inside of each other
-            # 5.1 gather list of children
-            lst_of_children = []
-            for i in range(0 , self.my_layout.count()):
-                if isinstance(self.my_layout.itemAt(i) , QtW.QWidgetItem):
-                    temp_widget = self.my_layout.itemAt(i).widget()
-                    lst_of_children.append(temp_widget)
-            # 5.2 If more than one, move the bottoms inside of the ones on top of it.
-            if len(lst_of_children) > 1:
-                first_child = lst_of_children[0]
-                for i in range(1 , len(lst_of_children)):
-                    tmp  = lst_of_children[i]
-                    new_x = first_child.geometry().topLeft().x()
-                    new_y = first_child.geometry().topLeft().y() + i*Draggable.block_height
-                    tmp.move(new_x , new_y)
-            
+                left_right_margin = 10
+                top_bottom_margin = 20
+                width_rect = self.width() - left_right_margin*2
+                height_rect = self.height() - top_bottom_margin*2
+                corner_radius = 15
+                round_rect_y = top_bottom_margin
+                round_rect_x = int(self.width() / 2) - int(width_rect/2)
+                painter.drawRect(
+                    round_rect_x, 
+                    round_rect_y, 
+                    width_rect,
+                    height_rect,
+                ) 
         else:
             return super().paintEvent(e)
 
@@ -409,8 +296,7 @@ class PipelineData():
 class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
 
-    BASE_PIPELINE_WIDTH = 400
-    BASE_PIPELINE_HEIGHT = 400
+
     SECTION_PREPROCCESSOR_TITLE="Preprocessors"
     SECTION_MODEL_TITLE="Models"
     SECTION_VALIDATOR_TITLE="Validator"
@@ -434,7 +320,7 @@ class Pipeline(QtW.QMdiSubWindow):
         self.setWindowFlag(Qt.WindowMaximizeButtonHint , False)
         self.setStyleSheet(f"background-color:{AppAppearance.PIPELINE_BACKGROUND_COLOR}")
         self.main_thing.setLayout(self.my_layout)
-        self.setFixedSize(Pipeline.BASE_PIPELINE_WIDTH , Pipeline.BASE_PIPELINE_HEIGHT)
+        self.setFixedSize(AppAppearance.BASE_PIPELINE_WIDTH , AppAppearance.BASE_PIPELINE_HEIGHT)
         self.name_pipeline = QtW.QLineEdit()
         self.name_pipeline.setText(f"pipeline {1 + len(self.my_parent.pipelines)}")
         self.preproccessor_pipe = PipelineSection(
@@ -525,14 +411,7 @@ class Pipeline(QtW.QMdiSubWindow):
         
             
     def get_name_pipeline(self) -> str:
-        return self.name_pipeline.text
-    
-    def resize_based_on_children(self):
-        # get the number of pre-proccessors and their height, default to zero if one or below. 
-        pre_proccessor_height = max((self.preproccessor_pipe.get_num_models()-1) * Draggable.BASE_HEIGHT , 0)
-        # Resize the pipeline based on the children size n_stuff.
-        self.setFixedHeight(Pipeline.BASE_PIPELINE_HEIGHT + pre_proccessor_height)
-    
+        return self.name_pipeline.text    
 
     def closeEvent(self, event):
         for x in range(0 , len(self.my_parent.pipelines)):

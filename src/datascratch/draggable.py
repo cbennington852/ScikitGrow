@@ -258,9 +258,8 @@ class Draggable(QPushButton):
                 0 , # y
                 self.width()-10, # w
                 self.height()-10, # h
-                10, # x radius
-                10 # y radius
-
+                AppAppearance.MODEL_CORNER_RADIUS, # x radius
+                AppAppearance.MODEL_CORNER_RADIUS # y radius
             )
 
             painter.setPen(QColor(Qt.white))
@@ -280,64 +279,23 @@ class Draggable(QPushButton):
 
 
         elif self.render_type == Draggable.INTERLOCK_RIGHT:
+            # tunable parameters
+            height_block = 40
+            width_center_block = self.label_inferred_width + 10
+            width_triangle = Draggable.POINTY_TRIANGLE_WIDTH
+            triangle_mid_y_axis = int(height_block / 2)
 
-            opt = QtW.QStyleOptionButton()
-            self.initStyleOption(opt)
-            rect = self.rect()
-            self.style().drawControl(QtW.QStyle.CE_PushButtonBevel, opt, painter, self)
-            if opt.state & QtW.QStyle.State_Sunken:
-                rect.adjust(2,2,2,2)
+            painter.drawRect(
+                0 , # x
+                0 , # y
+                self.width()-10, # w
+                self.height()-10, # h
+            )
 
-            # Top level input Calculations
-            starting_x = 0
-            starting_y = 0
-            right_of_bevel_width = max(self.label_inferred_width - Draggable.left_of_bevel_width + 5,200)
-            
-            top_of_left_bevel_x = starting_x + Draggable.left_of_bevel_width 
-            bottom_right_of_top_bevel_x = top_of_left_bevel_x + Draggable.bevel_slant_width + Draggable.bevel_width
-            far_right_corner_x = bottom_right_of_top_bevel_x + Draggable.bevel_slant_width + right_of_bevel_width
-            start_second_bevel = bottom_right_of_top_bevel_x + Draggable.bevel_slant_width + Draggable.space_in_between_two_bevels
-
-            block_with_bevel = QPolygon([
-                QPoint(starting_x , starting_y), # Top Right point.
-
-                # Top Bevel
-                QPoint(top_of_left_bevel_x, starting_y), # top of top left bevel point.
-                QPoint(top_of_left_bevel_x + Draggable.bevel_slant_width , starting_y + Draggable.bevel_depth), # bottom left of top bevel point
-                QPoint(bottom_right_of_top_bevel_x , starting_y + Draggable.bevel_depth), # bottom right of top bevel point
-                QPoint(bottom_right_of_top_bevel_x + Draggable.bevel_slant_width  , starting_y), # top right of top bevel point.
-
-                # second top bevel
-                QPoint(start_second_bevel, starting_y), # top of top left bevel point.
-                QPoint(start_second_bevel + Draggable.bevel_slant_width , starting_y + Draggable.bevel_depth), # bottom left of top bevel point
-                QPoint(Draggable.second_bevel_width + start_second_bevel , starting_y + Draggable.bevel_depth), # bottom right of top bevel point
-                QPoint(Draggable.second_bevel_width + Draggable.bevel_slant_width + start_second_bevel , starting_y), # top right of top bevel point.
-
-                
-                QPoint(far_right_corner_x  , starting_y), # top right corner.
-                QPoint(far_right_corner_x , Draggable.block_height) , # bottom right corner
-                
-                # second bottom bevel
-                QPoint(Draggable.second_bevel_width + Draggable.bevel_slant_width + start_second_bevel , starting_y + Draggable.block_height), # top right of top bevel point.E
-                QPoint(Draggable.second_bevel_width + start_second_bevel , starting_y + Draggable.bevel_depth + Draggable.block_height), # bottom right of top bevel point
-                QPoint(start_second_bevel + Draggable.bevel_slant_width , starting_y + Draggable.bevel_depth + Draggable.block_height), # bottom left of top bevel point
-                QPoint(start_second_bevel, starting_y + Draggable.block_height), # top of top left bevel point.
-
-
-                # Bottom Bevel
-                QPoint(bottom_right_of_top_bevel_x + Draggable.bevel_slant_width  , starting_y + Draggable.block_height), # top right of top bevel point.
-                QPoint(bottom_right_of_top_bevel_x , starting_y + Draggable.bevel_depth + Draggable.block_height), # bottom right of top bevel point
-                QPoint(top_of_left_bevel_x + Draggable.bevel_slant_width , starting_y + Draggable.bevel_depth + Draggable.block_height), # bottom left of top bevel point
-                QPoint(top_of_left_bevel_x, starting_y + Draggable.block_height), # top of top left bevel point.
-
-                QPoint(starting_x , Draggable.block_height) # bottom left corner
-            ])
-
-            painter.drawPolygon(block_with_bevel)
             painter.setPen(QColor(Qt.white))
             start_y_for_text = int(self.size().height() / 2) + 5
-            painter.drawText(Draggable.left_of_bevel_width , start_y_for_text, f"{self.name}")
-
+            painter.drawText(width_triangle + 15 , start_y_for_text, f"{self.name}")
+            
             if self.hovering:
                 icon_side_size = 30
                 painter.drawPixmap(
@@ -347,7 +305,7 @@ class Draggable(QPushButton):
                     icon_side_size, # height
                     QPixmap(":images/popup.png")
                 )
-            
+
         else:
             return super().paintEvent(event)
         
