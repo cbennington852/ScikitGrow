@@ -234,7 +234,7 @@ class MainWindow(QMainWindow):
         
         # for file related actions.
         file_menu = menu.addMenu("&File")
-        graph_settings = menu.addMenu("&Graph Settings")
+        #graph_settings = menu.addMenu("&Graph Settings")
         
         # Save action
         save_action = QAction("Save Project" , self)

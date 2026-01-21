@@ -430,6 +430,8 @@ class Pipeline(QtW.QMdiSubWindow):
         self.my_layout = QVBoxLayout()
         self.main_thing = QtW.QWidget()
         self.my_parent = my_parent
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint , True)
+        self.setWindowFlag(Qt.WindowMaximizeButtonHint , False)
         self.setStyleSheet(f"background-color:{AppAppearance.PIPELINE_BACKGROUND_COLOR}")
         self.main_thing.setLayout(self.my_layout)
         self.setFixedSize(Pipeline.BASE_PIPELINE_WIDTH , Pipeline.BASE_PIPELINE_HEIGHT)
@@ -438,7 +440,8 @@ class Pipeline(QtW.QMdiSubWindow):
         self.preproccessor_pipe = PipelineSection(
             title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
             accepting_function=Pipeline.PREPROCESSOR_FILTER,
-            my_parent=self
+            my_parent=self,
+            max_num_models=1
 
         )
         self.model_pipe = PipelineSection(
