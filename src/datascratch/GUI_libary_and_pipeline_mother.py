@@ -326,8 +326,9 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
 
         mayo.addWidget(self.train_models)
         mayo.addWidget(self.x_columns)
-        #mayo.addStretch(1)
         mayo.addWidget(self.y_columns)
+        self.y_natural_height = self.y_columns.height()
+        self.x_natural_height = self.x_columns.height()
         self.show()
 
     def save_data(self):
@@ -345,7 +346,12 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
     
     def resize_based_on_children(self):
         # get the number of pre-proccessors and their height, default to zero if one or below. 
-        y_col_height = max((self.x_columns.get_num_cols()-1) * DraggableColumn.BASE_HEIGHT , 0)
-        print(f"Suggested y_col_height : {y_col_height}")
+        # Get natural height of x cols = 
+        
+        curr_num_x_cols = self.x_columns.get_num_cols()
+        x_col_needed_height = (curr_num_x_cols + 2) * DraggableColumn.BASE_HEIGHT 
+        print(f"Current Num Cols: {curr_num_x_cols}")
+        #y_col_height = max(curr_num_cols * DraggableColumn.BASE_HEIGHT + DraggableColumn.BASE_HEIGHT, 0)
         # Resize the pipeline based on the children size n_stuff.
-        self.setFixedHeight(ColumnsMDIWindow.BASE_HEIGHT + y_col_height)
+        final_height = self.y_natural_height + x_col_needed_height + self.x_natural_height + self.train_models.height()
+        self.setFixedHeight(final_height)

@@ -10,6 +10,15 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "scikit-learn",
+    "PyQt5",
+    "matplotlib",
+    "seaborn",
+    "qtwidgets",
+    "pyqtdarktheme",
+    "aquarel",
+]
 
 
 [tool.setuptools.packages.find]
@@ -38,15 +47,6 @@ env = [
 requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
-dependencies = [
-    "scikit-learn",
-    "PyQt5",
-    "matplotlib",
-    "seaborn",
-    "qtwidgets",
-    "pyqtdarktheme",
-    "aquarel",
-]
 
 [project.optional-dependencies]
 dev = [

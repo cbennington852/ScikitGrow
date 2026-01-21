@@ -1,7 +1,7 @@
 from .draggable import DraggableColumn
 from PyQt5.QtWidgets import QVBoxLayout
 import PyQt5.QtWidgets as QtW
-from PyQt5.QtGui import QColor , QPolygon, QPainter
+from PyQt5.QtGui import QColor , QPolygon, QPainter , QResizeEvent
 from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt
 from .colors_and_appearance import AppAppearance
@@ -20,7 +20,6 @@ class ColumnsSubmodule(QtW.QWidget):
         self.my_layout = QVBoxLayout(self)
         self.setAcceptDrops(True)
         self.setMinimumHeight(250)
-        
         self.lst_cols = lst_cols
         for col in self.lst_cols:
             new_widget = DraggableColumn(col)
@@ -136,14 +135,10 @@ class ColumnsSection(QtW.QGroupBox):
         """
         return [drag_col.name for drag_col in self.get_cols()]
     
-    # re-doing the layout events
-    def resizeEvent(self, a0):
-        return super().resizeEvent(a0)
+
     
     def get_cols(self) -> list[DraggableColumn]:
         """
-
-
         Returns:
             list[DraggableColumn]: list of draggable columns for this area.
         """
@@ -280,20 +275,22 @@ class ColumnsSection(QtW.QGroupBox):
         widget = e.source()
         from_parent = widget.parentWidget()
         to_parent = self
+        num_cols = self.get_num_cols()
         def check_is_correct_type():
             if not isinstance(widget , DraggableColumn):
                 e.ignore()
                 return
-        # remove the spacer ,and readadd to bottom.
-        def remove_all_spacers():
-            for i in range(0 , self.my_layout.count()):
-                if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
-                    temp_widget = self.my_layout.itemAt(i)
-                    self.my_layout.removeItem(temp_widget)
-                    del temp_widget
+            
+        def resize_self():
+            base_addition = 100
+            if self.max_num_cols == 1: # Y cols
+                self.setFixedHeight(DraggableColumn.BASE_HEIGHT + base_addition)
+            else: # X cols
+                self.setFixedHeight(num_cols * DraggableColumn.BASE_HEIGHT + base_addition)
+            print("Resizing event")
         
         def if_limit_remove_all_other_widgets():
-            if (self.get_num_cols() == self.max_num_cols):
+            if (num_cols == self.max_num_cols):
                 # Remove one the children from this
                 for child in self.findChildren(QtW.QWidget):
                     if isinstance(child , DraggableColumn) and child != widget:
@@ -302,8 +299,8 @@ class ColumnsSection(QtW.QGroupBox):
                 e.accept()
             
         check_is_correct_type()
-        remove_all_spacers()
         if_limit_remove_all_other_widgets()
+        resize_self()
         # Handle replacement with parent module. If applicable
         if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSection):
             self.my_layout.addWidget(widget.copy_self())
@@ -314,10 +311,5 @@ class ColumnsSection(QtW.QGroupBox):
             # Add the dang widget
             self.my_layout.addWidget(widget)
             
-        # Re-center the height
-        # add space to end of the layout to make it all squished to top.
-        if self.max_num_cols != 1:
-            self.my_layout.addStretch()
-        # Remove hovering attribute.
         self.hovering=False        
         dnd.end_drag_and_drop_event(to_parent , from_parent)

@@ -23,7 +23,8 @@ Important Notes:
 -->
 
 # Summary
-Data science is a current and evolving field. Currently, this field is historicity a extremely coding heavy field. DataScratch is a novel approach to perform data science tasks, such as model training, and validation, through drag and drop interface without requiring heavy coding knowledge.  
+
+Data science is often taught at the upper undergraduate levels, with programming often cited as a prerequisite for learning data science. DataScratch is software intended to teach novices the core concepts of data science, without the prerequisite of knowing how to program. DataScratch achieves this via an intuitive drag and drop interface modeled after scratch.
 
 # Statement of need
 
@@ -39,7 +40,7 @@ DataScratch directly addresses this need by offering a visual, drag-and-drop env
 
 # State of the field
 
-There are several no-code, low code platforms available on the internet. However these are often designed with power users in mind, and are often expensive, making them frustrating to novices. Many of these softwares are geared twoard commercial data science use, with a focus on integration with common business tools. 
+There are several no-code, low code platforms available on the internet. However these are often designed with power users in mind, and are often expensive, making them frustrating to novices. Many of these softwares are geared toward commercial data science use, with a focus on integration with common business tools. 
 
 | Name        | Description                | Target Audience | License              | Drag and drop |
 |-------------|----------------------------|-----------------|----------------------|---------------|
@@ -48,22 +49,22 @@ There are several no-code, low code platforms available on the internet. However
 | Rapid Miner | Training / Visualization   | Data Scientists | Free for individuals | No            |
 | JASP        | Statistics / Visualization | High Undergraduate / Graduate        | Free                 | No            |
 
-Scratch, a visual programming language designed for children, offers a compelling model for accessible computational learning. Its intuitive drag-and-drop interface allows beginners to grasp fundamental programming concepts without needing to decipher complex syntax.  DataScratch seeks to replicate this accessibility within the realm of data science.
+Scratch[@resnick2009scratch], a visual programming language designed for children, offers a compelling model for accessible computational learning. Its intuitive drag-and-drop interface allows beginners to grasp fundamental programming concepts without needing to decipher complex syntax. Scratch's interface has been proven to be effective at teaching novices programming concepts, and assist learners when the transition to "real" programming[@armoni2015scratch].
 
 # Software design
-The language for this software is python, this is because python possesses several libraries, such as pandas[CITATION], matplotlib[CITATION], and scikit-learn[CITATION], which are standard tools for data science and AI modeling. Another reason would be portability. If a user desires features that are beyond the scope of DataScratch, the software is built in a way the models and utilizes underlying data science libraries, to make the transition from using DataScratch to programming in python easier.
 
-The GUI software was originally written using a python library called PyGtk[CITATION], however after several months of development this library was dropped, due to the PyGtk library having a non-functional pip installation, and graphical issues when run on windows. Additionally, electron was considered, with the benifit being easier styling, however it did not posses seamless python support. The project later switched to PyQt, which featured cross platform support, and allowed for installation via pip by default. 
+The language for this software is python, this is because python possesses several libraries, such as pandas[@reback2020pandas], matplotlib[@Hunter:2007], and scikit-learn[CITATION], which are standard tools for data science and AI modeling. Another reason would be portability. If a user desires features that are beyond the scope of DataScratch, the software is built in a way the models and utilizes underlying data science libraries, to make the transition from using DataScratch to programming in python easier.
 
-The drag and drop components are modeled closely after scratch[CITATION], a library which has been shown to be very intuitive and easy to use[CITATION]. This choice was intended to make the software easier to use for people who aren't heavy coders. The shape of each draggable block corresponds to a shape on the pipeline to give the user visual signifiers telling them where things should go.  
+The GUI software was originally written using a python library called PyGtk[CITATION], however after several months of development this library was dropped, due to the PyGtk library having a non-functional pip installation, and graphical issues when run on windows. Additionally, electron was considered, with the benefit being easier styling, however it did not posses seamless python support. The project later switched to PyQt, which featured cross platform support, and allowed for installation via pip by default. 
+
+The drag and drop components are modeled closely after scratch[resnick2009scratch].  The shape of each draggable block corresponds to a shape on the pipeline to give the user visual signifiers telling them where things should go. The purpose of this change is to reduce the complexity of the interface.  
 ![blocks v python](paper_images/Python_v_datascratch.png "Image showing the complexity of coding versus the new drag and drop interface.")
-The interface also enables the user to assemble and train multiple models at once, allowing for quick model comparison. This enables common user desires within data science, where data scientists often compare and contrast models. 
+
+The interface also enables the user to assemble and train multiple models at once, allowing for quick model comparison. This enables common user desires within data science, where data scientists often compare and contrast models. Another purpose of this feature is to allow users to learn the differences between certain models. 
 ![model comparison](paper_images/Example_model_comparison.svg "Image showing model comparison for the software. ")
 
-Additionally, Datascratch comes pre-loaded with several example datasets, which have been crafted to be usable to a wide range of users, allowing novices to get learning right away, without having to procure a dataset first. 
+Additionally, Datascratch comes pre-loaded with several example datasets, which have been crafted to be usable to a wide range of users, allowing novices to get learning right away, without having to procure a dataset first. The image below shows the output from a descriptive statistics query.  
 ![example dataset descriptive statistics](paper_images/diamonds_descriptive.png "Image showing descriptive statistics for the diamonds dataset")
-
-
 
 
 # Research impact statement
