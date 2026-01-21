@@ -26,7 +26,6 @@ class GUILibary(QtW.QTabWidget):
         # Styling
         self.setTabPosition(QtW.QTabWidget.West)
 
-        self.curr_index = 0
         def addModule(name , q_widget_list):    
             scroll_regressor = QtW.QScrollArea()
             scroll_regressor.setWidget(q_widget_list)
@@ -166,16 +165,14 @@ class GUILibary(QtW.QTabWidget):
         ) 
         validator_layout.addWidget(self.vali_submodule)
 
+        self.columns_tab = self.cols_tab()
+        self.curr_index = 0
+        addModule(QIcon(":/images/columns_icon.svg") , self.columns_tab)
         addModule(QIcon(":/images/reggessor_icon.svg") , regressor_box)
         addModule(QIcon(":/images/classification_icon.svg") , classifier_box)
         addModule(QIcon(":/images/preproccessor_icon.svg") , preproccessor_box)
         addModule(QIcon(":/images/validators_icon.svg") , validator_box)
 
-        self.columns_tab = self.cols_tab()
-        self.addTab(self.columns_tab ,"")
-        self.setTabIcon(self.curr_index , QIcon(":/images/columns_icon.svg"))
-
-        curr_index = 0
 
     def cols_tab(self):
         cols = ColumnsSubmodule(self.dataframe.columns.to_list())
