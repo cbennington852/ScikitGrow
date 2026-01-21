@@ -74,14 +74,20 @@ class SklearnAcceptableFunctions():
     # | is union in set
     CLASSIFIERS = CLASSIFIERS_ENSEMBLE | CLASSIFIERS_LINEAR | CLASSIFIERS_NEURAL | CLASSIFIERS_TREE
 
-    def _multi_line_lambda_for_pre_processors():
-        res = set()
-        for function in dir(pre):
-            if function[0] != '_' and function[0].isupper():
-               res.add(getattr(pre , function)) # getattr fetches the higher order function.
-        return res
 
-    PREPROCESSORS = _multi_line_lambda_for_pre_processors()
+    PREPROCESSORS = {
+        pre.Binarizer,
+        pre.KBinsDiscretizer,
+        pre.MaxAbsScaler,
+        pre.MinMaxScaler,
+        pre.Normalizer,
+        pre.PolynomialFeatures,
+        pre.PowerTransformer,
+        pre.QuantileTransformer,
+        pre.RobustScaler,
+        pre.SplineTransformer,
+        pre.StandardScaler,
+    }
 
     VALIDATORS = {
         val.KFold,
