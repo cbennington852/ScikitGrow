@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton, QMessageBox, QWidget, QVBoxLayout, QLabel
 from .sklearn_libary import SubLibary
 import PyQt5.QtWidgets as QtW
-from PyQt5.QtCore import  QPoint
+from PyQt5.QtCore import  QPoint 
 from PyQt5.QtCore import Qt, QMimeData
 import PyQt5.QtGui as PGui
 from PyQt5.QtGui import QDrag , QPixmap , QPainter , QPalette , QImage , QColor , QPolygon, QPen, QBrush, QIcon
@@ -13,6 +13,7 @@ from docstring_parser import parse as docstring_parse_func
 from docstring_parser import DocstringStyle
 import time
 from markdown import markdown
+
 
 class DraggableColumn(QPushButton):
     BASE_HEIGHT = 50
@@ -412,7 +413,12 @@ class ParameterPopup(QtW.QDialog):
         self.reset_button = QtW.QPushButton("Reset")
         self.reset_button.clicked.connect(self.reset_parameters)
         self.all_widgets = []
-        self.my_layout.insertRow(0 , "" , self.reset_button)
+        icon = QApplication.instance().style().standardIcon(QtW.QStyle.StandardPixmap.SP_MessageBoxQuestion)
+        pixmap = icon.pixmap(32)
+        description_label = QtW.QLabel()
+        description_label.setPixmap(pixmap)
+        description_label.setToolTip(self.doc_string.long_description)
+        self.my_layout.insertRow(0 , description_label , self.reset_button)
         for parameter_name , default_value in self.draggable_data.parameters:
             curr = parameter_filter(parameter_name , default_value)
             parameter_label = QtW.QLabel(parameter_name)
