@@ -51,6 +51,14 @@ class BooleanSingleLine(QtW.QCheckBox):
     def text(self):
         return str(self.isChecked())
     
+class StringListSingleLine(QtW.QComboBox):
+    def __init__(self , name , value,  **kwargs):
+        super().__init__(**kwargs)
+        self.addItems(value)
+
+    def text(self):
+        return self.currentText()
+    
 
 BANNED_PARAMETERS = {
     # Some parameters don't need to be changed.
@@ -72,12 +80,18 @@ def parameter_filter(name : str , value) -> Parameter:
         Parameter: _description_
     """
     try:
+        # Not a type
         if type(value) is int:
             return IntSingleLine(name , value)
         elif type(value) is float:
             return FloatSingleLine(name, value)
         elif type(value) is bool:
             return BooleanSingleLine(name , value)
+        elif (type(value) is list) and (type(value[0]) is str):
+            try:
+                return StringListSingleLine(name , value)
+            except Exception as e:
+                print(str(e))
         else:
             return SingleLineParameter(name , value)
     except:

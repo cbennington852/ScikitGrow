@@ -347,7 +347,6 @@ class ColumnsMDIWindow(QtW.QMdiSubWindow):
         
         curr_num_x_cols = self.x_columns.get_num_cols()
         x_col_needed_height = (curr_num_x_cols + 2) * DraggableColumn.BASE_HEIGHT 
-        print(f"Current Num Cols: {curr_num_x_cols}")
         #y_col_height = max(curr_num_cols * DraggableColumn.BASE_HEIGHT + DraggableColumn.BASE_HEIGHT, 0)
         # Resize the pipeline based on the children size n_stuff.
         final_height = self.y_natural_height + x_col_needed_height + self.x_natural_height + self.train_models.height()

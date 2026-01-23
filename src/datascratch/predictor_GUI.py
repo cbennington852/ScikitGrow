@@ -6,11 +6,12 @@ from PyQt5.QtGui import QDrag , QIcon
 import PyQt5.QtCore as QtCore 
 import pandas as pd
 import pickle
+from .draggable_parameter import parameter_filter
 from .sklearn_engine import EngineResults , Pipeline
 
 
 class PredictionGUI(QtW.QScrollArea):
-    def __init__(self, engine_results : EngineResults, hide_export_features = False, **kwargs):
+    def __init__(self, engine_results : EngineResults,  hide_export_features = False,  **kwargs):
         """
         A small part of the GUI which allows users to predict 
 
@@ -40,8 +41,14 @@ class PredictionGUI(QtW.QScrollArea):
         x_cols_box.setLayout(x_cols_box_layout)
         self.x_cols_ptr_lst = []
         for x_col in self.engine_results.x_cols:
+            # We could also use the parameter class here.
             x_col_name = QtW.QLabel(x_col)
-            x_col_entry = QtW.QLineEdit()
+            x_col_entry = None
+            if self.engine_results.is_column_in_list_converted_columns(x_col):
+                converted_col = self.engine_results.get_converted_column(x_col)
+                x_col_entry = parameter_filter(x_col , converted_col.code_map)
+            else:
+                x_col_entry = parameter_filter(x_col , self.engine_results.column_types[x_col])
             self.x_cols_ptr_lst.append(x_col_entry)
             x_cols_box_layout.addRow(x_col_name , x_col_entry)
 
@@ -77,12 +84,6 @@ class PredictionGUI(QtW.QScrollArea):
         export_as_pickle_action = QtW.QAction("Export as python pickle" , self.main)
         export_as_pickle_action.triggered.connect(lambda x : self.export_function_button_clicked(self.export_as_pickle , "Pickle  (*.pickle);;"))
         self.export_as_software_button.menu().addAction(export_as_pickle_action)
-
-
-        # self.predict_button = QtW.QPushButton("Predict")
-        # self.export_as_software_button = QtW.QPushButton("Export as software")
-        # self.export_as_software_button.clicked.connect(self.export_as_software_button_clicked)
-        # self.predict_button.clicked.connect(self.run_all_predictions)
 
         # Assemble page
         self.my_layout.addWidget(x_cols_box)
@@ -135,11 +136,11 @@ class PredictionGUI(QtW.QScrollArea):
         try:
             x_values = []
             for x_col in self.x_cols_ptr_lst:
-                curr_value = str(x_col.text())
+                curr_value = x_col.text()
                 new_value = curr_value if curr_value != "" else 0
                 x_values.append(new_value)
 
-            res = self.engine_results.predict(x_values )
+            res = self.engine_results.predict(x_values)
             for pipeline_ptr , value in res.items():
                 for gui_pipe in self.pipelines_groupbox_ptr:
                     if pipeline_ptr == gui_pipe.pipeline:
@@ -152,6 +153,8 @@ class PredictionGUI(QtW.QScrollArea):
                  f"{str(e)}" # Main message
             )
             print(e)
+
+
 
 class PredictionGUIPipeline(QtW.QGroupBox):
     def __init__(self, pipeline : Pipeline, **kwargs):

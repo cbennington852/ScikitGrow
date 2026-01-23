@@ -101,7 +101,8 @@ class EngineResults():
             trained_models : list[Pipeline] , 
             x_cols : list[str] , 
             y_col : str,
-            list_converted_columns : list[ConvertedColumn]
+            list_converted_columns : list[ConvertedColumn],
+            dataframe : pd.DataFrame
             ):
         self.visual_plot = visual_plot
         self.accuracy_plot = accuracy_plot
@@ -110,12 +111,38 @@ class EngineResults():
         self.y_col = y_col
         self.list_converted_columns = list_converted_columns
 
+        # Resolving a map of the types.
+        self.column_types : dict[str , any] = dict()
+        column_names = dataframe.columns
+        first_row = dataframe.iloc[0]
+        for k in range(0 , len(column_names)):
+            curr_value = first_row[k]
+            curr_col_name = column_names[k]
+            curr_type = None
+            if type(curr_value) == str:
+                curr_type = str
+            else:
+                curr_type = type(curr_value.item())
+            final_val = None
+            if curr_type == int:
+                final_val = 0
+            elif curr_type == float:
+                final_val = 0.0
+            elif curr_type == bool:
+                final_val = False
+            elif curr_type == complex:
+                final_val = complex(1, 1)
+            else:
+                final_val = ""
+            self.column_types[curr_col_name] = final_val
     def is_column_in_list_converted_columns(self, col_name : str):
-        for converted_col in self.list_converted_columns:
-            if col_name == converted_col.column_name:
-                return True
-        return False
-    
+        try:
+            for converted_col in self.list_converted_columns:
+                if col_name == converted_col.column_name:
+                    return True
+            return False
+        except:
+            return False
     def get_converted_column(self , col_name) -> ConvertedColumn:
         for converted_col in self.list_converted_columns:
             if col_name == converted_col.column_name:
@@ -216,7 +243,6 @@ class SklearnEngine():
         y = main_dataframe_copy[pipeline_y_value].iloc[:, 0]
 
         # Train the model
-
         SklearnEngine.train_model(
             main_dataframe=main_dataframe_copy, 
             curr_pipeline=curr_pipelines, 
@@ -338,7 +364,8 @@ class SklearnEngine():
                 trained_models=None,
                 x_cols=pipeline_x_values,
                 y_col=pipeline_y_value,
-                list_converted_columns=list_converted_columns
+                list_converted_columns=list_converted_columns,
+                dataframe=main_dataframe
             )
 
         # check to make sure cols are from this dataset.
@@ -529,7 +556,8 @@ class SklearnEngine():
                 trained_models=curr_pipelines,
                 x_cols=pipeline_x_values,
                 y_col=pipeline_y_value,
-                list_converted_columns=list_converted_columns
+                list_converted_columns=list_converted_columns,
+                dataframe=main_dataframe
             )
             
         def accuracy_plot(
@@ -750,7 +778,8 @@ class SklearnEngine():
                 trained_models=curr_pipelines,
                 x_cols=pipeline_x_values,
                 y_col=pipeline_y_value,
-                list_converted_columns=list_converted_columns
+                list_converted_columns=list_converted_columns,
+                dataframe=main_dataframe
             )
 
 

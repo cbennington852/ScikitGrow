@@ -397,14 +397,11 @@ class Pipeline(QtW.QMdiSubWindow):
         my_layout.addWidget(new_pipeline.validator)
         main_thing.setLayout(my_layout)
         new_pipeline.setWidget(main_thing)
-        print("Model form pipeline" , new_pipeline.model_pipe.get_models())
         new_pipeline.name_pipeline.setText(data.pipeline_name)
-        print(data.x_pos , data.y_pos, type(data.x_pos) , type(data.y_pos))
         if isinstance(data.x_pos , tuple):
             data.x_pos = data.x_pos[0]
         if isinstance(data.y_pos , tuple):
             data.y_pos = data.y_pos[0]
-        print(new_pipeline)
         new_pipeline.move(data.x_pos , data.y_pos)
         new_pipeline.resize_based_on_children()
         return new_pipeline
