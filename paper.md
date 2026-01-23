@@ -66,6 +66,9 @@ The interface also enables the user to assemble and train multiple models at onc
 Additionally, Datascratch comes pre-loaded with several example datasets, which have been crafted to be usable to a wide range of users, allowing novices to get learning right away, without having to procure a dataset first. The image below shows the output from a descriptive statistics query.  
 ![example dataset descriptive statistics](paper_images/diamonds_descriptive.png "Image showing descriptive statistics for the diamonds dataset")
 
+The interface also allows the user to input manual predictions, allowing for novices to interact with their new models. This tab enables the user to export their saved models as software, which is where a user can save their trained model, and access it later. The software also enables the exporting as pickle, which fulfills the needs of potential power users. 
+![example dataset descriptive statistics](paper_images/example_predictor.png "Image showing two predictors for the diamonds dataset")
+
 
 # Research impact statement
 
