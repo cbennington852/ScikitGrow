@@ -54,14 +54,12 @@ class PipelineSection(QtW.QGroupBox):
 
     BASE_MINIMUM_HEIGHT = 80
 
-    def __init__(self , accepting_function, title, my_parent , max_num_models = 100,  **kwargs):
+    def __init__(self , accepting_function, title, my_parent,  **kwargs):
         super().__init__( **kwargs)
         self.my_title = title
         self.setTitle(title)
-        # Lock size
         self.setFixedHeight(int(AppAppearance.BASE_PIPELINE_HEIGHT / 3))
         self.my_parent = my_parent
-        self.max_num_models = max_num_models
         self.accepting_function = accepting_function
         self.setAcceptDrops(True)
         self.setMinimumHeight(PipelineSection.BASE_MINIMUM_HEIGHT)
@@ -80,15 +78,13 @@ class PipelineSection(QtW.QGroupBox):
                 resulting_models.append(curr)
         return resulting_models
 
-    def pipeline_section_from_data( accepting_function, title, my_parent , data : list[DraggableData] , max_num_models):
+    def pipeline_section_from_data( accepting_function, title, my_parent , data : list[DraggableData]):
         new_pipe = PipelineSection(
             accepting_function=accepting_function,
             title=title,
             my_parent=my_parent,
-            max_num_models=max_num_models
         )
         for drag_data in data:
-            # Make a new draggable.
             new_drag = Draggable.new_draggable_from_data(drag_data)
             new_pipe.my_layout.addWidget(new_drag)
         return new_pipe
@@ -103,7 +99,6 @@ class PipelineSection(QtW.QGroupBox):
         pos = e.pos()
         widget = e.source()
         if isinstance(widget , Draggable):
-            print("TEST" , widget.render_type , self.accepting_function(widget.data.sklearn_function) , self.accepting_function)
             if self.accepting_function(widget.data.sklearn_function):
                 e.accept()        
                 self.model_hovering = True
@@ -117,7 +112,6 @@ class PipelineSection(QtW.QGroupBox):
         widget = e.source()
         from_parent = widget.parentWidget()
         to_parent = self
-        print("Drop event" , widget , from_parent , to_parent)
         def check_is_correct_type():
             if not isinstance(widget , Draggable):
                 e.ignore()
@@ -130,18 +124,15 @@ class PipelineSection(QtW.QGroupBox):
                     self.my_layout.removeItem(temp_widget)
                     del temp_widget
         
-        def if_limit_remove_all_other_widgets():
-            if (self.get_num_models() == self.max_num_models):
-                # Remove one the children from this
-                for child in self.findChildren(QtW.QWidget):
-                    if isinstance(child , Draggable) and child != widget:
-                        child.deleteLater()
-            else:
-                e.accept()
+      
+        
             
         check_is_correct_type()
         remove_all_spacers()
-        if_limit_remove_all_other_widgets()
+        # Remove the previous child.
+        for child in self.findChildren(QtW.QWidget):
+            if isinstance(child , Draggable) and child != widget:
+                child.deleteLater()
         # Handle replacement with parent module. If applicable
         if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
             self.my_layout.addWidget(widget.copy_self())
@@ -159,9 +150,8 @@ class PipelineSection(QtW.QGroupBox):
 
     def dragLeaveEvent(self, event):
         self.model_hovering = False
-        # Repaint the module
         self.repaint()
-        event.accept() # Accept the leave event
+        event.accept() 
 
     def get_num_models(self):
         return len(self.get_models())
@@ -326,21 +316,17 @@ class Pipeline(QtW.QMdiSubWindow):
         self.preproccessor_pipe = PipelineSection(
             title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
             accepting_function=Pipeline.PREPROCESSOR_FILTER,
-            my_parent=self,
-            max_num_models=1
-
+            my_parent=self
         )
         self.model_pipe = PipelineSection(
             title=Pipeline.SECTION_MODEL_TITLE,
             accepting_function=Pipeline.MODEL_FILTER,
-            my_parent=self,
-            max_num_models=1
+            my_parent=self
         )
         self.validator = PipelineSection(
             title=Pipeline.SECTION_VALIDATOR_TITLE,
             accepting_function=Pipeline.VALIDATOR_FILTER,
-            my_parent=self,
-            max_num_models=1
+            my_parent=self
         )
         # set mimumum heights
         self.my_layout.addWidget(self.name_pipeline)
@@ -370,22 +356,19 @@ class Pipeline(QtW.QMdiSubWindow):
             accepting_function=Pipeline.VALIDATOR_FILTER,
             title=Pipeline.SECTION_VALIDATOR_TITLE,
             my_parent=new_pipeline,
-            data=data.validator,
-            max_num_models=1
+            data=data.validator
         )
         new_pipeline.model_pipe = PipelineSection.pipeline_section_from_data(
             accepting_function=Pipeline.MODEL_FILTER,
             title=Pipeline.SECTION_MODEL_TITLE,
             my_parent=new_pipeline,
-            data=data.model_pipeline,
-            max_num_models=1
+            data=data.model_pipeline
         )
         new_pipeline.preproccessor_pipe = PipelineSection.pipeline_section_from_data(
             accepting_function=Pipeline.PREPROCESSOR_FILTER,
             title=Pipeline.SECTION_PREPROCCESSOR_TITLE,
             my_parent=new_pipeline,
-            data=data.preprocessor_section,
-            max_num_models=None
+            data=data.preprocessor_section
         )
         # Remove old layout
         new_pipeline.main_thing.deleteLater()
@@ -403,7 +386,6 @@ class Pipeline(QtW.QMdiSubWindow):
         if isinstance(data.y_pos , tuple):
             data.y_pos = data.y_pos[0]
         new_pipeline.move(data.x_pos , data.y_pos)
-        new_pipeline.resize_based_on_children()
         return new_pipeline
         
             
