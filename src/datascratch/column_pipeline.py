@@ -163,8 +163,6 @@ class ColumnsSection(QtW.QGroupBox):
         """
         painter = QPainter(self)
         
-        print(f"Curr height {self.max_num_cols} ... {self.geometry()}")
-
         painter.setPen(QColor(AppAppearance.PIPELINE_HOLDER_BORDER_COLOR))
         painter.setBrush(QColor(AppAppearance.PIPELINE_BACKGROUND_COLOR))
 
@@ -287,7 +285,6 @@ class ColumnsSection(QtW.QGroupBox):
                 self.setFixedHeight(DraggableColumn.BASE_HEIGHT + base_addition)
             else: # X cols
                 self.setFixedHeight(num_cols * DraggableColumn.BASE_HEIGHT + base_addition)
-            print("Resizing event")
         
         def if_limit_remove_all_other_widgets():
             if (num_cols == self.max_num_cols):

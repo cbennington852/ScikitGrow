@@ -9,4 +9,6 @@ aquarel
 pytest-qt
 coverage
 pytest-cov
+docstring_parser
+markdown
 PyInstaller==3.4

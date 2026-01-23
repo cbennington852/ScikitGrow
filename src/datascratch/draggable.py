@@ -9,7 +9,10 @@ import PyQt5.QtCore as QtCore
 from .colors_and_appearance import AppAppearance
 from .draggable_parameter import parameter_filter , BANNED_PARAMETERS
 import ast
+from docstring_parser import parse as docstring_parse_func
+from docstring_parser import DocstringStyle
 import time
+from markdown import markdown
 
 class DraggableColumn(QPushButton):
     BASE_HEIGHT = 50
@@ -382,9 +385,17 @@ class Draggable(QPushButton):
 
 
 
+
 class ParameterPopup(QtW.QDialog):
     def __init__(self , draggable_data  : DraggableData , parent : Draggable,  **kwargs):
         super().__init__(**kwargs) 
+        self.doc_string = docstring_parse_func(draggable_data.sklearn_function.__doc__ , DocstringStyle.NUMPYDOC)
+
+        # We need to map the parameters to the doc_string blurb.
+        self.doc_string_map = {}
+        for doc_param in self.doc_string.params:
+            self.doc_string_map[doc_param.arg_name] = doc_param
+
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
         self.my_parent = parent
         self.draggable_data = draggable_data
@@ -404,8 +415,11 @@ class ParameterPopup(QtW.QDialog):
         self.my_layout.insertRow(0 , "" , self.reset_button)
         for parameter_name , default_value in self.draggable_data.parameters:
             curr = parameter_filter(parameter_name , default_value)
+            parameter_label = QtW.QLabel(parameter_name)
+            md_to_html = markdown(self.doc_string_map[parameter_name].description)
+            parameter_label.setToolTip(md_to_html)
             self.my_layout.addRow(
-                parameter_name,
+                parameter_label,
                 curr
             )
             self.all_widgets.append((parameter_name , curr))
@@ -429,7 +443,6 @@ class ParameterPopup(QtW.QDialog):
         new_parameters = []
         for parameter_name , q_line_edit in self.all_widgets:
             curr = None
-            print(f"Attemping save of {q_line_edit.text()}")
             try:
                 curr = (parameter_name , ast.literal_eval(q_line_edit.text()))
             except:

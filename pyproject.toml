@@ -18,6 +18,8 @@ dependencies = [
     "qtwidgets",
     "pyqtdarktheme",
     "aquarel",
+    "docstring_parser",
+    "markdown",
 ]
 
 
