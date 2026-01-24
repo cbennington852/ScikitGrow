@@ -28,30 +28,23 @@ windows = []
 class MainMenu(QMainWindow):
 
 
-    def render_initial_screen(self):
+    def __init__(self ):
+        super().__init__()
+
+        self.setWindowTitle("DataScratchMain Menu")
+        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
+
         # Set up basic ptrs
         my_layout = QtW.QVBoxLayout()
         main_box = QtW.QWidget()
         main_box.setLayout(my_layout)
 
         # add the example datasets button
-        self.example_datasets_button = QtW.QPushButton("Example datasets")
         self.import_dataset_button = QtW.QPushButton("Import datasets")
         self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
         self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
-        self.example_datasets_button.clicked.connect(lambda : self.slides_layout.setCurrentIndex(1))
-        my_layout.addWidget(self.title_image)
-        my_layout.addWidget(self.example_datasets_button)
-        my_layout.addWidget(self.import_dataset_button)
 
-        return main_box
-
-
-    def render_example_datasets_screen(self):
-         # self.open_main_window_on_dataset(sns.load_dataset('iris')
-        self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
-
-
+        # Render example dataset list
         example_datasets = [
             "car_crashes",
             "diamonds",
@@ -73,24 +66,22 @@ class MainMenu(QMainWindow):
         list_widget = QListWidget()
         list_widget.addItems(example_datasets)
         list_widget.clicked.connect(open_on_dataset)
-        return list_widget
 
-    def __init__(self ):
-        super().__init__()
+        group_box = QtW.QGroupBox("Example datasets")
+        group_box.setLayout(QtW.QVBoxLayout())
+        group_box.layout().addWidget(list_widget)
+        #group_box.setMaximumSize(100 , 100)
 
-        self.setWindowTitle("DataScratchMain Menu")
-        self.resize(MainWindow.BASE_WINDOW_WIDTH , MainWindow.BASE_WINDOW_HEIGHT)
-        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
+        # second_box
+        second_box = QtW.QWidget()
+        second_box_lay = QtW.QHBoxLayout()
+        second_box.setLayout(second_box_lay)
+        second_box_lay.addWidget(group_box)
+        second_box_lay.addWidget(self.import_dataset_button)
+        my_layout.addWidget(self.title_image)
+        my_layout.addWidget(second_box)
+        self.setCentralWidget(main_box)
 
-        self.slides = QtW.QWidget()
-        self.slides_layout = QtW.QStackedLayout()
-
-        self.slides_layout.addWidget(self.render_initial_screen()) # Inital 0
-        self.slides_layout.addWidget(self.render_example_datasets_screen()) # Datasets 1
-
-        self.setCentralWidget(self.slides)
-
-        self.hide()
 
       
 
@@ -367,9 +358,8 @@ def main():
     if len(sys.argv) > 1:
         open_on_file_handle(sys.argv[1])
     else:
-        print("Here")
         main_menu = MainMenu()
-        #main_menu.show()
+        main_menu.show()
     sys.exit(app.exec_()) # Start the application's event loop
 
 

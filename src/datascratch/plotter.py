@@ -183,9 +183,6 @@ class Plotter(QtW.QTabWidget):
                 f"Unexpected error : {str(e)}" # Main message
             )
 
-    
-        
-
     @QtCore.pyqtSlot(str , str)
     def crashed_handler(self , title, message):
         if (title == PlotterWorker.INTERRUPT_TITLE) and (message == PlotterWorker.INTERRUPT_MESSAGE):
