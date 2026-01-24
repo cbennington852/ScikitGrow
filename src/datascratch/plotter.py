@@ -4,7 +4,7 @@ from PyQt5.QtCore import  QPoint
 from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QIcon
 import PyQt5.QtCore as QtCore 
-
+import multiprocessing
 import sys
 import time
 import matplotlib
@@ -75,6 +75,10 @@ class Plotter(QtW.QTabWidget):
 
     def do_regardless(self):
         self.ptr_to_train_models_button.setEnabled(True)
+        try:
+            self.prog_box.close()
+        except:
+            pass
         if hasattr(self , 'spinner_thread'):
             self.spinner_thread.join()
         if hasattr(self , 'worker'):
@@ -137,6 +141,8 @@ class Plotter(QtW.QTabWidget):
             y_cols = [item.name for item in y_value_draggables]
             # 3. start the engine on it's own thread.
             # 3.1 before we start the enngine, make sure to disable the button for this.
+            # TESTING : Make a small popup to for this. 
+            
             self.ptr_to_train_models_button.setEnabled(False)
             self.worker_thread = QtCore.QThread()
             self.worker = PlotterWorker(
@@ -157,12 +163,10 @@ class Plotter(QtW.QTabWidget):
             self.worker_thread.finished.connect(self.worker_thread.deleteLater)
             self.worker_thread.start()
 
-            
-            # executes after, but also during the thing
-            # Executes after? during the thing?
-            # Maybe we make a new thread on the event that this takes more than two seconds? 
-            
-            
+            # Start a popup with a dialog
+            self.prog_box = QtW.QProgressDialog("Training Models...", "Abort", 0, 0, self)
+            self.prog_box.canceled.connect(lambda : self.worker_thread.requestInterruption())
+            self.prog_box.show()
         except ScikitGrowEngineAssemblyError as e:
             self.handle_thread_crashing()
             QtW.QMessageBox.critical(
@@ -184,13 +188,16 @@ class Plotter(QtW.QTabWidget):
 
     @QtCore.pyqtSlot(str , str)
     def crashed_handler(self , title, message):
-        self.handle_thread_crashing()
-        QtW.QMessageBox.critical(
+        if (title == PlotterWorker.INTERRUPT_TITLE) and (message == PlotterWorker.INTERRUPT_MESSAGE):
+            pass
+        else:
+            QtW.QMessageBox.critical(
                 None,                        # Parent: Use None if not within a QWidget class
                 f"{title}",            # Title bar text
                 f"{message}" # Main message
             )
-
+        self.handle_thread_crashing()
+        
     def resolve_accuracy(self , engine_results):
         # scroller
         scroller = QtW.QScrollArea()
@@ -218,8 +225,6 @@ class Plotter(QtW.QTabWidget):
         scroller.setWidget(main_area)
         return scroller
 
-
-    
     @QtCore.pyqtSlot()
     def plotting_finished(self):
         for i in range(0 , self.count()):
@@ -268,27 +273,55 @@ class PlotterWorker(QtCore.QObject):
         self.x_cols = x_cols
         self.y_cols = y_cols
         self.ptr_to_training_button = ptr_to_training_button
-        self.dataframe = dataframe
+        self.dataframe = dataframe    
 
+    INTERRUPT_TITLE = "Ended"
+    INTERRUPT_MESSAGE = "Process interrupted by user."
 
     @QtCore.pyqtSlot() # What does this do?
     def start_plotting(self):
+        def runner_wrapper(queue , main_dataframe , curr_pipelines , pipeline_x_values , pipeline_y_values):
+            try:
+                curr_results = sklearn_engine.SklearnEngine.main_sklearn_pipe(
+                    main_dataframe=main_dataframe,
+                    curr_pipelines=curr_pipelines,
+                    pipeline_x_values=pipeline_x_values,
+                    pipeline_y_value=pipeline_y_values,
+                )
+                queue.put(curr_results)
+            except Exception as e:
+                queue.put(e)
 
-        try:
-            self.engine_results = sklearn_engine.SklearnEngine.main_sklearn_pipe(
-                main_dataframe=self.dataframe,
-                curr_pipelines=self.lst_engine_pipelines,
-                pipeline_x_values=self.x_cols,
-                pipeline_y_value=self.y_cols,
-            )
-            if QtCore.QThread.currentThread().isInterruptionRequested():
-                self.crashed.emit("Interrupted" ,"Interupted")
-            else:
-                self.finished.emit()
-        except Exception as e:
-            self.crashed.emit("Unknown error" , str(e))
-        except sklearn_engine.InternalEngineError as e:        
-            self.crashed.emit("Internal Engine Error", str(e))
+        queue = multiprocessing.Queue()
+        process = multiprocessing.Process(target=runner_wrapper, args=(
+            queue,
+            self.dataframe,
+            self.lst_engine_pipelines,
+            self.x_cols,
+            self.y_cols
+        ))
+        process.start()
+        results = 0
+        while process.is_alive():
+            # Check for cancel option
+            is_interruption = self.thread().isInterruptionRequested()
+            print("Interruption status: " , is_interruption )
+            if is_interruption == True:
+                process.kill()
+                self.crashed.emit(PlotterWorker.INTERRUPT_TITLE , PlotterWorker.INTERRUPT_MESSAGE)
+                return
+            # Check for the result
+            if not queue.empty():
+                print("Got results")
+                results = queue.get()
+            print("Still alive")
+        print("Exit code: ", process)
+        print("Results: " , results)
+        if isinstance(results , Exception):
+            self.crashed.emit("Error" , str(results))
+        else:
+            self.engine_results = results
+            self.finished.emit()
 
 
 
