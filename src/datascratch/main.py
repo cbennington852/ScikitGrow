@@ -18,12 +18,12 @@ import traceback
 import time
 import qdarktheme
 import pandas as pd
+from .settings_manager import DataScratchSettings
 from .predictor_GUI import PredictionGUI
 import logging
 logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
 
 windows = []
-
 
 class MainMenu(QMainWindow):
 
@@ -33,16 +33,24 @@ class MainMenu(QMainWindow):
 
         self.setWindowTitle("DataScratchMain Menu")
         self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
+        self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
+        self.setMaximumWidth(self.title_image.width())
 
         # Set up basic ptrs
         my_layout = QtW.QVBoxLayout()
         main_box = QtW.QWidget()
         main_box.setLayout(my_layout)
 
-        # add the example datasets button
-        self.import_dataset_button = QtW.QPushButton("Import datasets")
-        self.title_image = QtW.QLabel(pixmap=QPixmap(":images/Full_logo_SciKit_Grow.svg"))
-        self.import_dataset_button.clicked.connect(self.import_datasets_clicked)
+        curr_toolbar = QtW.QToolBar()
+        curr_toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
+        import_dataset = QtW.QAction(QIcon(":images/import_dataset.svg") , "Import dataset" , self)
+        import_dataset.triggered.connect(self.import_datasets_clicked)
+        curr_toolbar.addAction(import_dataset)
+
+        import_dataset = QtW.QAction(QIcon(":images/import_dataset.svg") , "Import dataset" , self)
+        import_dataset.triggered.connect(self.import_datasets_clicked)
+        curr_toolbar.addAction(import_dataset)
 
         # Render example dataset list
         example_datasets = [
@@ -67,18 +75,37 @@ class MainMenu(QMainWindow):
         list_widget.addItems(example_datasets)
         list_widget.clicked.connect(open_on_dataset)
 
+
+        settings = DataScratchSettings.getSettings()
+        recent_files_opened = settings.value(DataScratchSettings.RECENT_FILES_KEY , [] , type=list)
+        recent_list_widget = QListWidget()
+        recent_list_widget.addItems(recent_files_opened)
+        recent_list_widget.clicked.connect(open_on_file_handle)
+
+
+        recent_group_box = QtW.QGroupBox("Recent Datasets")
+        recent_group_box.setLayout(QtW.QVBoxLayout())
+
+
         group_box = QtW.QGroupBox("Example datasets")
         group_box.setLayout(QtW.QVBoxLayout())
         group_box.layout().addWidget(list_widget)
-        #group_box.setMaximumSize(100 , 100)
 
+  
         # second_box
         second_box = QtW.QWidget()
-        second_box_lay = QtW.QHBoxLayout()
+        second_box_lay = QtW.QVBoxLayout()
         second_box.setLayout(second_box_lay)
+        second_box_lay.addWidget(curr_toolbar)
+        second_box_lay.addWidget(recent_group_box)
         second_box_lay.addWidget(group_box)
-        second_box_lay.addWidget(self.import_dataset_button)
+
+        # Hello Text.
+        hello_text = QtW.QLabel("""Welcome to DataScratch! You can import datasets through the Open Dataset button. Supported file types include excel, csv, parquet, and pkl""")
+        hello_text.setWordWrap(True)
+
         my_layout.addWidget(self.title_image)
+        my_layout.addWidget(hello_text)
         my_layout.addWidget(second_box)
         self.setCentralWidget(main_box)
 
@@ -124,8 +151,6 @@ class MainWindow(QMainWindow):
         # start a parsel. 
         # load dataframe 
         self.dataframe = dataframe
-
-        self.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
 
         self.libary = GUILibary(self.dataframe)
         self.dataframeViewer = DataframeViewer(self.dataframe)
@@ -193,6 +218,11 @@ class MainWindow(QMainWindow):
                 self.setWindowTitle(self.file_path)
                 
                 print(f"Saved successfully to: {file_path}")
+                # Also add this to the recently saved section.
+                settings = DataScratchSettings.getSettings()
+                curr_recently_opened = settings.value(DataScratchSettings.RECENT_FILES_KEY , [] , type=list)
+                curr_recently_opened.append(save_file)
+                settings.setValue(DataScratchSettings.RECENT_FILES_KEY)
             except OSError as e:
                 QMessageBox.critical(None, "File Error", f"Could not open file: {e}")
             except Exception as e:
@@ -242,9 +272,7 @@ class MainWindow(QMainWindow):
         open_action.triggered.connect(self.open_button_pressed)
         file_menu.addAction(open_action)
 
-        # Change graph color themes
-        graph_colors = QAction("Change graph themes")
-        #graph_colors.triggered.connect()
+
 
     def save_button_pressed(self):
         if self.file_path is not None:
@@ -352,6 +380,7 @@ def main():
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv) # Create the application instance
+    app.setWindowIcon(QIcon(":/images/Mini_Logo_Alantis_Learn_book.svg"))
     # Below handles the opening of a main menu bar, 
     stylesheet = qdarktheme.load_stylesheet(theme='light') 
     app.setStyleSheet(stylesheet)

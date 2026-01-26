@@ -34,5 +34,6 @@
         <file>Mini_Logo_Alantis_2_Box.svg</file>
         <file>export_icon.svg</file>
         <file>popup.png</file>
+        <file>import_dataset.svg</file>
     </qresource>
 </RCC>
