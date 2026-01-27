@@ -9,42 +9,6 @@ from .list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 from .colors_and_appearance import AppAppearance
 from . import drag_and_drop_utility as dnd
 
-class GUILibarySubmodule(QtW.QGroupBox):
-    
-    def __init__(self , sublibary , render_type = "", hex_value = "",  **kwargs):
-        super().__init__(**kwargs)
-        self.my_layout = QVBoxLayout(self)
-        self.setAcceptDrops(True)
-        self.sublibary = sublibary
-        self.setTitle(self.sublibary.library_name)
-        if len(self.sublibary.function_calls) == 0:
-            self.deleteLater()
-        for sklearn in self.sublibary.function_calls:
-            self.my_layout.addWidget(Draggable(
-                name=str(sklearn.__name__),
-                sklearn_function=sklearn,
-                render_type=render_type,
-                hex_color=hex_value
-            ))
-        
-    def dragEnterEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        e.accept()
-        
-    def dropEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        from_parent = widget.parentWidget()
-        to_parent = self
-        if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , GUILibarySubmodule):
-            e.accept()
-        elif isinstance(from_parent , PipelineSection) and isinstance(to_parent , GUILibarySubmodule):
-            e.accept()
-            from_parent.layout().removeWidget(widget)
-            widget.deleteLater()
-        dnd.end_drag_and_drop_event(to_parent , from_parent)
-
 
 
 class PipelineSection(QtW.QGroupBox):
@@ -110,6 +74,7 @@ class PipelineSection(QtW.QGroupBox):
         widget = e.source()
         from_parent = widget.parentWidget()
         to_parent = self
+        print("Pipeline: " , " From: ",from_parent,"  To: " ,to_parent)
         
         # Check if this is the correct type
         if not isinstance(widget , Draggable):
@@ -122,11 +87,10 @@ class PipelineSection(QtW.QGroupBox):
                 child.deleteLater()
 
         # Handle replacement with parent module. If applicable
-        if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
-            self.my_layout.addWidget(widget.copy_self())
-        else:
-            # Add the dang widget
+        if isinstance(from_parent , PipelineSection) and isinstance(from_parent , PipelineSection):
             self.my_layout.addWidget(widget)
+        else:
+            self.my_layout.addWidget(widget.copy_self())
         # Accepts
         e.accept()
         # Remove hovering attribute.

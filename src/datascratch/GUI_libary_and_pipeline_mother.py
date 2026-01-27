@@ -8,10 +8,11 @@ import PyQt5.QtCore as QtCore
 from .draggable import Draggable , DraggableColumn , DraggableData
 from sklearn.base import is_regressor, is_classifier
 import sklearn
-from .column_pipeline import ColumnsSection , ColumnsSubmodule
-from .draggable_pipeline import DraggableColumn , PipelineSection, Pipeline, PipelineData, GUILibarySubmodule
+from .column_pipeline import ColumnsSection
+from .draggable_pipeline import DraggableColumn , PipelineSection, Pipeline, PipelineData
 from .list_of_acceptable_sklearn_functions import SklearnAcceptableFunctions
 from .colors_and_appearance import AppAppearance
+from .library_submodules import PipelineSubmodule , ColumnsSubmodule
 
 class ColumnsWindowData():
     def __init__(self , x_cols : list[str] , y_cols : list[str]):
@@ -49,7 +50,7 @@ class GUILibary(QtW.QTabWidget):
         regressor_box.setLayout(regressor_layout)
 
         # make sublibaries from the picked out lists. 
-        self.lin_reg = GUILibarySubmodule(
+        self.lin_reg = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_LINEAR,
                 "Linear Models"
@@ -57,7 +58,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.REGRESSOR_LINEAR_COLOR
         ) 
-        self.lin_ens = GUILibarySubmodule(
+        self.lin_ens = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_ENSEMBLE,
                 "Ensemble Models"
@@ -65,7 +66,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.REGRESSOR_ENSEMBLE_COLOR
         ) 
-        self.lin_neu = GUILibarySubmodule(
+        self.lin_neu = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_NEURAL_NETWORK,
                 "Neural Network Models"
@@ -73,7 +74,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.REGRESSOR_NEURAL_COLOR
         ) 
-        self.lin_tre = GUILibarySubmodule(
+        self.lin_tre = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.REGRESSORS_TREE,
                 "Tree Models"
@@ -93,7 +94,7 @@ class GUILibary(QtW.QTabWidget):
         classifier_box = QtW.QWidget()
         classifier_layout = QtW.QVBoxLayout()
         classifier_box.setLayout(classifier_layout)
-        self.cla_reg = GUILibarySubmodule(
+        self.cla_reg = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_LINEAR,
                 "Linear Models"
@@ -101,7 +102,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.CLASSIFIER_LINEAR_COLOR
         ) 
-        self.cla_ens = GUILibarySubmodule(
+        self.cla_ens = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_ENSEMBLE,
                 "Ensemble Models"
@@ -109,7 +110,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.CLASSIFIER_ENSEMBLE_COLOR
         ) 
-        self.cla_neu = GUILibarySubmodule(
+        self.cla_neu = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_NEURAL,
                 "Neural Network Models"
@@ -117,7 +118,7 @@ class GUILibary(QtW.QTabWidget):
             render_type=Draggable.BUBBLE,
             hex_value=AppAppearance.CLASSIFIER_NEURAL_COLOR
         ) 
-        self.cla_tre = GUILibarySubmodule(
+        self.cla_tre = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.CLASSIFIERS_TREE,
                 "Tree Models"
@@ -137,7 +138,7 @@ class GUILibary(QtW.QTabWidget):
         preproccessor_box = QtW.QWidget()
         preproccessor_layout = QtW.QVBoxLayout()
         preproccessor_box.setLayout(preproccessor_layout)
-        self.pre_sub_module = GUILibarySubmodule(
+        self.pre_sub_module = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.PREPROCESSORS,
                 ""
@@ -155,7 +156,7 @@ class GUILibary(QtW.QTabWidget):
         validator_box = QtW.QWidget()
         validator_layout = QtW.QVBoxLayout()
         validator_box.setLayout(validator_layout)
-        self.vali_submodule = GUILibarySubmodule(
+        self.vali_submodule = PipelineSubmodule(
             sublibary=SubLibary(
                 SklearnAcceptableFunctions.VALIDATORS,
                 ""

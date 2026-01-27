@@ -8,48 +8,6 @@ from .colors_and_appearance import AppAppearance
 from . import drag_and_drop_utility as dnd
 
 
-class ColumnsSubmodule(QtW.QWidget):
-    def __init__(self , lst_cols , **kwargs):
-        """
-        A part of the GUI library, this renders a group of draggable columns to the library. 
-
-        Args:
-            lst_cols (str): list of strings of the dataframe columns.
-        """
-        super().__init__(**kwargs)
-        self.my_layout = QVBoxLayout(self)
-        self.setAcceptDrops(True)
-        self.setMinimumHeight(250)
-        self.lst_cols = lst_cols
-        for col in self.lst_cols:
-            new_widget = DraggableColumn(col)
-            self.my_layout.addWidget(new_widget)
-
-    def dragEnterEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-        e.accept()
-
-    def dropEvent(self, e):
-        """
-        An event where something is dropped onto the library. 
-
-        Args:
-            e (_type_): _description_
-        """
-        pos = e.pos()
-        widget = e.source()
-        from_parent = widget.parentWidget()
-        to_parent = self
-        if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSubmodule):
-            e.accept()
-        elif isinstance(from_parent , ColumnsSection) and isinstance(to_parent , ColumnsSubmodule):
-            e.accept()
-            from_parent.layout().removeWidget(widget)
-            widget.deleteLater()
-            
-        dnd.end_drag_and_drop_event(to_parent , from_parent)
-
 class ColumnsSection(QtW.QGroupBox):
     def __init__(self , title, my_parent , max_num_cols = 100, **kwargs):
         """
@@ -299,14 +257,11 @@ class ColumnsSection(QtW.QGroupBox):
         if_limit_remove_all_other_widgets()
         resize_self()
         # Handle replacement with parent module. If applicable
-        if isinstance(from_parent , ColumnsSubmodule) and isinstance(to_parent , ColumnsSection):
-            self.my_layout.addWidget(widget.copy_self())
-            e.accept()
-        else:
-            # accept
-            e.accept()
-            # Add the dang widget
+        if isinstance(from_parent , ColumnsSection) and isinstance(from_parent , ColumnsSection):
             self.my_layout.addWidget(widget)
+        else:
+            self.my_layout.addWidget(widget.copy_self())
+        e.accept()
             
         self.hovering=False        
         dnd.end_drag_and_drop_event(to_parent , from_parent)
