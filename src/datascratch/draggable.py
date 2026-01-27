@@ -169,6 +169,7 @@ class Draggable(QPushButton):
         super().__init__(**kwargs) 
         self.kwargs = kwargs
         self.name = name
+        
         self.render_type = render_type
         self.hovering = False
         self.hex_color = hex_color
@@ -379,17 +380,23 @@ class Draggable(QPushButton):
             draggable_data=self.data,
             parent=self
         )
-        popover.exec()
+        self.test_popup = PopoverWidget(self , popover_content=popover)
+        self.popup = QtW.QWidgetAction(self)
+        self.popup.setDefaultWidget(popover)
+        self.test_popup.addAction(self.popup)
+        self.test_popup.exec(self.mapToGlobal(QPoint(0 , self.height()-1)))
 
     def reset_parameters(self):
         self.data.parameters = SubLibary.get_sklearn_parameters(self.data.sklearn_function)
 
 
 
-
-class ParameterPopup(QtW.QDialog):
+class ParameterPopup(QtW.QWidget):
     def __init__(self , draggable_data  : DraggableData , parent : Draggable,  **kwargs):
         super().__init__(**kwargs) 
+        self.setStyleSheet(f"""
+            background-color : {AppAppearance.MDI_AREA_COLOR};
+        """)
         self.doc_string = docstring_parse_func(draggable_data.sklearn_function.__doc__ , DocstringStyle.NUMPYDOC)
 
         # We need to map the parameters to the doc_string blurb.
@@ -403,8 +410,6 @@ class ParameterPopup(QtW.QDialog):
         
         self.setWindowTitle(f"{parent.name} hyper parameters")
         self.setGeometry(100, 100, 200, 100)  # x, y, width, height
-
-
         self.my_layout = QtW.QFormLayout()
         self.render_layout()
         self.setLayout(self.my_layout)
@@ -455,8 +460,18 @@ class ParameterPopup(QtW.QDialog):
                 curr = (parameter_name , ast.literal_eval(f'\'{q_line_edit.text()}\''))
             new_parameters.append(curr)
         self.my_parent.data.parameters = new_parameters
-        self.accept()
 
+class PopoverWidget(QtW.QMenu):
+    def __init__(self, parent , popover_content  : ParameterPopup ):
+        super().__init__(parent)
+        self.popover_content = popover_content
+        self.setStyleSheet(f"""
+            background-color : {AppAppearance.MDI_AREA_COLOR};
+        """)
+
+    def closeEvent(self, a0):
+        self.popover_content.save_parameters()
+        return super().closeEvent(a0)
 
 
 

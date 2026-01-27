@@ -35,5 +35,6 @@
         <file>export_icon.svg</file>
         <file>popup.png</file>
         <file>import_dataset.svg</file>
+        <file>file_open.png</file>
     </qresource>
 </RCC>

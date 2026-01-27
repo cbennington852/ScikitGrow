@@ -48,7 +48,7 @@ class MainMenu(QMainWindow):
         import_dataset.triggered.connect(self.import_datasets_clicked)
         curr_toolbar.addAction(import_dataset)
 
-        import_dataset = QtW.QAction(QIcon(":images/import_dataset.svg") , "Import dataset" , self)
+        import_dataset = QtW.QAction(QIcon(":images/file_open.png") , "Open dataset" , self)
         import_dataset.triggered.connect(self.import_datasets_clicked)
         curr_toolbar.addAction(import_dataset)
 
@@ -69,6 +69,7 @@ class MainMenu(QMainWindow):
                 curr = MainMenu.open_main_window_on_dataset(df)
                 curr.show()
                 windows.append(curr)
+                self.deleteLater()
 
         # Render all of the example datasets.
         list_widget = QListWidget()
@@ -110,8 +111,7 @@ class MainMenu(QMainWindow):
         self.setCentralWidget(main_box)
 
 
-      
-
+     
     def open_main_window_on_dataset(dataframe):
         pixmap = QPixmap(":/images/Full_logo_SciKit_Grow.svg")
         splash = QtW.QSplashScreen(pixmap)
@@ -256,7 +256,6 @@ class MainWindow(QMainWindow):
         # for file related actions.
         file_menu = menu.addMenu("&File")
         #graph_settings = menu.addMenu("&Graph Settings")
-        
         # Save action
         save_action = QAction("Save Project" , self)
         save_action.triggered.connect(lambda x : self.save_button_pressed())
@@ -271,6 +270,11 @@ class MainWindow(QMainWindow):
         open_action = QAction("Open Project" , self)
         open_action.triggered.connect(self.open_button_pressed)
         file_menu.addAction(open_action)
+
+        # Add the ediatable thing
+        menu.addSeparator()
+        menu.addMenu("Test")
+        menu.addSeparator()
 
 
 
