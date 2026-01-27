@@ -79,13 +79,15 @@ class MainMenu(QMainWindow):
 
         settings = DataScratchSettings.getSettings()
         recent_files_opened = settings.value(DataScratchSettings.RECENT_FILES_KEY , [] , type=list)
+        print("Recent files opened" , recent_files_opened)
         recent_list_widget = QListWidget()
         recent_list_widget.addItems(recent_files_opened)
-        recent_list_widget.clicked.connect(open_on_file_handle)
+        recent_list_widget.clicked.connect(lambda x : open_on_file_handle(recent_files_opened[x.row()]))
 
 
         recent_group_box = QtW.QGroupBox("Recent Datasets")
         recent_group_box.setLayout(QtW.QVBoxLayout())
+        recent_group_box.layout().addWidget(recent_list_widget)
 
 
         group_box = QtW.QGroupBox("Example datasets")
@@ -221,8 +223,8 @@ class MainWindow(QMainWindow):
                 # Also add this to the recently saved section.
                 settings = DataScratchSettings.getSettings()
                 curr_recently_opened = settings.value(DataScratchSettings.RECENT_FILES_KEY , [] , type=list)
-                curr_recently_opened.append(save_file)
-                settings.setValue(DataScratchSettings.RECENT_FILES_KEY)
+                curr_recently_opened.append(file_path)
+                settings.setValue(DataScratchSettings.RECENT_FILES_KEY , curr_recently_opened)
             except OSError as e:
                 QMessageBox.critical(None, "File Error", f"Could not open file: {e}")
             except Exception as e:
@@ -272,9 +274,7 @@ class MainWindow(QMainWindow):
         file_menu.addAction(open_action)
 
         # Add the ediatable thing
-        menu.addSeparator()
-        menu.addMenu("Test")
-        menu.addSeparator()
+        # Later I want this toolbar to have a editable project name.
 
 
 

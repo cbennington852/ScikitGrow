@@ -321,17 +321,23 @@ class Pipeline(QtW.QMdiSubWindow):
             my_parent=new_pipeline,
             data=data.preprocessor_section
         )
+        new_pipeline.name_pipeline = QtW.QLineEdit()
+        print("Name from data" , data.pipeline_name )
+        print("The line editor " , new_pipeline.name_pipeline)
+        new_pipeline.name_pipeline.setText(data.pipeline_name)
+        print("Text name" , new_pipeline.name_pipeline.text())
         # Remove old layout
         new_pipeline.main_thing.deleteLater()
         # make new layout. 
         main_thing = QWidget()
         my_layout = QtW.QVBoxLayout()
+        my_layout.addWidget(new_pipeline.name_pipeline)
         my_layout.addWidget(new_pipeline.preproccessor_pipe)        
         my_layout.addWidget(new_pipeline.model_pipe)
         my_layout.addWidget(new_pipeline.validator)
         main_thing.setLayout(my_layout)
         new_pipeline.setWidget(main_thing)
-        new_pipeline.name_pipeline.setText(data.pipeline_name)
+        
         if isinstance(data.x_pos , tuple):
             data.x_pos = data.x_pos[0]
         if isinstance(data.y_pos , tuple):
