@@ -49,7 +49,7 @@ class GUILibarySubmodule(QtW.QGroupBox):
 
 class PipelineSection(QtW.QGroupBox):
     """
-    This only holds one thing. 
+    This is a general class for the draggable pipeline. This holds only one object. 
     """
 
     BASE_MINIMUM_HEIGHT = 80
@@ -96,7 +96,6 @@ class PipelineSection(QtW.QGroupBox):
         return lst_data
 
     def dragEnterEvent(self, e):
-        pos = e.pos()
         widget = e.source()
         if isinstance(widget , Draggable):
             if self.accepting_function(widget.data.sklearn_function):
@@ -108,31 +107,20 @@ class PipelineSection(QtW.QGroupBox):
             e.ignore()
 
     def dropEvent(self, e):
-        pos = e.pos()
         widget = e.source()
         from_parent = widget.parentWidget()
         to_parent = self
-        def check_is_correct_type():
-            if not isinstance(widget , Draggable):
-                e.ignore()
-                return
-        # remove the spacer ,and readadd to bottom.
-        def remove_all_spacers():
-            for i in range(0 , self.my_layout.count()):
-                if isinstance(self.my_layout.itemAt(i) , QtW.QSpacerItem): 
-                    temp_widget = self.my_layout.itemAt(i)
-                    self.my_layout.removeItem(temp_widget)
-                    del temp_widget
         
-      
-        
-            
-        check_is_correct_type()
-        remove_all_spacers()
+        # Check if this is the correct type
+        if not isinstance(widget , Draggable):
+            e.ignore()
+            return
+
         # Remove the previous child.
         for child in self.findChildren(QtW.QWidget):
             if isinstance(child , Draggable) and child != widget:
                 child.deleteLater()
+
         # Handle replacement with parent module. If applicable
         if isinstance(from_parent , GUILibarySubmodule) and isinstance(to_parent , PipelineSection):
             self.my_layout.addWidget(widget.copy_self())
@@ -141,8 +129,6 @@ class PipelineSection(QtW.QGroupBox):
             self.my_layout.addWidget(widget)
         # Accepts
         e.accept()
-        # add space to end of the layout to make it all squished to top.
-        self.my_layout.addStretch()
         # Remove hovering attribute.
         self.model_hovering=False        
         # Re-render the group box
@@ -283,6 +269,7 @@ class PipelineData():
         self.x_pos = x_pos,
         self.y_pos = y_pos
 
+
 class Pipeline(QtW.QMdiSubWindow):
     all_pipelines = []
 
@@ -328,7 +315,7 @@ class Pipeline(QtW.QMdiSubWindow):
             accepting_function=Pipeline.VALIDATOR_FILTER,
             my_parent=self
         )
-        # set mimumum heights
+        # Add widgets
         self.my_layout.addWidget(self.name_pipeline)
         self.my_layout.addWidget(self.preproccessor_pipe)
         self.my_layout.addWidget(self.model_pipe)
@@ -387,10 +374,7 @@ class Pipeline(QtW.QMdiSubWindow):
             data.y_pos = data.y_pos[0]
         new_pipeline.move(data.x_pos , data.y_pos)
         return new_pipeline
-        
-            
-    def get_name_pipeline(self) -> str:
-        return self.name_pipeline.text    
+
 
     def closeEvent(self, event):
         for x in range(0 , len(self.my_parent.pipelines)):

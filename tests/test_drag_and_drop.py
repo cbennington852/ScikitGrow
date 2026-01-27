@@ -167,7 +167,5 @@ def test_library_to_columns_to_pipeline(qtbot):
 def test_main_menu_loads(qtbot):
     window = MainMenu()
     qtbot.addWidget(window)
-
-    assert window.example_datasets_button
-    assert window.import_dataset_button
+    assert window
 

@@ -5,19 +5,7 @@ import inspect
 class SubLibary():
     def __init__(self , function_calls , library_name):
         self.function_calls = function_calls
-        self.library_name = library_name
-
-    def get_public_methods(library , filter_function = lambda x : True):
-        res = []
-        for function in dir(library):
-            if function[0] != '_' and function[0].isupper():
-                if filter_function(getattr(library , function)):
-                    res.append(getattr(library , function))
-        return SubLibary(
-            res,
-            library_name=str(library.__name__)
-        )
-            
+        self.library_name = library_name            
 
     def get_sklearn_parameters(sklearn_model_function_call):
         raw = inspect.signature(sklearn_model_function_call).parameters.items()
