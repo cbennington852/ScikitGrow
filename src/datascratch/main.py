@@ -24,6 +24,10 @@ import logging
 logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
 
 windows = []
+FILE_EXTENSION = 'dscr'
+FILE_EXTENSION_NAME = 'Data Scratch Project File'
+FILE_OPEN_STRING = f"All Files (*.{FILE_EXTENSION} *.csv *.xls *{PredictionGUI.model_save_extension});; {FILE_EXTENSION_NAME} (*.{FILE_EXTENSION});; CSV Files (*.csv);; Excel Files (*.xls);; DataScratch Pipeline File (*{PredictionGUI.model_save_extension});; "
+#DataScratchSettings.getSettings().setValue(DataScratchSettings.RECENT_FILES_KEY , [])
 
 class MainMenu(QMainWindow):
 
@@ -82,7 +86,7 @@ class MainMenu(QMainWindow):
         print("Recent files opened" , recent_files_opened)
         recent_list_widget = QListWidget()
         recent_list_widget.addItems(recent_files_opened)
-        recent_list_widget.clicked.connect(lambda x : open_on_file_handle(recent_files_opened[x.row()]))
+        recent_list_widget.clicked.connect(lambda x : open_on_file_handle(recent_files_opened[x.row()] ))
 
 
         recent_group_box = QtW.QGroupBox("Recent Datasets")
@@ -104,7 +108,7 @@ class MainMenu(QMainWindow):
         second_box_lay.addWidget(group_box)
 
         # Hello Text.
-        hello_text = QtW.QLabel("""Welcome to DataScratch! You can import datasets through the Open Dataset button. Supported file types include excel, csv, parquet, and pkl""")
+        hello_text = QtW.QLabel(f"""Welcome to DataScratch! You can import datasets through the Open Dataset button. Supported file types include excel, csv, parquet, and {FILE_EXTENSION}""")
         hello_text.setWordWrap(True)
 
         my_layout.addWidget(self.title_image)
@@ -124,7 +128,7 @@ class MainMenu(QMainWindow):
 
     def import_datasets_clicked(self):
         fileName, _ = QtW.QFileDialog.getOpenFileName(self, "Open File", "",
-                                                  "All Files (*);; CSV file (*.csv);; Parquet file (*.parquet);; Exel format (*.xl*)",
+                                                  FILE_OPEN_STRING,
                                                   options=QtW.QFileDialog.Options())
         if fileName:
             print("File name: " , fileName)
@@ -190,15 +194,15 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.pipeline_mother)
 
-    def save_function(self , file_name='data_2.pkl' , no_popup=False):
+    def save_function(self , file_name=f'my_project.{FILE_EXTENSION}' , no_popup=False):
         print(f"Dataframe {self.dataframe}")
         print(f"file_name : {file_name}")
         if not no_popup:
             file_path, _ = QtW.QFileDialog.getSaveFileName(
-                None, "Save Project", file_name, "Pickle Files (*.pkl);;All Files (*)"
+                None, "Save Project", file_name, f"{FILE_EXTENSION_NAME} (*.{FILE_EXTENSION});;All Files (*)"
             )
-            if not file_path.endswith('.pkl'):
-                file_path += '.pkl'
+            if not file_path.endswith(f'.{FILE_EXTENSION}'):
+                file_path += f'.{FILE_EXTENSION}'
         else:
             file_path = file_name
         if file_path:
@@ -231,7 +235,7 @@ class MainWindow(QMainWindow):
                 traceback.print_exc()
 
 
-    def open_on_saved_file(file_name='data_2.pkl'):
+    def open_on_saved_file(file_name=f'data_2.{FILE_EXTENSION}'):
         # basically open the file and then pass in all of the info for the things.
         with open(file_name, 'rb') as file:
             loaded_data = pickle.load(file)
@@ -253,10 +257,15 @@ class MainWindow(QMainWindow):
 
 
     def render_menu_bar(self):
-        menu = self.menuBar()
-        
+        menu = QtW.QToolBar()
+        menu.setMovable(False)
+        self.addToolBar(menu)
         # for file related actions.
-        file_menu = menu.addMenu("&File")
+        tool_button = QtW.QToolButton()
+        tool_button.setText("File")
+        file_menu = QtW.QMenu("File")
+        tool_button.setPopupMode(QtW.QToolButton.InstantPopup)
+        tool_button.setMenu(file_menu)
         #graph_settings = menu.addMenu("&Graph Settings")
         # Save action
         save_action = QAction("Save Project" , self)
@@ -272,9 +281,28 @@ class MainWindow(QMainWindow):
         open_action = QAction("Open Project" , self)
         open_action.triggered.connect(self.open_button_pressed)
         file_menu.addAction(open_action)
+        #name_project = QtW.QLineEdit()
+        #name_project.setText("My Project")
+        #name_project.setAlignment(Qt.AlignCenter)
 
-        # Add the ediatable thing
-        # Later I want this toolbar to have a editable project name.
+        # Left expander
+        left_expander = QtW.QWidget()
+        left_expander.setSizePolicy(
+            QtW.QSizePolicy.Policy.Expanding,
+            QtW.QSizePolicy.Policy.Ignored
+        )
+
+        right_expander = QtW.QWidget()
+        right_expander.setSizePolicy(
+            QtW.QSizePolicy.Policy.Expanding,
+            QtW.QSizePolicy.Policy.Ignored
+        )
+
+        menu.addWidget(tool_button)
+        menu.addWidget(left_expander)
+        #menu.addWidget(name_project)
+        menu.addWidget(right_expander)
+
 
 
 
@@ -295,7 +323,7 @@ class MainWindow(QMainWindow):
 
     def open_button_pressed(self):
         file_path, _ = QtW.QFileDialog.getOpenFileName(
-                None, "Open Project",None ,f"All Files (*.pkl *.csv *.xls *{PredictionGUI.model_save_extension});; Pickle Files (*.pkl);; CSV Files (*.csv);; Excel Files (*.xls);; DataScratch Pipeline File (*{PredictionGUI.model_save_extension});; "
+                None, "Open Project",None , FILE_OPEN_STRING
             )
         if file_path:
             open_on_file_handle(file_path)
@@ -318,7 +346,7 @@ def open_on_file_handle(file_handle):
     print("Attempted open on file handle" , file_handle)
     if os.path.exists(file_handle):
         # parse command line argument
-        if file_handle.endswith('.pkl'):
+        if file_handle.endswith(f'.{FILE_EXTENSION}'):
             try:
                 # Make a splash 
                 main_window = MainWindow.open_on_saved_file(file_handle)

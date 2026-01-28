@@ -210,6 +210,12 @@ class Draggable(QPushButton):
     bevel_slant_width = 10
     left_of_bevel_width  = 40
 
+    # POPUp
+    IMAGE_FOR_POPUP_HOVER = ":images/dropdown_arrow.png"
+    POPUP_ICON_WIDTH = 28
+    POPUP_ICON_HEIGHT = 18
+
+
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -240,13 +246,12 @@ class Draggable(QPushButton):
             start_y_for_text = int(self.size().height() / 2) + 5
 
             if self.hovering:
-                icon_side_size = 30
                 painter.drawPixmap(
                     15, # x
-                    int((self.height()/2)-(icon_side_size/2)-5), # y
-                    icon_side_size, # width
-                    icon_side_size, # height
-                    QPixmap(":images/popup.png")
+                    int((self.height()/2)-(Draggable.POPUP_ICON_HEIGHT/2)-5), # y
+                    Draggable.POPUP_ICON_WIDTH, # width
+                    Draggable.POPUP_ICON_HEIGHT, # height
+                    QPixmap(Draggable.IMAGE_FOR_POPUP_HOVER)
                 )
 
             painter.drawText(width_triangle + 25 , start_y_for_text, f"{self.name}")
@@ -272,13 +277,12 @@ class Draggable(QPushButton):
             painter.drawText(width_triangle + 15 , start_y_for_text, f"{self.name}")
             
             if self.hovering:
-                icon_side_size = 30
                 painter.drawPixmap(
                     5, # x
-                    int((self.height()/2)-(icon_side_size/2)-5), # y
-                    icon_side_size, # width
-                    icon_side_size, # height
-                    QPixmap(":images/popup.png")
+                    int((self.height()/2)-(Draggable.POPUP_ICON_HEIGHT/2)-5), # y
+                    Draggable.POPUP_ICON_WIDTH, # width
+                    Draggable.POPUP_ICON_HEIGHT, # height
+                    QPixmap(Draggable.IMAGE_FOR_POPUP_HOVER)
                 )
 
 
@@ -302,13 +306,12 @@ class Draggable(QPushButton):
             painter.drawText(width_triangle + 15 , start_y_for_text, f"{self.name}")
             
             if self.hovering:
-                icon_side_size = 30
                 painter.drawPixmap(
                     5, # x
-                    int((self.height()/2)-(icon_side_size/2)-5), # y
-                    icon_side_size, # width
-                    icon_side_size, # height
-                    QPixmap(":images/popup.png")
+                    int((self.height()/2)-(Draggable.POPUP_ICON_HEIGHT/2)-5), # y
+                    Draggable.POPUP_ICON_WIDTH, # width
+                    Draggable.POPUP_ICON_HEIGHT, # height
+                    QPixmap(Draggable.IMAGE_FOR_POPUP_HOVER)
                 )
 
         else:
