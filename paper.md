@@ -69,6 +69,8 @@ Additionally, Datascratch comes pre-loaded with several example datasets, which 
 The interface also allows the user to input manual predictions, allowing for novices to interact with their new models. This tab enables the user to export their saved models as software, which is where a user can save their trained model, and access it later. The software also enables the exporting as pickle, which fulfills the needs of potential power users. 
 ![example dataset descriptive statistics](paper_images/example_predictor.png "Image showing two predictors for the diamonds dataset")
 
+Each Model also allows for the user to manually tune hyperparameters, this can be done by clicking on the individual model, and then editing the dropdown menu.
+
 
 # Research impact statement
 

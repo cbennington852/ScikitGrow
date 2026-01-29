@@ -15,6 +15,7 @@ permissions:
 jobs:
   Linux:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 2
     strategy:
       matrix:
         os : [ubuntu-latest]
