@@ -287,7 +287,7 @@ class PlotterWorker(QtCore.QObject):
                 )
                 queue.put(curr_results)
             except Exception as e:
-                queue.put(e)
+                queue.put("Major Issue: " + str(e))
 
         queue = multiprocessing.Queue()
         process = multiprocessing.Process(target=runner_wrapper, args=(
@@ -307,10 +307,13 @@ class PlotterWorker(QtCore.QObject):
                 process.kill()
                 self.crashed.emit(PlotterWorker.INTERRUPT_TITLE , PlotterWorker.INTERRUPT_MESSAGE)
                 return
+            
             # Check for the result
             if not queue.empty():
                 print("Got results")
                 results = queue.get()
+            else:
+                print("Results empty")
             print("Still alive")
         print("Exit code: ", process)
         print("Results: " , results)
