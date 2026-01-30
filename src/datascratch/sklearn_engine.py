@@ -1,6 +1,5 @@
 import matplotlib
 import seaborn
-import threading
 import matplotlib.pyplot as plt
 import sklearn
 import random
@@ -115,7 +114,6 @@ class EngineResults():
         self.column_types : dict[str , any] = dict()
         column_names = dataframe.columns
         first_row = dataframe.iloc[0].values
-        print("First row:" , first_row)
         for k in range(0 , len(column_names)):
             curr_value = first_row[k]
             curr_col_name = column_names[k]

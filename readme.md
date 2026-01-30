@@ -89,7 +89,7 @@ python -m venv myenv
 ```
 Then activate your virtual environment.
 ```
-# Linux / Mac
+# Linux / Mac / Git bash
 source ./myenv/bin/activate
 
 # Or

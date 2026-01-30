@@ -78,6 +78,7 @@ The interface also allows the user to input manual predictions, allowing for nov
   * Enhanced Data Science Literacy
   * Democratization of AI literacy
 
+This software possesses near term significance in the form of enhancing 
 
 
 # AI usage disclosure

@@ -4,11 +4,12 @@ Important Notes:
 
 -->
 <h1 id="summary">Summary</h1>
-<p>Data science is a current and evolving field. Currently, this field
-is historicity a extremely coding heavy field. DataScratch is a novel
-approach to perform data science tasks, such as model training, and
-validation, through drag and drop interface without requiring heavy
-coding knowledge.</p>
+<p>Data science is often taught at the upper undergraduate levels, with
+programming often cited as a prerequisite for learning data science.
+DataScratch is software intended to teach novices the core concepts of
+data science, without the prerequisite of knowing how to program.
+DataScratch achieves this via an intuitive drag and drop interface
+modeled after scratch.</p>
 <h1 id="statement-of-need">Statement of need</h1>
 <p>The current educational landscape presents a significant hurdle for
 novices seeking to engage with data science. While foundational
@@ -51,7 +52,7 @@ concepts in data science and AI.</p>
 <p>There are several no-code, low code platforms available on the
 internet. However these are often designed with power users in mind, and
 are often expensive, making them frustrating to novices. Many of these
-softwares are geared twoard commercial data science use, with a focus on
+softwares are geared toward commercial data science use, with a focus on
 integration with common business tools.</p>
 <table>
 <colgroup>
@@ -101,49 +102,71 @@ integration with common business tools.</p>
 </tr>
 </tbody>
 </table>
-<p>Scratch, a visual programming language designed for children, offers
-a compelling model for accessible computational learning. Its intuitive
-drag-and-drop interface allows beginners to grasp fundamental
-programming concepts without needing to decipher complex syntax.
-DataScratch seeks to replicate this accessibility within the realm of
-data science.</p>
+<p>Scratch<span class="citation"
+data-cites="resnick2009scratch">(Resnick et al. 2009)</span>, a visual
+programming language designed for children, offers a compelling model
+for accessible computational learning. Its intuitive drag-and-drop
+interface allows beginners to grasp fundamental programming concepts
+without needing to decipher complex syntax. Scratch’s interface has been
+proven to be effective at teaching novices programming concepts, and
+assist learners when the transition to “real” programming<span
+class="citation" data-cites="armoni2015scratch">(Armoni,
+Meerbaum-Salant, and Ben-Ari 2015)</span>. <img
+src="paper_images/python_v_scratch.png"
+title="Image showing equivalent python and scratch code."
+alt="blocks v python" /></p>
+<p>This project was heavily inspired by scratch. The design of the
+column blocks is similar to the scratch stack blocks. Additionally the
+design of the validators is modeled after the scratch boolean logic
+blocks.</p>
 <h1 id="software-design">Software design</h1>
 <p>The language for this software is python, this is because python
-possesses several libraries, such as pandas[CITATION],
-matplotlib[CITATION], and scikit-learn[CITATION], which are standard
-tools for data science and AI modeling. Another reason would be
-portability. If a user desires features that are beyond the scope of
-DataScratch, the software is built in a way the models and utilizes
-underlying data science libraries, to make the transition from using
-DataScratch to programming in python easier.</p>
+possesses several libraries, such as pandas<span class="citation"
+data-cites="reback2020pandas">(team 2020)</span>, matplotlib<span
+class="citation" data-cites="Hunter:2007">(Hunter 2007)</span>, and
+scikit-learn[<span class="citation" data-cites="scikit-learn">Pedregosa
+et al. (2011)</span>;sklearn_api], which are standard tools for data
+science and AI modeling. Another reason would be portability. If a user
+desires features that are beyond the scope of DataScratch, the software
+is built in a way the models and utilizes underlying data science
+libraries, to make the transition from using DataScratch to programming
+in python easier.</p>
 <p>The GUI software was originally written using a python library called
-PyGtk[CITATION], however after several months of development this
-library was dropped, due to the PyGtk library having a non-functional
-pip installation, and graphical issues when run on windows.
-Additionally, electron was considered, with the benifit being easier
-styling, however it did not posses seamless python support. The project
-later switched to PyQt, which featured cross platform support, and
-allowed for installation via pip by default.</p>
-<p>The drag and drop components are modeled closely after
-scratch[CITATION], a library which has been shown to be very intuitive
-and easy to use[CITATION]. This choice was intended to make the software
-easier to use for people who aren’t heavy coders. The shape of each
-draggable block corresponds to a shape on the pipeline to give the user
-visual signifiers telling them where things should go.<br />
+PyGtk<span class="citation" data-cites="pygobject2025">(GNOME Project
+2026)</span>, however after several months of development this library
+was dropped, due to the PyGtk library having a non-functional pip
+installation, and graphical issues when run on windows. Additionally,
+electron was considered, with the benefit being easier styling, however
+it did not posses seamless python support. The project later switched to
+PyQt, which featured cross platform support, and allowed for
+installation via pip by default.</p>
+<p>The drag and drop interface was designed to be easy to use, with the
+layout and design imitating underlying python libraries. This ensures
+that users have an low floor to learning, while also paving the way for
+them to transition to writing code later.<br />
 <img src="paper_images/Python_v_datascratch.png"
 title="Image showing the complexity of coding versus the new drag and drop interface."
-alt="blocks v python" /> The interface also enables the user to assemble
-and train multiple models at once, allowing for quick model comparison.
-This enables common user desires within data science, where data
-scientists often compare and contrast models. <img
+alt="blocks v python" /></p>
+<p>The interface also enables the user to assemble and train multiple
+models at once, allowing for quick model comparison. This enables common
+user desires within data science, where data scientists often compare
+and contrast models. Another purpose of this feature is to allow users
+to learn the differences between certain models. <img
 src="paper_images/Example_model_comparison.svg"
 title="Image showing model comparison for the software."
 alt="model comparison" /></p>
 <p>Additionally, Datascratch comes pre-loaded with several example
 datasets, which have been crafted to be usable to a wide range of users,
 allowing novices to get learning right away, without having to procure a
-dataset first. <img src="paper_images/diamonds_descriptive.png"
-title="Image showing descriptive statistics for the diamonds dataset"
+dataset first.</p>
+<p>The interface also allows the user to input manual predictions,
+allowing for novices to interact with their newly created AI models.
+This tab enables the user to export their saved models as software,
+which is where a user can save their trained model, and access it later.
+The software also enables the exporting as pickle, which fulfills the
+needs of potential power users. <img
+src="paper_images/example_predictor.png"
+title="Image showing two predictors for the diamonds dataset"
 alt="example dataset descriptive statistics" /></p>
 <h1 id="research-impact-statement">Research impact statement</h1>
 <ul>
@@ -167,6 +190,11 @@ These AI suggestions were then verified with human experts.</p>
 <h1 class="unnumbered" id="references">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent"
 role="list">
+<div id="ref-armoni2015scratch" class="csl-entry" role="listitem">
+Armoni, Michal, Orni Meerbaum-Salant, and Mordechai Ben-Ari. 2015.
+<span>“From Scratch to <span>‘Real’</span> Programming.”</span> <em>ACM
+Transactions on Computing Education (TOCE)</em> 14 (4): 1–15.
+</div>
 <div id="ref-bart2016implementing" class="csl-entry" role="listitem">
 Bart, Austin Cory, Javier Tibau, Eli Tilevich, Clifford A Shaffer, and
 Dennis G Kafura. 2016. <span>“Implementing an Open-Access, Data Science
@@ -177,20 +205,47 @@ Programming Environment for Learners.”</span> In <em>COMPSAC</em>,
 Brunner, Robert J, and Edward J Kim. 2016. <span>“Teaching Data
 Science.”</span> <em>Procedia Computer Science</em> 80: 1947–56.
 </div>
+<div id="ref-pygobject2025" class="csl-entry" role="listitem">
+GNOME Project. 2026. <span>“PyGObject.”</span> <a
+href="https://pygobject.gnome.org/#">https://pygobject.gnome.org/#</a>.
+</div>
 <div id="ref-hsu2025effects" class="csl-entry" role="listitem">
 Hsu, Ting-Chia, and Mu-Sheng Chen. 2025. <span>“Effects of Students
 Using Different Learning Approaches for Learning Computational Thinking
 and AI Applications.”</span> <em>Education and Information
 Technologies</em> 30 (6): 7549–71.
 </div>
+<div id="ref-Hunter:2007" class="csl-entry" role="listitem">
+Hunter, J. D. 2007. <span>“Matplotlib: A 2D Graphics
+Environment.”</span> <em>Computing in Science &amp; Engineering</em> 9
+(3): 90–95. <a
+href="https://doi.org/10.1109/MCSE.2007.55">https://doi.org/10.1109/MCSE.2007.55</a>.
+</div>
 <div id="ref-jain2021smart" class="csl-entry" role="listitem">
 Jain, Lakhmi C. 2021. <span>“Smart Innovation, Systems and
 Technologies.”</span> Springer: Singapore.
+</div>
+<div id="ref-scikit-learn" class="csl-entry" role="listitem">
+Pedregosa, F., G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O.
+Grisel, M. Blondel, et al. 2011. <span>“Scikit-Learn: Machine Learning
+in <span>P</span>ython.”</span> <em>Journal of Machine Learning
+Research</em> 12: 2825–30.
 </div>
 <div id="ref-provost2013data" class="csl-entry" role="listitem">
 Provost, Foster, and Tom Fawcett. 2013. <span>“Data Science and Its
 Relationship to Big Data and Data-Driven Decision Making.”</span>
 <em>Big Data</em> 1 (1): 51–59.
+</div>
+<div id="ref-resnick2009scratch" class="csl-entry" role="listitem">
+Resnick, Mitchel, John Maloney, Andrés Monroy-Hernández, Natalie Rusk,
+Evelyn Eastmond, Karen Brennan, Amon Millner, et al. 2009.
+<span>“Scratch: Programming for All.”</span> <em>Communications of the
+ACM</em> 52 (11): 60–67.
+</div>
+<div id="ref-reback2020pandas" class="csl-entry" role="listitem">
+team, The pandas development. 2020. <span>“Pandas-Dev/Pandas:
+Pandas.”</span> Zenodo. <a
+href="https://doi.org/10.5281/zenodo.3509134">https://doi.org/10.5281/zenodo.3509134</a>.
 </div>
 <div id="ref-thayer2020practical" class="csl-entry" role="listitem">
 Thayer, Kyle Matthew. 2020. <span>“Practical Knowledge Barriers in
