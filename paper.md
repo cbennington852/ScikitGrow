@@ -50,26 +50,26 @@ There are several no-code, low code platforms available on the internet. However
 | JASP        | Statistics / Visualization | High Undergraduate / Graduate        | Free                 | No            |
 
 Scratch[@resnick2009scratch], a visual programming language designed for children, offers a compelling model for accessible computational learning. Its intuitive drag-and-drop interface allows beginners to grasp fundamental programming concepts without needing to decipher complex syntax. Scratch's interface has been proven to be effective at teaching novices programming concepts, and assist learners when the transition to "real" programming[@armoni2015scratch].
+![blocks v python](paper_images/python_v_scratch.png "Image showing equivalent python and scratch code.")
+
+This project was heavily inspired by scratch. The design of the column blocks is similar to the scratch stack blocks. Additionally the design of the validators is modeled after the scratch boolean logic blocks. 
 
 # Software design
 
-The language for this software is python, this is because python possesses several libraries, such as pandas[@reback2020pandas], matplotlib[@Hunter:2007], and scikit-learn[CITATION], which are standard tools for data science and AI modeling. Another reason would be portability. If a user desires features that are beyond the scope of DataScratch, the software is built in a way the models and utilizes underlying data science libraries, to make the transition from using DataScratch to programming in python easier.
+The language for this software is python, this is because python possesses several libraries, such as pandas[@reback2020pandas], matplotlib[@Hunter:2007], and scikit-learn[@scikit-learn;sklearn_api], which are standard tools for data science and AI modeling. Another reason would be portability. If a user desires features that are beyond the scope of DataScratch, the software is built in a way the models and utilizes underlying data science libraries, to make the transition from using DataScratch to programming in python easier.
 
-The GUI software was originally written using a python library called PyGtk[CITATION], however after several months of development this library was dropped, due to the PyGtk library having a non-functional pip installation, and graphical issues when run on windows. Additionally, electron was considered, with the benefit being easier styling, however it did not posses seamless python support. The project later switched to PyQt, which featured cross platform support, and allowed for installation via pip by default. 
+The GUI software was originally written using a python library called PyGtk[@pygobject2025], however after several months of development this library was dropped, due to the PyGtk library having a non-functional pip installation, and graphical issues when run on windows. Additionally, electron was considered, with the benefit being easier styling, however it did not posses seamless python support. The project later switched to PyQt, which featured cross platform support, and allowed for installation via pip by default. 
 
-The drag and drop components are modeled closely after scratch[resnick2009scratch].  The shape of each draggable block corresponds to a shape on the pipeline to give the user visual signifiers telling them where things should go. The purpose of this change is to reduce the complexity of the interface.  
+The drag and drop interface was designed to be easy to use, with the layout and design imitating underlying python libraries. This ensures that users have an low floor to learning, while also paving the way for them to transition to writing code later.  
 ![blocks v python](paper_images/Python_v_datascratch.png "Image showing the complexity of coding versus the new drag and drop interface.")
 
 The interface also enables the user to assemble and train multiple models at once, allowing for quick model comparison. This enables common user desires within data science, where data scientists often compare and contrast models. Another purpose of this feature is to allow users to learn the differences between certain models. 
 ![model comparison](paper_images/Example_model_comparison.svg "Image showing model comparison for the software. ")
 
-Additionally, Datascratch comes pre-loaded with several example datasets, which have been crafted to be usable to a wide range of users, allowing novices to get learning right away, without having to procure a dataset first. The image below shows the output from a descriptive statistics query.  
-![example dataset descriptive statistics](paper_images/diamonds_descriptive.png "Image showing descriptive statistics for the diamonds dataset")
+Additionally, Datascratch comes pre-loaded with several example datasets, which have been crafted to be usable to a wide range of users, allowing novices to get learning right away, without having to procure a dataset first. 
 
-The interface also allows the user to input manual predictions, allowing for novices to interact with their new models. This tab enables the user to export their saved models as software, which is where a user can save their trained model, and access it later. The software also enables the exporting as pickle, which fulfills the needs of potential power users. 
+The interface also allows the user to input manual predictions, allowing for novices to interact with their newly created AI models. This tab enables the user to export their saved models as software, which is where a user can save their trained model, and access it later. The software also enables the exporting as pickle, which fulfills the needs of potential power users. 
 ![example dataset descriptive statistics](paper_images/example_predictor.png "Image showing two predictors for the diamonds dataset")
-
-Each Model also allows for the user to manually tune hyperparameters, this can be done by clicking on the individual model, and then editing the dropdown menu.
 
 
 # Research impact statement
@@ -77,6 +77,8 @@ Each Model also allows for the user to manually tune hyperparameters, this can b
 * Talk about the near-term significance (benchmarks, reproducible materials, community-readiness signals).
   * Enhanced Data Science Literacy
   * Democratization of AI literacy
+
+
 
 # AI usage disclosure
 The dataframe_viewer class was heavily written by AI. This is a small subclass which renders a pandas dataframe as a PyQt table. Google was used to search for API documentation. The built in AI overview on google cannot be deactivated, and thus the AI overview was unintentionally used upon each google search. Oftentimes, the AI overview provided false information, and was later ignored due to a lack of verifiability. 

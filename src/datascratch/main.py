@@ -228,6 +228,7 @@ class MainWindow(QMainWindow):
                 settings = DataScratchSettings.getSettings()
                 curr_recently_opened = settings.value(DataScratchSettings.RECENT_FILES_KEY , [] , type=list)
                 curr_recently_opened.append(file_path)
+                curr_recently_opened = list(set(curr_recently_opened))
                 settings.setValue(DataScratchSettings.RECENT_FILES_KEY , curr_recently_opened)
             except OSError as e:
                 QMessageBox.critical(None, "File Error", f"Could not open file: {e}")
