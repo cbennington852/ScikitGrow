@@ -78,7 +78,7 @@ The interface also allows the user to input manual predictions, allowing for nov
   * Enhanced Data Science Literacy
   * Democratization of AI literacy
 
-This software possesses near term significance in the form of enhancing 
+This software possesses near term significance in the form of enhancing data science literacy, and the democratization of AI literacy. There is an need for open source AI learning, and the democratization of AI literacy[@prinsloo2024democratisation], in a world rapidly being shaped by AI. 
 
 
 # AI usage disclosure

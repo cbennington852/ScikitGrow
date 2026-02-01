@@ -227,6 +227,7 @@ class Plotter(QtW.QTabWidget):
         for i in range(0 , self.count()):
             widget = self.widget(i)
             widget.deleteLater()
+            del widget
         self.visual_plot = FigureCanvasQTAgg(self.worker.engine_results.visual_plot)
         try:
             self.accuracy_plot = self.resolve_accuracy(self.worker.engine_results)
